@@ -6,7 +6,7 @@ Each phase is implemented, built, tested where behavior exists, reviewed, commit
 
 - **Phase 0 — Foundation (complete):** shared iPhone/Mac SwiftUI project, app shell, public-repository privacy safeguards, and core documentation.
 - **Phase 1 — Journal domain (complete):** entry and day models, extensible source and type values, independent highlight relationships, async repository contracts, calendar-aware grouping, deterministic ordering, and fictional-data tests.
-- **Phase 2 — Local persistence:** SwiftData adapters and repository implementation with durable create, read, update, and delete behavior. Production stores must use the application container; tests must use in-memory or disposable stores and prove no data is written beneath the source checkout.
+- **Phase 2 — Local persistence (complete):** versioned SwiftData records, mapping, and repository actors with durable entry and highlight CRUD. Production storage uses the application container with CloudKit disabled; tests use in-memory or disposable stores and prove no data is written beneath the source checkout.
 - **Phase 3 — Today:** fast text capture, today's chronological entries, editing, deletion, and empty state.
 - **Phase 4 — Timeline:** previous-day summaries, Day Detail, and date navigation.
 - **Phase 5 — Highlights:** highlight and unhighlight entries, browse the curated collection, and navigate to source context.

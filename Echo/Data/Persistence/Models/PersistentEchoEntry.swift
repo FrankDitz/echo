@@ -1,0 +1,37 @@
+import Foundation
+import SwiftData
+
+@Model
+final class PersistentEchoEntry {
+  @Attribute(.unique) var id: UUID
+  var createdAt: Date
+  var modifiedAt: Date
+  var dayKey: String
+  var dayPayload: Data
+  var rawText: String
+  var polishedText: String?
+  var typeRawValue: String
+  var sourceRawValue: String
+
+  init(
+    id: UUID,
+    createdAt: Date,
+    modifiedAt: Date,
+    dayKey: String,
+    dayPayload: Data,
+    rawText: String,
+    polishedText: String?,
+    typeRawValue: String,
+    sourceRawValue: String
+  ) {
+    self.id = id
+    self.createdAt = createdAt
+    self.modifiedAt = modifiedAt
+    self.dayKey = dayKey
+    self.dayPayload = dayPayload
+    self.rawText = rawText
+    self.polishedText = polishedText
+    self.typeRawValue = typeRawValue
+    self.sourceRawValue = sourceRawValue
+  }
+}

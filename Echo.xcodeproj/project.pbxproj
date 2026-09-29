@@ -21,6 +21,17 @@
 		B10000000000000000000009 /* EchoEntryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000029 /* EchoEntryTests.swift */; };
 		B1000000000000000000000A /* EchoDayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000002A /* EchoDayTests.swift */; };
 		B1000000000000000000000B /* EchoHighlightTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000002B /* EchoHighlightTests.swift */; };
+		C10000000000000000000001 /* EchoRepositoryError.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000021 /* EchoRepositoryError.swift */; };
+		C10000000000000000000002 /* PersistentEchoEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000022 /* PersistentEchoEntry.swift */; };
+		C10000000000000000000003 /* PersistentEchoHighlight.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000023 /* PersistentEchoHighlight.swift */; };
+		C10000000000000000000004 /* EchoSchema.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000024 /* EchoSchema.swift */; };
+		C10000000000000000000005 /* EchoModelContainerFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000025 /* EchoModelContainerFactory.swift */; };
+		C10000000000000000000006 /* EchoPersistenceMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000026 /* EchoPersistenceMapper.swift */; };
+		C10000000000000000000007 /* SwiftDataEchoEntryRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000027 /* SwiftDataEchoEntryRepository.swift */; };
+		C10000000000000000000008 /* SwiftDataEchoHighlightRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000028 /* SwiftDataEchoHighlightRepository.swift */; };
+		C10000000000000000000009 /* SwiftDataEchoEntryRepositoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000029 /* SwiftDataEchoEntryRepositoryTests.swift */; };
+		C1000000000000000000000A /* SwiftDataEchoHighlightRepositoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1000000000000000000002A /* SwiftDataEchoHighlightRepositoryTests.swift */; };
+		C1000000000000000000000B /* EchoModelContainerFactoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1000000000000000000002B /* EchoModelContainerFactoryTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -50,6 +61,17 @@
 		B1000000000000000000002A /* EchoDayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoDayTests.swift; sourceTree = "<group>"; };
 		B1000000000000000000002B /* EchoHighlightTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoHighlightTests.swift; sourceTree = "<group>"; };
 		B1000000000000000000002C /* EchoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EchoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C10000000000000000000021 /* EchoRepositoryError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoRepositoryError.swift; sourceTree = "<group>"; };
+		C10000000000000000000022 /* PersistentEchoEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistentEchoEntry.swift; sourceTree = "<group>"; };
+		C10000000000000000000023 /* PersistentEchoHighlight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistentEchoHighlight.swift; sourceTree = "<group>"; };
+		C10000000000000000000024 /* EchoSchema.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoSchema.swift; sourceTree = "<group>"; };
+		C10000000000000000000025 /* EchoModelContainerFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoModelContainerFactory.swift; sourceTree = "<group>"; };
+		C10000000000000000000026 /* EchoPersistenceMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoPersistenceMapper.swift; sourceTree = "<group>"; };
+		C10000000000000000000027 /* SwiftDataEchoEntryRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataEchoEntryRepository.swift; sourceTree = "<group>"; };
+		C10000000000000000000028 /* SwiftDataEchoHighlightRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataEchoHighlightRepository.swift; sourceTree = "<group>"; };
+		C10000000000000000000029 /* SwiftDataEchoEntryRepositoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataEchoEntryRepositoryTests.swift; sourceTree = "<group>"; };
+		C1000000000000000000002A /* SwiftDataEchoHighlightRepositoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataEchoHighlightRepositoryTests.swift; sourceTree = "<group>"; };
+		C1000000000000000000002B /* EchoModelContainerFactoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoModelContainerFactoryTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -130,6 +152,8 @@
 		A10000000000000000000007 /* Data */ = {
 			isa = PBXGroup;
 			children = (
+				C10000000000000000000040 /* Persistence */,
+				C10000000000000000000042 /* Repositories */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -189,6 +213,7 @@
 			children = (
 				B10000000000000000000026 /* EchoEntryRepository.swift */,
 				B10000000000000000000027 /* EchoHighlightRepository.swift */,
+				C10000000000000000000021 /* EchoRepositoryError.swift */,
 			);
 			path = Repositories;
 			sourceTree = "<group>";
@@ -200,8 +225,40 @@
 				B10000000000000000000029 /* EchoEntryTests.swift */,
 				B1000000000000000000002A /* EchoDayTests.swift */,
 				B1000000000000000000002B /* EchoHighlightTests.swift */,
+				C10000000000000000000029 /* SwiftDataEchoEntryRepositoryTests.swift */,
+				C1000000000000000000002A /* SwiftDataEchoHighlightRepositoryTests.swift */,
+				C1000000000000000000002B /* EchoModelContainerFactoryTests.swift */,
 			);
 			path = EchoTests;
+			sourceTree = "<group>";
+		};
+		C10000000000000000000040 /* Persistence */ = {
+			isa = PBXGroup;
+			children = (
+				C10000000000000000000041 /* Models */,
+				C10000000000000000000024 /* EchoSchema.swift */,
+				C10000000000000000000025 /* EchoModelContainerFactory.swift */,
+				C10000000000000000000026 /* EchoPersistenceMapper.swift */,
+			);
+			path = Persistence;
+			sourceTree = "<group>";
+		};
+		C10000000000000000000041 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				C10000000000000000000022 /* PersistentEchoEntry.swift */,
+				C10000000000000000000023 /* PersistentEchoHighlight.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		C10000000000000000000042 /* Repositories */ = {
+			isa = PBXGroup;
+			children = (
+				C10000000000000000000027 /* SwiftDataEchoEntryRepository.swift */,
+				C10000000000000000000028 /* SwiftDataEchoHighlightRepository.swift */,
+			);
+			path = Repositories;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -312,6 +369,14 @@
 				B10000000000000000000005 /* EchoHighlight.swift in Sources */,
 				B10000000000000000000006 /* EchoEntryRepository.swift in Sources */,
 				B10000000000000000000007 /* EchoHighlightRepository.swift in Sources */,
+				C10000000000000000000001 /* EchoRepositoryError.swift in Sources */,
+				C10000000000000000000002 /* PersistentEchoEntry.swift in Sources */,
+				C10000000000000000000003 /* PersistentEchoHighlight.swift in Sources */,
+				C10000000000000000000004 /* EchoSchema.swift in Sources */,
+				C10000000000000000000005 /* EchoModelContainerFactory.swift in Sources */,
+				C10000000000000000000006 /* EchoPersistenceMapper.swift in Sources */,
+				C10000000000000000000007 /* SwiftDataEchoEntryRepository.swift in Sources */,
+				C10000000000000000000008 /* SwiftDataEchoHighlightRepository.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -323,6 +388,9 @@
 				B10000000000000000000009 /* EchoEntryTests.swift in Sources */,
 				B1000000000000000000000A /* EchoDayTests.swift in Sources */,
 				B1000000000000000000000B /* EchoHighlightTests.swift in Sources */,
+				C10000000000000000000009 /* SwiftDataEchoEntryRepositoryTests.swift in Sources */,
+				C1000000000000000000000A /* SwiftDataEchoHighlightRepositoryTests.swift in Sources */,
+				C1000000000000000000000B /* EchoModelContainerFactoryTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

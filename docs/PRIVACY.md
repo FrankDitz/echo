@@ -4,15 +4,15 @@ Journal content can be among the most sensitive data a person keeps. Echo treats
 
 ## Current behavior
 
-Phase 0 stores no journal data. The application has no account system, networking, analytics, advertising, external AI provider, cloud sync, or third-party dependency. It requests no protected-system permissions.
+Phase 2 stores journal data locally in the application's sandbox. The application has no account system, networking, analytics, advertising, external AI provider, cloud sync, or third-party dependency. Its SwiftData configuration explicitly disables CloudKit and requests no protected-system permissions.
 
 The source repository is public. It must never contain real journal content, credentials, API keys, tokens, private exports, local database files, personal media, or screenshots of personal entries. Application code must not log entry text. Tests, previews, demos, and documentation use fictional data only.
 
 ## Local persistence
 
-Phase 2 will keep entries in the system-provided application container through a persistence adapter. Production code must never derive a store location from the repository, current working directory, application bundle, or a relative path. Tests use in-memory or unique disposable stores and never copy the developer's personal container.
+Phase 2 keeps entries and highlights in the system-provided application container through versioned SwiftData records and repository adapters. Production code does not derive a store location from the repository, current working directory, application bundle, or a relative path. Tests use in-memory or unique disposable stores and never copy the developer's personal container.
 
-Persistence models and migration behavior will be reviewed separately. Backups, deletion semantics, and file protection need explicit verification before claiming stronger guarantees. Database files, sidecars, exports, backups, and runtime-media directories are ignored and rejected by repository safety checks.
+The initial schema establishes an explicit migration boundary, and CRUD plus persistence across container recreation are tested with fictional data. Backups, deletion semantics, and file protection need explicit verification before claiming stronger guarantees. Database files, sidecars, exports, backups, and runtime-media directories are ignored and rejected by repository safety checks.
 
 ## AI processing
 

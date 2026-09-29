@@ -26,8 +26,8 @@ Echo/
     Models/            Entry, calendar day, ordering, and highlight behavior
     Repositories/      Async persistence contracts
   Data/
-    Persistence/       Planned SwiftData models and mapping
-    Repositories/      Planned repository implementations
+    Persistence/       Versioned SwiftData records, mapping, and container setup
+    Repositories/      SwiftData repository actors
   Services/
     AI/                Planned provider-neutral AI boundary
   Hub/                 Future integration contracts only
@@ -54,13 +54,15 @@ These are boundaries, not a requirement to create one type per layer. A protocol
 
 ## Data and identity decisions
 
-Phase 1 defines stable UUIDs, explicit timestamps, calendar-day semantics, source, entry type, and highlight behavior in serialization-friendly domain models. Entry type, source, and highlight-target kind are extensible raw values so newly introduced kinds do not break older decoders. Phase 2 maps these models to SwiftData behind repository interfaces. SwiftData types do not flow through SwiftUI as the application's only model.
+Phase 1 defines stable UUIDs, explicit timestamps, calendar-day semantics, source, entry type, and highlight behavior in serialization-friendly domain models. Entry type, source, and highlight-target kind are extensible raw values so newly introduced kinds do not break older decoders. Phase 2 maps these models to a versioned SwiftData schema behind repository interfaces. SwiftData records remain internal to the data layer and never replace the domain models.
 
 Calendar grouping uses an injected `Calendar`. An entry captures its calendar identifier and local era/year/month/day at creation, so later time-zone changes do not silently move it to another day. Day groups and their entries have deterministic chronological ordering with UUID tie-breaking.
 
 Highlights are independent relationships rather than Boolean entry fields. The current target references an entry UUID, while its extensible kind leaves room for organized journals, media, and future passage anchors. A behavior-only collection prevents duplicate highlights for the same target.
 
 Production persistence is confined to the system-provided application container. No repository or service may default to a relative path, the current working directory, the source checkout, or the application bundle. Tests use in-memory stores or unique disposable directories and never read from a personal application container.
+
+The app composition root creates the production `ModelContainer` and installs it in the SwiftUI environment. Its configuration has no app group and explicitly disables CloudKit. Entry and highlight repository actors each receive a container, perform durable CRUD through their isolated `ModelContext`, and translate records through a dedicated mapper. The first schema is versioned so future storage changes have an explicit migration boundary.
 
 ## AI boundary
 
@@ -74,7 +76,7 @@ Feature state will be owned by focused observable presentation types when behavi
 
 ## Testing strategy
 
-Tests begin with Phase 1, when meaningful domain behavior exists. They cover creation and editing invariants, monotonic timestamps, Codable round-trips, calendar and time-zone boundaries, deterministic ordering, day grouping, highlighting, and proof that assisted text never replaces originals. Repository implementations are tested when persistence arrives in Phase 2. UI snapshot or rendering tests are not part of the initial strategy.
+Tests begin with Phase 1, when meaningful domain behavior exists. They cover creation and editing invariants, monotonic timestamps, Codable round-trips, calendar and time-zone boundaries, deterministic ordering, day grouping, highlighting, and proof that assisted text never replaces originals. Phase 2 adds repository CRUD, identity errors, deterministic query ordering, highlight uniqueness, storage-location safety, and a durable-store test that recreates the container before reading. UI snapshot or rendering tests are not part of the initial strategy.
 
 All fixtures are fictional. Persistence tests use in-memory or disposable stores and include an invariant that no database is created beneath the repository checkout. Repository safety checks scan staged files and reachable history for private-data paths and credential patterns.
 
@@ -84,9 +86,13 @@ All fixtures are fictional. Persistence tests use in-memory or disposable stores
 
 Shared product behavior outweighs the small amount of platform variation. One target reduces drift while still producing native binaries for iOS and macOS.
 
-### No persistence in Phase 0
+### Persistence follows the domain
 
-Adding SwiftData before defining domain semantics would let a storage framework shape the model prematurely. Persistence follows the tested domain contract in Phase 2.
+SwiftData was added only after the domain semantics were defined and tested. Concrete records and repository actors conform to those contracts, keeping storage concerns from shaping feature code.
+
+### Local-only SwiftData configuration
+
+Phase 2 uses the system application container and explicitly disables CloudKit. Test-only factories provide in-memory and caller-selected disposable stores; production code has no checkout-relative storage option.
 
 ### Independent highlights
 
