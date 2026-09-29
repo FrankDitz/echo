@@ -2,6 +2,7 @@ import SwiftUI
 
 struct AppShellView: View {
   let todayViewModel: TodayViewModel
+  let timelineViewModel: TimelineViewModel
 
   @State private var selection: AppSection = .today
   @State private var isShowingSettings = false
@@ -15,15 +16,11 @@ struct AppShellView: View {
             Label("Today", systemImage: "sun.max")
           }
 
-        placeholder(
-          title: "Timeline",
-          systemImage: "clock.arrow.circlepath",
-          description: "Your days will gather here over time."
-        )
-        .tag(AppSection.timeline)
-        .tabItem {
-          Label("Timeline", systemImage: "clock")
-        }
+        TimelineView(viewModel: timelineViewModel)
+          .tag(AppSection.timeline)
+          .tabItem {
+            Label("Timeline", systemImage: "clock")
+          }
 
         placeholder(
           title: "Highlights",

@@ -38,6 +38,7 @@
 		F10000000000000000000001 /* EntryEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000000000000000000021 /* EntryEditorView.swift */; };
 		G10000000000000000000001 /* TimelineViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = G10000000000000000000021 /* TimelineViewModel.swift */; };
 		G10000000000000000000002 /* TimelineViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = G10000000000000000000022 /* TimelineViewModelTests.swift */; };
+		H10000000000000000000001 /* TimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = H10000000000000000000021 /* TimelineView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -84,6 +85,7 @@
 		F10000000000000000000021 /* EntryEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryEditorView.swift; sourceTree = "<group>"; };
 		G10000000000000000000021 /* TimelineViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineViewModel.swift; sourceTree = "<group>"; };
 		G10000000000000000000022 /* TimelineViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineViewModelTests.swift; sourceTree = "<group>"; };
+		H10000000000000000000021 /* TimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -298,6 +300,7 @@
 		G10000000000000000000040 /* Timeline */ = {
 			isa = PBXGroup;
 			children = (
+				H10000000000000000000021 /* TimelineView.swift */,
 				G10000000000000000000021 /* TimelineViewModel.swift */,
 			);
 			path = Timeline;
@@ -423,6 +426,7 @@
 				E10000000000000000000001 /* TodayView.swift in Sources */,
 				F10000000000000000000001 /* EntryEditorView.swift in Sources */,
 				G10000000000000000000001 /* TimelineViewModel.swift in Sources */,
+				H10000000000000000000001 /* TimelineView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
