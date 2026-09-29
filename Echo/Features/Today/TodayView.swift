@@ -4,6 +4,7 @@ struct TodayView: View {
   let viewModel: TodayViewModel
 
   @State private var draft = ""
+  @State private var selectedEntry: EchoEntry?
   @FocusState private var isComposerFocused: Bool
 
   var body: some View {
@@ -21,6 +22,11 @@ struct TodayView: View {
     .background(groupedBackground)
     .task {
       await viewModel.load()
+    }
+    .sheet(item: $selectedEntry) { entry in
+      EntryEditorView(entry: entry) { rawText in
+        await viewModel.updateEntry(id: entry.id, rawText: rawText)
+      }
     }
   }
 
@@ -105,7 +111,13 @@ struct TodayView: View {
         .frame(maxWidth: .infinity, minHeight: 220)
       } else {
         ForEach(viewModel.entries) { entry in
-          TodayEntryRow(entry: entry)
+          Button {
+            selectedEntry = entry
+          } label: {
+            TodayEntryRow(entry: entry)
+          }
+          .buttonStyle(.plain)
+          .accessibilityHint("Opens the entry editor")
           if entry.id != viewModel.entries.last?.id {
             Divider()
           }

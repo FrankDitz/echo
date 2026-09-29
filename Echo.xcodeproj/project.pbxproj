@@ -35,6 +35,7 @@
 		D10000000000000000000001 /* TodayViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10000000000000000000021 /* TodayViewModel.swift */; };
 		D10000000000000000000002 /* TodayViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10000000000000000000022 /* TodayViewModelTests.swift */; };
 		E10000000000000000000001 /* TodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10000000000000000000021 /* TodayView.swift */; };
+		F10000000000000000000001 /* EntryEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000000000000000000021 /* EntryEditorView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -78,6 +79,7 @@
 		D10000000000000000000021 /* TodayViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayViewModel.swift; sourceTree = "<group>"; };
 		D10000000000000000000022 /* TodayViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayViewModelTests.swift; sourceTree = "<group>"; };
 		E10000000000000000000021 /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
+		F10000000000000000000021 /* EntryEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryEditorView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -143,6 +145,7 @@
 			children = (
 				A1000000000000000000000B /* AppShell */,
 				D10000000000000000000040 /* Today */,
+				F10000000000000000000040 /* EntryEditor */,
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -278,6 +281,14 @@
 			path = Today;
 			sourceTree = "<group>";
 		};
+		F10000000000000000000040 /* EntryEditor */ = {
+			isa = PBXGroup;
+			children = (
+				F10000000000000000000021 /* EntryEditorView.swift */,
+			);
+			path = EntryEditor;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -396,6 +407,7 @@
 				C10000000000000000000008 /* SwiftDataEchoHighlightRepository.swift in Sources */,
 				D10000000000000000000001 /* TodayViewModel.swift in Sources */,
 				E10000000000000000000001 /* TodayView.swift in Sources */,
+				F10000000000000000000001 /* EntryEditorView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
