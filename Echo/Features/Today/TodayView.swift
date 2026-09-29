@@ -5,6 +5,8 @@ struct TodayView: View {
 
   @State private var draft = ""
   @State private var selectedEntry: EchoEntry?
+  @State private var entryPendingDeletion: EchoEntry?
+  @State private var isConfirmingDeletion = false
   @FocusState private var isComposerFocused: Bool
 
   var body: some View {
@@ -27,6 +29,20 @@ struct TodayView: View {
       EntryEditorView(entry: entry) { rawText in
         await viewModel.updateEntry(id: entry.id, rawText: rawText)
       }
+    }
+    .confirmationDialog(
+      "Delete this entry?",
+      isPresented: $isConfirmingDeletion,
+      titleVisibility: .visible
+    ) {
+      Button("Delete Entry", role: .destructive) {
+        deletePendingEntry()
+      }
+      Button("Cancel", role: .cancel) {
+        entryPendingDeletion = nil
+      }
+    } message: {
+      Text("This permanently removes the entry from Echo and cannot be undone.")
     }
   }
 
@@ -111,13 +127,11 @@ struct TodayView: View {
         .frame(maxWidth: .infinity, minHeight: 220)
       } else {
         ForEach(viewModel.entries) { entry in
-          Button {
-            selectedEntry = entry
-          } label: {
-            TodayEntryRow(entry: entry)
-          }
-          .buttonStyle(.plain)
-          .accessibilityHint("Opens the entry editor")
+          TodayEntryRow(
+            entry: entry,
+            onOpen: { selectedEntry = entry },
+            onDelete: { confirmDeletion(of: entry) }
+          )
           if entry.id != viewModel.entries.last?.id {
             Divider()
           }
@@ -161,6 +175,22 @@ struct TodayView: View {
     }
   }
 
+  private func confirmDeletion(of entry: EchoEntry) {
+    entryPendingDeletion = entry
+    isConfirmingDeletion = true
+  }
+
+  private func deletePendingEntry() {
+    guard let entry = entryPendingDeletion else { return }
+    entryPendingDeletion = nil
+
+    Task {
+      if await viewModel.deleteEntry(id: entry.id), selectedEntry?.id == entry.id {
+        selectedEntry = nil
+      }
+    }
+  }
+
   private var groupedBackground: Color {
     #if os(iOS)
       Color(uiColor: .systemGroupedBackground)
@@ -172,20 +202,38 @@ struct TodayView: View {
 
 private struct TodayEntryRow: View {
   let entry: EchoEntry
+  let onOpen: () -> Void
+  let onDelete: () -> Void
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 8) {
-      Text(entry.createdAt, format: .dateTime.hour().minute())
-        .font(.caption.weight(.semibold))
-        .foregroundStyle(.secondary)
-      Text(entry.rawText)
-        .font(.body)
-        .lineSpacing(4)
-        .lineLimit(6)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .textSelection(.enabled)
+    HStack(alignment: .top, spacing: 12) {
+      Button(action: onOpen) {
+        VStack(alignment: .leading, spacing: 8) {
+          Text(entry.createdAt, format: .dateTime.hour().minute())
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(.secondary)
+          Text(entry.rawText)
+            .font(.body)
+            .lineSpacing(4)
+            .lineLimit(6)
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .contentShape(Rectangle())
+      }
+      .buttonStyle(.plain)
+      .accessibilityHint("Opens the entry editor")
+
+      Menu("Entry Actions", systemImage: "ellipsis") {
+        Button("Edit", systemImage: "pencil", action: onOpen)
+        Button("Delete", systemImage: "trash", role: .destructive, action: onDelete)
+      }
+      .labelStyle(.iconOnly)
+      .accessibilityLabel("Entry actions")
     }
     .padding(.vertical, 4)
-    .accessibilityElement(children: .combine)
+    .contextMenu {
+      Button("Edit", systemImage: "pencil", action: onOpen)
+      Button("Delete", systemImage: "trash", role: .destructive, action: onDelete)
+    }
   }
 }
