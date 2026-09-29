@@ -36,6 +36,8 @@
 		D10000000000000000000002 /* TodayViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10000000000000000000022 /* TodayViewModelTests.swift */; };
 		E10000000000000000000001 /* TodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10000000000000000000021 /* TodayView.swift */; };
 		F10000000000000000000001 /* EntryEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000000000000000000021 /* EntryEditorView.swift */; };
+		G10000000000000000000001 /* TimelineViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = G10000000000000000000021 /* TimelineViewModel.swift */; };
+		G10000000000000000000002 /* TimelineViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = G10000000000000000000022 /* TimelineViewModelTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -80,6 +82,8 @@
 		D10000000000000000000022 /* TodayViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayViewModelTests.swift; sourceTree = "<group>"; };
 		E10000000000000000000021 /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
 		F10000000000000000000021 /* EntryEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryEditorView.swift; sourceTree = "<group>"; };
+		G10000000000000000000021 /* TimelineViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineViewModel.swift; sourceTree = "<group>"; };
+		G10000000000000000000022 /* TimelineViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineViewModelTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -146,6 +150,7 @@
 				A1000000000000000000000B /* AppShell */,
 				D10000000000000000000040 /* Today */,
 				F10000000000000000000040 /* EntryEditor */,
+				G10000000000000000000040 /* Timeline */,
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -239,6 +244,7 @@
 				C1000000000000000000002A /* SwiftDataEchoHighlightRepositoryTests.swift */,
 				C1000000000000000000002B /* EchoModelContainerFactoryTests.swift */,
 				D10000000000000000000022 /* TodayViewModelTests.swift */,
+				G10000000000000000000022 /* TimelineViewModelTests.swift */,
 			);
 			path = EchoTests;
 			sourceTree = "<group>";
@@ -287,6 +293,14 @@
 				F10000000000000000000021 /* EntryEditorView.swift */,
 			);
 			path = EntryEditor;
+			sourceTree = "<group>";
+		};
+		G10000000000000000000040 /* Timeline */ = {
+			isa = PBXGroup;
+			children = (
+				G10000000000000000000021 /* TimelineViewModel.swift */,
+			);
+			path = Timeline;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -408,6 +422,7 @@
 				D10000000000000000000001 /* TodayViewModel.swift in Sources */,
 				E10000000000000000000001 /* TodayView.swift in Sources */,
 				F10000000000000000000001 /* EntryEditorView.swift in Sources */,
+				G10000000000000000000001 /* TimelineViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -423,6 +438,7 @@
 				C1000000000000000000000A /* SwiftDataEchoHighlightRepositoryTests.swift in Sources */,
 				C1000000000000000000000B /* EchoModelContainerFactoryTests.swift in Sources */,
 				D10000000000000000000002 /* TodayViewModelTests.swift in Sources */,
+				G10000000000000000000002 /* TimelineViewModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
