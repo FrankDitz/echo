@@ -41,6 +41,21 @@ struct EchoDayIdentifier: Codable, Hashable, Comparable, Sendable {
     self.day = day
   }
 
+  func date(in timeZone: TimeZone = .autoupdatingCurrent) -> Date? {
+    var calendar = Calendar(identifier: calendarIdentifier)
+    calendar.timeZone = timeZone
+
+    var components = DateComponents()
+    components.calendar = calendar
+    components.timeZone = timeZone
+    components.era = era
+    components.year = year
+    components.month = month
+    components.day = day
+    components.hour = 12
+    return calendar.date(from: components)
+  }
+
   static func < (lhs: EchoDayIdentifier, rhs: EchoDayIdentifier) -> Bool {
     if lhs.calendarIdentifier != rhs.calendarIdentifier {
       return String(describing: lhs.calendarIdentifier)

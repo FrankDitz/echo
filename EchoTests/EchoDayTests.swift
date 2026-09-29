@@ -80,4 +80,26 @@ struct EchoDayTests {
     #expect(newYorkDay.day == 29)
     #expect(utcDay != newYorkDay)
   }
+
+  @Test("A captured day reconstructs a stable display date")
+  func displayDate() throws {
+    let timeZone = try #require(TimeZone(identifier: "America/New_York"))
+    let day = EchoDayIdentifier(
+      calendarIdentifier: .gregorian,
+      era: 1,
+      year: 2026,
+      month: 3,
+      day: 8
+    )
+
+    let date = try #require(day.date(in: timeZone))
+    var calendar = Calendar(identifier: .gregorian)
+    calendar.timeZone = timeZone
+    let components = calendar.dateComponents([.year, .month, .day, .hour], from: date)
+
+    #expect(components.year == 2026)
+    #expect(components.month == 3)
+    #expect(components.day == 8)
+    #expect(components.hour == 12)
+  }
 }
