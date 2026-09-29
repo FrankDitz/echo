@@ -54,4 +54,4 @@ It excludes accounts, authentication, sync, a backend, real AI calls, Hub or Amb
 
 ## Current implementation boundary
 
-Phase 2 adds local-only persistence behind the tested journal domain: a versioned SwiftData schema, record mapping, durable entry and highlight repositories, and application-container composition. CloudKit is disabled, test stores are isolated from the checkout and personal application data, and all fixtures remain fictional. The implementation intentionally contains no AI service, sample personal data, or interactive journal workflow.
+Phase 3 adds the first interactive journal workflow. Today supports low-friction text capture, current-date loading, chronological reading, a focused editor, explicit save status, unsaved-change protection, and confirmed deletion. It uses the local repository boundary introduced in Phase 2; SwiftData does not flow into the views. Highlight interactions remain in Phase 5, and the implementation still contains no AI service or sample personal data.

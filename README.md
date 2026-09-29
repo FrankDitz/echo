@@ -2,7 +2,7 @@
 
 Echo is a private, low-friction journal and life archive for iPhone and Mac. It is designed to feel like a quiet conversation with yourself: write once at the end of a day, capture several small moments, or simply leave the day alone.
 
-> **Status:** Phase 2 — local persistence complete. The app still presents the native navigation shell; interactive journal features begin in Phase 3.
+> **Status:** Phase 3 — the Today journal workflow is complete. Echo supports fast local writing, chronological review, focused editing, and confirmed deletion.
 
 ## Foundation
 
@@ -14,6 +14,9 @@ Echo is a private, low-friction journal and life archive for iPhone and Mac. It 
 - Repository safety checks that reject common credentials and private runtime data
 - Platform-independent entry, day, highlight, ordering, and repository contracts
 - SwiftData repository adapters with durable entry and highlight CRUD
+- A native Today experience with quick capture, calm empty and loading states, and chronological entries
+- A distraction-free entry editor with explicit save feedback and unsaved-change protection
+- Confirmed entry deletion through compact action and context menus
 - Fictional-data domain and persistence tests using Swift Testing
 
 The shared target keeps the product and domain code consistent across Apple platforms. Platform-specific behavior will be isolated only when the platforms genuinely differ.
