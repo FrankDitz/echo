@@ -39,6 +39,7 @@
 		G10000000000000000000001 /* TimelineViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = G10000000000000000000021 /* TimelineViewModel.swift */; };
 		G10000000000000000000002 /* TimelineViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = G10000000000000000000022 /* TimelineViewModelTests.swift */; };
 		H10000000000000000000001 /* TimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = H10000000000000000000021 /* TimelineView.swift */; };
+		I10000000000000000000001 /* DayDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = I10000000000000000000021 /* DayDetailView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -86,6 +87,7 @@
 		G10000000000000000000021 /* TimelineViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineViewModel.swift; sourceTree = "<group>"; };
 		G10000000000000000000022 /* TimelineViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineViewModelTests.swift; sourceTree = "<group>"; };
 		H10000000000000000000021 /* TimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineView.swift; sourceTree = "<group>"; };
+		I10000000000000000000021 /* DayDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayDetailView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -153,6 +155,7 @@
 				D10000000000000000000040 /* Today */,
 				F10000000000000000000040 /* EntryEditor */,
 				G10000000000000000000040 /* Timeline */,
+				I10000000000000000000040 /* DayDetail */,
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -306,6 +309,14 @@
 			path = Timeline;
 			sourceTree = "<group>";
 		};
+		I10000000000000000000040 /* DayDetail */ = {
+			isa = PBXGroup;
+			children = (
+				I10000000000000000000021 /* DayDetailView.swift */,
+			);
+			path = DayDetail;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -427,6 +438,7 @@
 				F10000000000000000000001 /* EntryEditorView.swift in Sources */,
 				G10000000000000000000001 /* TimelineViewModel.swift in Sources */,
 				H10000000000000000000001 /* TimelineView.swift in Sources */,
+				I10000000000000000000001 /* DayDetailView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

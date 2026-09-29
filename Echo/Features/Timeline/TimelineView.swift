@@ -50,7 +50,13 @@ struct TimelineView: View {
       .frame(maxWidth: .infinity, minHeight: 320)
     } else {
       ForEach(viewModel.days) { day in
-        TimelineDayRow(day: day, timeZone: timeZone)
+        NavigationLink {
+          DayDetailView(day: day)
+        } label: {
+          TimelineDayRow(day: day, timeZone: timeZone)
+        }
+        .buttonStyle(.plain)
+        .accessibilityHint("Opens this day’s entries")
       }
 
       if viewModel.failure != nil {
@@ -86,6 +92,9 @@ private struct TimelineDayRow: View {
         Text(entryCountLabel)
           .font(.caption.weight(.medium))
           .foregroundStyle(.secondary)
+        Image(systemName: "chevron.right")
+          .font(.caption.weight(.semibold))
+          .foregroundStyle(.tertiary)
       }
 
       if let preview = day.entries.last?.rawText {
