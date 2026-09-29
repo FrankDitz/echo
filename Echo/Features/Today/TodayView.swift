@@ -95,8 +95,13 @@ struct TodayView: View {
   private var saveStatus: some View {
     switch viewModel.saveState {
     case .idle:
-      Text("⌘↩ to save")
-        .foregroundStyle(.tertiary)
+      #if os(macOS)
+        Text("⌘↩ to save")
+          .foregroundStyle(.tertiary)
+      #else
+        Text("Ready when you are")
+          .foregroundStyle(.tertiary)
+      #endif
     case .saving:
       ProgressView()
         .controlSize(.small)

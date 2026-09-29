@@ -73,7 +73,9 @@ struct EntryEditorView: View {
     }
     .frame(minWidth: 360, minHeight: 420)
     .interactiveDismissDisabled(isDirty)
-    .onAppear {
+    .task {
+      // Wait for the presented sheet to become the active focus scope.
+      try? await Task.sleep(for: .milliseconds(300))
       isEditorFocused = true
     }
     .onChange(of: draft) {
