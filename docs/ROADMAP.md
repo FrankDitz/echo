@@ -8,7 +8,7 @@ Each phase is implemented, built, tested where behavior exists, reviewed, commit
 - **Phase 1 — Journal domain (complete):** entry and day models, extensible source and type values, independent highlight relationships, async repository contracts, calendar-aware grouping, deterministic ordering, and fictional-data tests.
 - **Phase 2 — Local persistence (complete):** versioned SwiftData records, mapping, and repository actors with durable entry and highlight CRUD. Production storage uses the application container with CloudKit disabled; tests use in-memory or disposable stores and prove no data is written beneath the source checkout.
 - **Phase 3 — Today (complete):** fast text capture, current-date loading, chronological entries, calm loading and empty states, focused editing with explicit save feedback, and confirmed deletion.
-- **Phase 4 — Timeline:** previous-day summaries, Day Detail, and date navigation.
+- **Phase 4 — Timeline (complete):** previous-day filtering and newest-first summaries, entry counts and previews, captured-date presentation, refresh states, native Day Detail navigation, and readable chronological entries.
 - **Phase 5 — Highlights:** highlight and unhighlight entries, browse the curated collection, and navigate to source context.
 - **Phase 6 — AI architecture:** provider-neutral protocol, deterministic local mock, cleanup, polish, day organization, organized-journal model, and immutability tests. No provider credential or real journal content may enter the app bundle, fixtures, logs, or Git.
 - **Phase 7 — MVP review:** full builds and tests, architecture and privacy review, naming cleanup, documentation refresh, staged-data scan, and full reachable-history scan.

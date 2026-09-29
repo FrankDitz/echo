@@ -54,4 +54,4 @@ It excludes accounts, authentication, sync, a backend, real AI calls, Hub or Amb
 
 ## Current implementation boundary
 
-Phase 3 adds the first interactive journal workflow. Today supports low-friction text capture, current-date loading, chronological reading, a focused editor, explicit save status, unsaved-change protection, and confirmed deletion. It uses the local repository boundary introduced in Phase 2; SwiftData does not flow into the views. Highlight interactions remain in Phase 5, and the implementation still contains no AI service or sample personal data.
+Phase 4 adds historical browsing. Timeline groups previous entries into newest-first day summaries with counts and previews, while Day Detail presents each day’s complete raw entries chronologically. Captured calendar-day components drive date presentation so later time-zone changes do not silently relabel a memory. Historical views are read-focused; highlight interactions remain in Phase 5, and the implementation still contains no AI service or sample personal data.
