@@ -18,10 +18,10 @@ Echo/
   Features/
     AppShell/          Phase 0 navigation shell
     Today/             Today journal presentation and application state
-    Timeline/          Planned timeline presentation
+    Timeline/          Previous-day browsing state and summaries
     Highlights/        Planned highlights presentation
     EntryEditor/       Focused long-form entry editing
-    DayDetail/         Planned day-detail presentation
+    DayDetail/         Read-focused chronological day presentation
   Domain/
     Models/            Entry, calendar day, ordering, and highlight behavior
     Repositories/      Async persistence contracts
@@ -72,11 +72,11 @@ A future distributed build must not contain an app-owned provider secret: build 
 
 ## State and concurrency
 
-Feature state is owned by focused observable presentation types when behavior warrants it. `TodayViewModel` runs on the main actor, depends on the domain repository contract, and owns loading plus create, edit, and delete workflows. SwiftUI owns only transient presentation state such as drafts, focus, sheets, and confirmation dialogs. Long-running or external work uses structured Swift concurrency.
+Feature state is owned by focused observable presentation types when behavior warrants it. `TodayViewModel` runs on the main actor, depends on the domain repository contract, and owns loading plus create, edit, and delete workflows. `TimelineViewModel` uses the same contract to group prior entries, order historical days, preserve results across refresh failures, and resolve navigation data. SwiftUI owns only transient presentation state such as drafts, focus, sheets, navigation, and confirmation dialogs. Long-running or external work uses structured Swift concurrency.
 
 ## Testing strategy
 
-Tests begin with Phase 1, when meaningful domain behavior exists. They cover creation and editing invariants, monotonic timestamps, Codable round-trips, calendar and time-zone boundaries, deterministic ordering, day grouping, highlighting, and proof that assisted text never replaces originals. Phase 2 adds repository CRUD, identity errors, deterministic query ordering, highlight uniqueness, storage-location safety, and a durable-store test that recreates the container before reading. Phase 3 adds deterministic tests for current-day loading, capture validation, editing timestamps, deletion, save state, and persistence failures. UI snapshot or rendering tests are not part of the initial strategy.
+Tests begin with Phase 1, when meaningful domain behavior exists. They cover creation and editing invariants, monotonic timestamps, Codable round-trips, calendar and time-zone boundaries, deterministic ordering, day grouping, highlighting, and proof that assisted text never replaces originals. Phase 2 adds repository CRUD, identity errors, deterministic query ordering, highlight uniqueness, storage-location safety, and a durable-store test that recreates the container before reading. Phase 3 adds deterministic tests for current-day loading, capture validation, editing timestamps, deletion, save state, and persistence failures. Phase 4 adds captured-day display reconstruction, prior-day filtering, reverse-chronological grouping, Day Detail resolution, and refresh-failure retention. UI snapshot or rendering tests are not part of the initial strategy.
 
 All fixtures are fictional. Persistence tests use in-memory or disposable stores and include an invariant that no database is created beneath the repository checkout. Repository safety checks scan staged files and reachable history for private-data paths and credential patterns.
 
