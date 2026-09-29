@@ -34,6 +34,7 @@
 		C1000000000000000000000B /* EchoModelContainerFactoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1000000000000000000002B /* EchoModelContainerFactoryTests.swift */; };
 		D10000000000000000000001 /* TodayViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10000000000000000000021 /* TodayViewModel.swift */; };
 		D10000000000000000000002 /* TodayViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10000000000000000000022 /* TodayViewModelTests.swift */; };
+		E10000000000000000000001 /* TodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10000000000000000000021 /* TodayView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -76,6 +77,7 @@
 		C1000000000000000000002B /* EchoModelContainerFactoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoModelContainerFactoryTests.swift; sourceTree = "<group>"; };
 		D10000000000000000000021 /* TodayViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayViewModel.swift; sourceTree = "<group>"; };
 		D10000000000000000000022 /* TodayViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayViewModelTests.swift; sourceTree = "<group>"; };
+		E10000000000000000000021 /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -270,6 +272,7 @@
 		D10000000000000000000040 /* Today */ = {
 			isa = PBXGroup;
 			children = (
+				E10000000000000000000021 /* TodayView.swift */,
 				D10000000000000000000021 /* TodayViewModel.swift */,
 			);
 			path = Today;
@@ -392,6 +395,7 @@
 				C10000000000000000000007 /* SwiftDataEchoEntryRepository.swift in Sources */,
 				C10000000000000000000008 /* SwiftDataEchoHighlightRepository.swift in Sources */,
 				D10000000000000000000001 /* TodayViewModel.swift in Sources */,
+				E10000000000000000000001 /* TodayView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

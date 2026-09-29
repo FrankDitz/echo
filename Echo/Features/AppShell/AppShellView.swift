@@ -1,21 +1,19 @@
 import SwiftUI
 
 struct AppShellView: View {
+  let todayViewModel: TodayViewModel
+
   @State private var selection: AppSection = .today
   @State private var isShowingSettings = false
 
   var body: some View {
     NavigationStack {
       TabView(selection: $selection) {
-        placeholder(
-          title: "Today",
-          systemImage: "square.and.pencil",
-          description: "A quiet place for whatever is on your mind."
-        )
-        .tag(AppSection.today)
-        .tabItem {
-          Label("Today", systemImage: "sun.max")
-        }
+        TodayView(viewModel: todayViewModel)
+          .tag(AppSection.today)
+          .tabItem {
+            Label("Today", systemImage: "sun.max")
+          }
 
         placeholder(
           title: "Timeline",
@@ -37,7 +35,6 @@ struct AppShellView: View {
           Label("Highlights", systemImage: "bookmark")
         }
       }
-      .navigationTitle(selection.title)
       .toolbar {
         ToolbarItem(placement: .primaryAction) {
           Button("Settings", systemImage: "gearshape") {
@@ -69,16 +66,6 @@ private enum AppSection: Hashable {
   case timeline
   case highlights
 
-  var title: String {
-    switch self {
-    case .today:
-      "Today"
-    case .timeline:
-      "Timeline"
-    case .highlights:
-      "Highlights"
-    }
-  }
 }
 
 private struct SettingsPlaceholderView: View {

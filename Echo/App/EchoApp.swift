@@ -4,10 +4,15 @@ import SwiftUI
 @main
 struct EchoApp: App {
   private let modelContainer: ModelContainer
+  private let todayViewModel: TodayViewModel
 
   init() {
     do {
-      modelContainer = try EchoModelContainerFactory.makePersistent()
+      let container = try EchoModelContainerFactory.makePersistent()
+      modelContainer = container
+      todayViewModel = TodayViewModel(
+        repository: SwiftDataEchoEntryRepository(modelContainer: container)
+      )
     } catch {
       preconditionFailure("Echo could not initialize its local data store.")
     }
@@ -15,7 +20,7 @@ struct EchoApp: App {
 
   var body: some Scene {
     WindowGroup {
-      AppShellView()
+      AppShellView(todayViewModel: todayViewModel)
     }
     .modelContainer(modelContainer)
   }
