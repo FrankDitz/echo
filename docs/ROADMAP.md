@@ -4,14 +4,14 @@ Each phase is implemented, built, tested where behavior exists, reviewed, commit
 
 ## MVP phases
 
-- **Phase 0 — Foundation (complete locally):** shared iPhone/Mac SwiftUI project, app shell, repository hygiene, and core documentation.
-- **Phase 1 — Journal domain:** entry and day models, source and type, highlight semantics, repository contracts, day grouping, ordering, and tests.
-- **Phase 2 — Local persistence:** SwiftData adapters and repository implementation with durable create, read, update, and delete behavior.
+- **Phase 0 — Foundation (complete):** shared iPhone/Mac SwiftUI project, app shell, public-repository privacy safeguards, and core documentation.
+- **Phase 1 — Journal domain:** entry and day models, source and type, highlight semantics, repository contracts, day grouping, ordering, and tests. Fixtures must be fictional, logs must not contain entry text, and repository-safety checks remain required acceptance criteria.
+- **Phase 2 — Local persistence:** SwiftData adapters and repository implementation with durable create, read, update, and delete behavior. Production stores must use the application container; tests must use in-memory or disposable stores and prove no data is written beneath the source checkout.
 - **Phase 3 — Today:** fast text capture, today's chronological entries, editing, deletion, and empty state.
 - **Phase 4 — Timeline:** previous-day summaries, Day Detail, and date navigation.
 - **Phase 5 — Highlights:** highlight and unhighlight entries, browse the curated collection, and navigate to source context.
-- **Phase 6 — AI architecture:** provider-neutral protocol, deterministic local mock, cleanup, polish, day organization, organized-journal model, and immutability tests.
-- **Phase 7 — MVP review:** full builds and tests, architecture and privacy review, naming cleanup, documentation refresh, and secret scan.
+- **Phase 6 — AI architecture:** provider-neutral protocol, deterministic local mock, cleanup, polish, day organization, organized-journal model, and immutability tests. No provider credential or real journal content may enter the app bundle, fixtures, logs, or Git.
+- **Phase 7 — MVP review:** full builds and tests, architecture and privacy review, naming cleanup, documentation refresh, staged-data scan, and full reachable-history scan.
 
 ## Near-term improvements
 

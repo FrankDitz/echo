@@ -6,11 +6,13 @@ Journal content can be among the most sensitive data a person keeps. Echo treats
 
 Phase 0 stores no journal data. The application has no account system, networking, analytics, advertising, external AI provider, cloud sync, or third-party dependency. It requests no protected-system permissions.
 
-The project must never commit real journal content, credentials, API keys, tokens, private exports, or local database files. Application code should not log entry text.
+The source repository is public. It must never contain real journal content, credentials, API keys, tokens, private exports, local database files, personal media, or screenshots of personal entries. Application code must not log entry text. Tests, previews, demos, and documentation use fictional data only.
 
 ## Local persistence
 
-Phase 2 will keep entries in the app's local sandbox through a persistence adapter. Persistence models and migration behavior will be reviewed separately. Backups, deletion semantics, and file protection need explicit verification before claiming stronger guarantees.
+Phase 2 will keep entries in the system-provided application container through a persistence adapter. Production code must never derive a store location from the repository, current working directory, application bundle, or a relative path. Tests use in-memory or unique disposable stores and never copy the developer's personal container.
+
+Persistence models and migration behavior will be reviewed separately. Backups, deletion semantics, and file protection need explicit verification before claiming stronger guarantees. Database files, sidecars, exports, backups, and runtime-media directories are ignored and rejected by repository safety checks.
 
 ## AI processing
 
@@ -24,6 +26,8 @@ The first AI service is local and deterministic. Before any remote provider is i
 - clear consent and an option to keep AI fully disabled
 
 Raw text remains stored separately from assisted output and is never overwritten by it.
+
+An app-owned provider key must never be compiled into or packaged with Echo; values placed in source, plist files, asset files, or build settings are extractable from a distributed client. A future user-supplied key belongs in Keychain. Alternatively, an authenticated service may hold its own provider credential outside the app. Local development secret files remain untracked.
 
 ## Cloud synchronization and backups
 
@@ -45,3 +49,14 @@ Hub access must be opt-in and purpose-limited. Events should omit journal text b
 
 Exports require clear destination and deletion behavior. Diagnostic logs and crash reports must avoid journal text, generated journals, media content, search terms, and stable identifiers where they are unnecessary.
 
+## Public repository safeguards
+
+The repository includes layered controls:
+
+- ignore rules for databases, exports, private-data directories, signing material, and local secret configuration
+- a pre-commit check for forbidden paths, unreviewed media, and common credential patterns
+- a full-history CI scan on every push and pull request
+- a fictional-data-only policy for fixtures, previews, screenshots, and bug reports
+- a documented incident process because removing a later commit cannot recall public clones
+
+These controls are guardrails, not permission to place private data near the repository. Personal content should remain in the application container and user-selected private export locations.

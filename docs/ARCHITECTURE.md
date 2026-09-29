@@ -59,9 +59,13 @@ Phase 1 defines stable UUIDs, explicit timestamps, calendar-day semantics, sourc
 
 Calendar grouping must use an injected or explicit `Calendar` so day boundaries remain testable and correct for the user's locale and time zone.
 
+Production persistence is confined to the system-provided application container. No repository or service may default to a relative path, the current working directory, the source checkout, or the application bundle. Tests use in-memory stores or unique disposable directories and never read from a personal application container.
+
 ## AI boundary
 
 Phase 6 introduces a provider-neutral service for cleanup, polish, and day organization. Every operation returns a separate result. Raw entry text is never mutated by AI output. The first adapter is local and deterministic; provider credentials and network calls remain absent.
+
+A future distributed build must not contain an app-owned provider secret: build settings and obfuscation do not make bundled values private. A user-provided credential may be stored in Keychain, or an authenticated service may keep its own provider credential outside the client. UI and domain code continue to depend only on the provider-neutral service contract.
 
 ## State and concurrency
 
@@ -70,6 +74,8 @@ Feature state will be owned by focused observable presentation types when behavi
 ## Testing strategy
 
 Tests begin with Phase 1, when meaningful domain behavior exists. They prioritize creation and editing invariants, day grouping, ordering, highlighting, repository behavior, and proof that assisted text never replaces originals. UI snapshot or rendering tests are not part of the initial strategy.
+
+All fixtures are fictional. Persistence tests use in-memory or disposable stores and include an invariant that no database is created beneath the repository checkout. Repository safety checks scan staged files and reachable history for private-data paths and credential patterns.
 
 ## Significant decisions
 
@@ -89,3 +95,6 @@ Phase 0 contains only static navigation. The project does not add a test that pr
 
 Xcode generates platform Info.plists from build settings. This avoids maintaining duplicate iOS and macOS plist files while the application has no custom usage descriptions or document types.
 
+### Public source and private runtime data
+
+The repository is suitable for public review, but it is not a data store. Journal databases, exports, backups, media, logs containing content, signing material, and credentials are prohibited from Git. This is enforced through ignore rules, a pre-commit scanner, CI, synthetic fixture requirements, and application-container persistence.

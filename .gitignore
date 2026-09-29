@@ -21,13 +21,37 @@ DerivedData/
 # Local configuration and secrets
 .env
 .env.*
-!.env.example
+Secrets.xcconfig
+*.secrets.xcconfig
+credentials.json
+credentials.*.json
+service-account*.json
+GoogleService-Info.plist
+AuthKey_*.p8
 *.p12
+*.p8
 *.pem
+*.key
+*.cer
+*.mobileprovision
+*.provisionprofile
 
-# Local journal data and exports
-*.sqlite
-*.sqlite-shm
-*.sqlite-wal
+# Runtime data must never enter source control
+LocalData/
+UserData/
+JournalData/
+PrivateData/
+RuntimeData/
+UserContent/
+JournalMedia/
+Recordings/
+Backups/
 Exports/
-
+*.sqlite
+*.sqlite-*
+*.db
+*.db-*
+*.store
+*.store-*
+*.journal
+*.backup
