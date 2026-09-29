@@ -2,7 +2,7 @@
 
 Echo is a private, low-friction journal and life archive for iPhone and Mac. It is designed to feel like a quiet conversation with yourself: write once at the end of a day, capture several small moments, or simply leave the day alone.
 
-> **Status:** Phase 1 — journal domain complete. The app still presents the native navigation shell; persistence and interactive journal features intentionally begin in later phases.
+> **Status:** Phase 2 — local persistence complete. The app still presents the native navigation shell; interactive journal features begin in Phase 3.
 
 ## Foundation
 
@@ -10,10 +10,11 @@ Echo is a private, low-friction journal and life archive for iPhone and Mac. It 
 - Native `TabView` navigation for Today, Timeline, and Highlights
 - Settings kept outside the primary navigation
 - No accounts, network services, analytics, or third-party dependencies
-- No journal content is stored or transmitted in this phase
+- Local-only SwiftData persistence with CloudKit explicitly disabled
 - Repository safety checks that reject common credentials and private runtime data
 - Platform-independent entry, day, highlight, ordering, and repository contracts
-- Fictional-data domain tests using Swift Testing
+- SwiftData repository adapters with durable entry and highlight CRUD
+- Fictional-data domain and persistence tests using Swift Testing
 
 The shared target keeps the product and domain code consistent across Apple platforms. Platform-specific behavior will be isolated only when the platforms genuinely differ.
 
@@ -21,7 +22,7 @@ The shared target keeps the product and domain code consistent across Apple plat
 
 Echo's implementation is public for learning and portfolio review. Personal journal data is not part of the project and must never enter Git.
 
-Future persistence will use the application sandbox. Tests, previews, screenshots, and demos must use fictional data; development builds must never copy a personal application container into this checkout. Long-lived service credentials will not be embedded in the application. User-provided credentials, if supported later, belong in Keychain.
+Production persistence uses the application sandbox. Tests, previews, screenshots, and demos must use fictional data; development builds must never copy a personal application container into this checkout. Long-lived service credentials will not be embedded in the application. User-provided credentials, if supported later, belong in Keychain.
 
 Before committing, activate the repository hook once per clone and run the full audit when appropriate:
 
@@ -72,7 +73,7 @@ xcodebuild \
 
 ## Tests
 
-The `EchoTests` target covers domain invariants rather than SwiftUI rendering. Run it with:
+The `EchoTests` target covers domain invariants, repository CRUD, persistence across container recreation, and storage-location safety rather than SwiftUI rendering. Run it with:
 
 ```sh
 xcodebuild \
@@ -93,7 +94,7 @@ Echo/
   App/          App lifecycle and dependency composition
   Features/     SwiftUI presentation grouped by user-facing feature
   Domain/       Platform-independent models and repository contracts
-  Data/         Persistence adapters and repository implementations (Phase 2)
+  Data/         SwiftData persistence adapters and repository implementations
   Services/     Replaceable external capabilities, including AI (Phase 6)
   Hub/          Future Hub boundary; no Hub implementation in the MVP
   Shared/       Focused UI utilities and resources

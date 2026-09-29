@@ -54,4 +54,4 @@ It excludes accounts, authentication, sync, a backend, real AI calls, Hub or Amb
 
 ## Current implementation boundary
 
-Phase 1 adds the tested journal domain: entries, captured calendar-day identity, chronological grouping, independent highlight relationships, and repository contracts. It intentionally contains no SwiftData schema, concrete repository, AI service, sample personal data, or interactive journal workflow.
+Phase 2 adds local-only persistence behind the tested journal domain: a versioned SwiftData schema, record mapping, durable entry and highlight repositories, and application-container composition. CloudKit is disabled, test stores are isolated from the checkout and personal application data, and all fixtures remain fictional. The implementation intentionally contains no AI service, sample personal data, or interactive journal workflow.
