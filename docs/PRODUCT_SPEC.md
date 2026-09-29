@@ -52,7 +52,6 @@ The MVP includes text entries, local persistence, Today, Timeline, Day Detail, e
 
 It excludes accounts, authentication, sync, a backend, real AI calls, Hub or Ambition integration, media capture, voice transcription, analytics, tags, location, gamification, notifications, widgets, watchOS, and public sharing.
 
-## Phase 0 boundary
+## Current implementation boundary
 
-The current phase contains only the multiplatform project, navigation shell, resources, and documentation. It intentionally contains no journal model, repository, SwiftData schema, AI service, or sample journal data.
-
+Phase 1 adds the tested journal domain: entries, captured calendar-day identity, chronological grouping, independent highlight relationships, and repository contracts. It intentionally contains no SwiftData schema, concrete repository, AI service, sample personal data, or interactive journal workflow.

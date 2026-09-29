@@ -2,7 +2,7 @@
 
 Echo is a private, low-friction journal and life archive for iPhone and Mac. It is designed to feel like a quiet conversation with yourself: write once at the end of a day, capture several small moments, or simply leave the day alone.
 
-> **Status:** Phase 0 — foundation complete. The app currently contains a native navigation shell only. Journal data, persistence, highlights, and AI assistance intentionally begin in later phases.
+> **Status:** Phase 1 — journal domain complete. The app still presents the native navigation shell; persistence and interactive journal features intentionally begin in later phases.
 
 ## Foundation
 
@@ -12,6 +12,8 @@ Echo is a private, low-friction journal and life archive for iPhone and Mac. It 
 - No accounts, network services, analytics, or third-party dependencies
 - No journal content is stored or transmitted in this phase
 - Repository safety checks that reject common credentials and private runtime data
+- Platform-independent entry, day, highlight, ordering, and repository contracts
+- Fictional-data domain tests using Swift Testing
 
 The shared target keeps the product and domain code consistent across Apple platforms. Platform-specific behavior will be isolated only when the platforms genuinely differ.
 
@@ -70,7 +72,7 @@ xcodebuild \
 
 ## Tests
 
-Phase 0 has no behavior to test, so it deliberately does not include placeholder UI tests. A unit-test target and meaningful domain tests are introduced with the journal domain in Phase 1. Once present, run them with:
+The `EchoTests` target covers domain invariants rather than SwiftUI rendering. Run it with:
 
 ```sh
 xcodebuild \
@@ -78,6 +80,7 @@ xcodebuild \
   -scheme Echo \
   -destination 'platform=macOS' \
   -derivedDataPath /tmp/EchoDerivedData-tests \
+  CODE_SIGNING_ALLOWED=NO \
   test
 ```
 
@@ -89,7 +92,7 @@ The source tree grows by responsibility:
 Echo/
   App/          App lifecycle and dependency composition
   Features/     SwiftUI presentation grouped by user-facing feature
-  Domain/       Platform-independent models and use cases (Phase 1)
+  Domain/       Platform-independent models and repository contracts
   Data/         Persistence adapters and repository implementations (Phase 2)
   Services/     Replaceable external capabilities, including AI (Phase 6)
   Hub/          Future Hub boundary; no Hub implementation in the MVP

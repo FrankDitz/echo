@@ -23,9 +23,8 @@ Echo/
     EntryEditor/       Planned entry editor presentation
     DayDetail/         Planned day-detail presentation
   Domain/
-    Models/            Planned value types and entities
-    Services/          Planned application use-case contracts
-    Repositories/      Planned persistence contracts
+    Models/            Entry, calendar day, ordering, and highlight behavior
+    Repositories/      Async persistence contracts
   Data/
     Persistence/       Planned SwiftData models and mapping
     Repositories/      Planned repository implementations
@@ -35,7 +34,7 @@ Echo/
   Shared/              Focused reusable UI and resources
 ```
 
-Only directories with real Phase 0 files exist today. Future directories are created when their first implementation arrives, avoiding empty abstractions and placeholder production types.
+Only directories with real implementation files exist today. Future directories are created when their first implementation arrives, avoiding empty abstractions and placeholder production types.
 
 ## Dependency direction
 
@@ -55,9 +54,11 @@ These are boundaries, not a requirement to create one type per layer. A protocol
 
 ## Data and identity decisions
 
-Phase 1 defines stable UUIDs, explicit timestamps, calendar-day semantics, source, entry type, and highlight behavior in serialization-friendly domain models. Phase 2 maps those models to SwiftData behind repository interfaces. SwiftData types do not flow through SwiftUI as the application's only model.
+Phase 1 defines stable UUIDs, explicit timestamps, calendar-day semantics, source, entry type, and highlight behavior in serialization-friendly domain models. Entry type, source, and highlight-target kind are extensible raw values so newly introduced kinds do not break older decoders. Phase 2 maps these models to SwiftData behind repository interfaces. SwiftData types do not flow through SwiftUI as the application's only model.
 
-Calendar grouping must use an injected or explicit `Calendar` so day boundaries remain testable and correct for the user's locale and time zone.
+Calendar grouping uses an injected `Calendar`. An entry captures its calendar identifier and local era/year/month/day at creation, so later time-zone changes do not silently move it to another day. Day groups and their entries have deterministic chronological ordering with UUID tie-breaking.
+
+Highlights are independent relationships rather than Boolean entry fields. The current target references an entry UUID, while its extensible kind leaves room for organized journals, media, and future passage anchors. A behavior-only collection prevents duplicate highlights for the same target.
 
 Production persistence is confined to the system-provided application container. No repository or service may default to a relative path, the current working directory, the source checkout, or the application bundle. Tests use in-memory stores or unique disposable directories and never read from a personal application container.
 
@@ -73,7 +74,7 @@ Feature state will be owned by focused observable presentation types when behavi
 
 ## Testing strategy
 
-Tests begin with Phase 1, when meaningful domain behavior exists. They prioritize creation and editing invariants, day grouping, ordering, highlighting, repository behavior, and proof that assisted text never replaces originals. UI snapshot or rendering tests are not part of the initial strategy.
+Tests begin with Phase 1, when meaningful domain behavior exists. They cover creation and editing invariants, monotonic timestamps, Codable round-trips, calendar and time-zone boundaries, deterministic ordering, day grouping, highlighting, and proof that assisted text never replaces originals. Repository implementations are tested when persistence arrives in Phase 2. UI snapshot or rendering tests are not part of the initial strategy.
 
 All fixtures are fictional. Persistence tests use in-memory or disposable stores and include an invariant that no database is created beneath the repository checkout. Repository safety checks scan staged files and reachable history for private-data paths and credential patterns.
 
@@ -86,6 +87,10 @@ Shared product behavior outweighs the small amount of platform variation. One ta
 ### No persistence in Phase 0
 
 Adding SwiftData before defining domain semantics would let a storage framework shape the model prematurely. Persistence follows the tested domain contract in Phase 2.
+
+### Independent highlights
+
+An entry does not own an `isHighlighted` flag. A separate highlight has its own stable identity, timestamp, and entity target. This keeps entry data focused and supports future highlight targets without rewriting entry persistence.
 
 ### No empty test suite
 
