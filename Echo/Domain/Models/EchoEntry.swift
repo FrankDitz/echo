@@ -11,6 +11,26 @@ struct EchoEntry: Identifiable, Codable, Hashable, Sendable {
   let source: EchoEntrySource
 
   init(
+    id: UUID,
+    createdAt: Date,
+    modifiedAt: Date,
+    day: EchoDayIdentifier,
+    rawText: String,
+    polishedText: String?,
+    type: EchoEntryType,
+    source: EchoEntrySource
+  ) {
+    self.id = id
+    self.createdAt = createdAt
+    self.modifiedAt = max(createdAt, modifiedAt)
+    self.day = day
+    self.rawText = rawText
+    self.polishedText = polishedText
+    self.type = type
+    self.source = source
+  }
+
+  init(
     id: UUID = UUID(),
     createdAt: Date,
     modifiedAt: Date? = nil,
