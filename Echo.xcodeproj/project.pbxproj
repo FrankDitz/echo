@@ -32,6 +32,8 @@
 		C10000000000000000000009 /* SwiftDataEchoEntryRepositoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000029 /* SwiftDataEchoEntryRepositoryTests.swift */; };
 		C1000000000000000000000A /* SwiftDataEchoHighlightRepositoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1000000000000000000002A /* SwiftDataEchoHighlightRepositoryTests.swift */; };
 		C1000000000000000000000B /* EchoModelContainerFactoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1000000000000000000002B /* EchoModelContainerFactoryTests.swift */; };
+		D10000000000000000000001 /* TodayViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10000000000000000000021 /* TodayViewModel.swift */; };
+		D10000000000000000000002 /* TodayViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10000000000000000000022 /* TodayViewModelTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -72,6 +74,8 @@
 		C10000000000000000000029 /* SwiftDataEchoEntryRepositoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataEchoEntryRepositoryTests.swift; sourceTree = "<group>"; };
 		C1000000000000000000002A /* SwiftDataEchoHighlightRepositoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataEchoHighlightRepositoryTests.swift; sourceTree = "<group>"; };
 		C1000000000000000000002B /* EchoModelContainerFactoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoModelContainerFactoryTests.swift; sourceTree = "<group>"; };
+		D10000000000000000000021 /* TodayViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayViewModel.swift; sourceTree = "<group>"; };
+		D10000000000000000000022 /* TodayViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayViewModelTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -136,6 +140,7 @@
 			isa = PBXGroup;
 			children = (
 				A1000000000000000000000B /* AppShell */,
+				D10000000000000000000040 /* Today */,
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -228,6 +233,7 @@
 				C10000000000000000000029 /* SwiftDataEchoEntryRepositoryTests.swift */,
 				C1000000000000000000002A /* SwiftDataEchoHighlightRepositoryTests.swift */,
 				C1000000000000000000002B /* EchoModelContainerFactoryTests.swift */,
+				D10000000000000000000022 /* TodayViewModelTests.swift */,
 			);
 			path = EchoTests;
 			sourceTree = "<group>";
@@ -259,6 +265,14 @@
 				C10000000000000000000028 /* SwiftDataEchoHighlightRepository.swift */,
 			);
 			path = Repositories;
+			sourceTree = "<group>";
+		};
+		D10000000000000000000040 /* Today */ = {
+			isa = PBXGroup;
+			children = (
+				D10000000000000000000021 /* TodayViewModel.swift */,
+			);
+			path = Today;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -377,6 +391,7 @@
 				C10000000000000000000006 /* EchoPersistenceMapper.swift in Sources */,
 				C10000000000000000000007 /* SwiftDataEchoEntryRepository.swift in Sources */,
 				C10000000000000000000008 /* SwiftDataEchoHighlightRepository.swift in Sources */,
+				D10000000000000000000001 /* TodayViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -391,6 +406,7 @@
 				C10000000000000000000009 /* SwiftDataEchoEntryRepositoryTests.swift in Sources */,
 				C1000000000000000000000A /* SwiftDataEchoHighlightRepositoryTests.swift in Sources */,
 				C1000000000000000000000B /* EchoModelContainerFactoryTests.swift in Sources */,
+				D10000000000000000000002 /* TodayViewModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
