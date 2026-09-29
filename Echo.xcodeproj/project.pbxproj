@@ -10,17 +10,57 @@
 		A10000000000000000000031 /* EchoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000021 /* EchoApp.swift */; };
 		A10000000000000000000032 /* AppShellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000022 /* AppShellView.swift */; };
 		A10000000000000000000033 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000023 /* Assets.xcassets */; };
+		B10000000000000000000001 /* EchoDayIdentifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000021 /* EchoDayIdentifier.swift */; };
+		B10000000000000000000002 /* EchoEntryClassification.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000022 /* EchoEntryClassification.swift */; };
+		B10000000000000000000003 /* EchoEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000023 /* EchoEntry.swift */; };
+		B10000000000000000000004 /* EchoDay.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000024 /* EchoDay.swift */; };
+		B10000000000000000000005 /* EchoHighlight.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000025 /* EchoHighlight.swift */; };
+		B10000000000000000000006 /* EchoEntryRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000026 /* EchoEntryRepository.swift */; };
+		B10000000000000000000007 /* EchoHighlightRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000027 /* EchoHighlightRepository.swift */; };
+		B10000000000000000000008 /* TestSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000028 /* TestSupport.swift */; };
+		B10000000000000000000009 /* EchoEntryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000029 /* EchoEntryTests.swift */; };
+		B1000000000000000000000A /* EchoDayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000002A /* EchoDayTests.swift */; };
+		B1000000000000000000000B /* EchoHighlightTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000002B /* EchoHighlightTests.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		B10000000000000000000060 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A10000000000000000000000 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A10000000000000000000010;
+			remoteInfo = Echo;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		A10000000000000000000020 /* Echo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Echo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A10000000000000000000021 /* EchoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoApp.swift; sourceTree = "<group>"; };
 		A10000000000000000000022 /* AppShellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppShellView.swift; sourceTree = "<group>"; };
 		A10000000000000000000023 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		B10000000000000000000021 /* EchoDayIdentifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoDayIdentifier.swift; sourceTree = "<group>"; };
+		B10000000000000000000022 /* EchoEntryClassification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoEntryClassification.swift; sourceTree = "<group>"; };
+		B10000000000000000000023 /* EchoEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoEntry.swift; sourceTree = "<group>"; };
+		B10000000000000000000024 /* EchoDay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoDay.swift; sourceTree = "<group>"; };
+		B10000000000000000000025 /* EchoHighlight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoHighlight.swift; sourceTree = "<group>"; };
+		B10000000000000000000026 /* EchoEntryRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoEntryRepository.swift; sourceTree = "<group>"; };
+		B10000000000000000000027 /* EchoHighlightRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoHighlightRepository.swift; sourceTree = "<group>"; };
+		B10000000000000000000028 /* TestSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestSupport.swift; sourceTree = "<group>"; };
+		B10000000000000000000029 /* EchoEntryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoEntryTests.swift; sourceTree = "<group>"; };
+		B1000000000000000000002A /* EchoDayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoDayTests.swift; sourceTree = "<group>"; };
+		B1000000000000000000002B /* EchoHighlightTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoHighlightTests.swift; sourceTree = "<group>"; };
+		B1000000000000000000002C /* EchoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EchoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		A10000000000000000000041 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B10000000000000000000052 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -34,6 +74,7 @@
 			isa = PBXGroup;
 			children = (
 				A10000000000000000000002 /* Echo */,
+				B10000000000000000000042 /* EchoTests */,
 				A10000000000000000000003 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -56,6 +97,7 @@
 			isa = PBXGroup;
 			children = (
 				A10000000000000000000020 /* Echo.app */,
+				B1000000000000000000002C /* EchoTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -79,6 +121,8 @@
 		A10000000000000000000006 /* Domain */ = {
 			isa = PBXGroup;
 			children = (
+				B10000000000000000000040 /* Models */,
+				B10000000000000000000041 /* Repositories */,
 			);
 			path = Domain;
 			sourceTree = "<group>";
@@ -128,6 +172,38 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
+		B10000000000000000000040 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				B10000000000000000000021 /* EchoDayIdentifier.swift */,
+				B10000000000000000000022 /* EchoEntryClassification.swift */,
+				B10000000000000000000023 /* EchoEntry.swift */,
+				B10000000000000000000024 /* EchoDay.swift */,
+				B10000000000000000000025 /* EchoHighlight.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		B10000000000000000000041 /* Repositories */ = {
+			isa = PBXGroup;
+			children = (
+				B10000000000000000000026 /* EchoEntryRepository.swift */,
+				B10000000000000000000027 /* EchoHighlightRepository.swift */,
+			);
+			path = Repositories;
+			sourceTree = "<group>";
+		};
+		B10000000000000000000042 /* EchoTests */ = {
+			isa = PBXGroup;
+			children = (
+				B10000000000000000000028 /* TestSupport.swift */,
+				B10000000000000000000029 /* EchoEntryTests.swift */,
+				B1000000000000000000002A /* EchoDayTests.swift */,
+				B1000000000000000000002B /* EchoHighlightTests.swift */,
+			);
+			path = EchoTests;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -148,6 +224,24 @@
 			productReference = A10000000000000000000020 /* Echo.app */;
 			productType = "com.apple.product-type.application";
 		};
+		B10000000000000000000050 /* EchoTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B10000000000000000000070 /* Build configuration list for PBXNativeTarget "EchoTests" */;
+			buildPhases = (
+				B10000000000000000000051 /* Sources */,
+				B10000000000000000000052 /* Frameworks */,
+				B10000000000000000000053 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B10000000000000000000061 /* PBXTargetDependency */,
+			);
+			name = EchoTests;
+			productName = EchoTests;
+			productReference = B1000000000000000000002C /* EchoTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -160,6 +254,10 @@
 				TargetAttributes = {
 					A10000000000000000000010 = {
 						CreatedOnToolsVersion = 26.6;
+					};
+					B10000000000000000000050 = {
+						CreatedOnToolsVersion = 26.6;
+						TestTargetID = A10000000000000000000010;
 					};
 				};
 			};
@@ -177,6 +275,7 @@
 			projectRoot = "";
 			targets = (
 				A10000000000000000000010 /* Echo */,
+				B10000000000000000000050 /* EchoTests */,
 			);
 		};
 /* End PBXProject section */
@@ -190,6 +289,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		B10000000000000000000053 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -199,10 +305,36 @@
 			files = (
 				A10000000000000000000031 /* EchoApp.swift in Sources */,
 				A10000000000000000000032 /* AppShellView.swift in Sources */,
+				B10000000000000000000001 /* EchoDayIdentifier.swift in Sources */,
+				B10000000000000000000002 /* EchoEntryClassification.swift in Sources */,
+				B10000000000000000000003 /* EchoEntry.swift in Sources */,
+				B10000000000000000000004 /* EchoDay.swift in Sources */,
+				B10000000000000000000005 /* EchoHighlight.swift in Sources */,
+				B10000000000000000000006 /* EchoEntryRepository.swift in Sources */,
+				B10000000000000000000007 /* EchoHighlightRepository.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B10000000000000000000051 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B10000000000000000000008 /* TestSupport.swift in Sources */,
+				B10000000000000000000009 /* EchoEntryTests.swift in Sources */,
+				B1000000000000000000000A /* EchoDayTests.swift in Sources */,
+				B1000000000000000000000B /* EchoHighlightTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		B10000000000000000000061 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A10000000000000000000010 /* Echo */;
+			targetProxy = B10000000000000000000060 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		A10000000000000000000070 /* Debug */ = {
@@ -364,6 +496,56 @@
 			};
 			name = Release;
 		};
+		B10000000000000000000071 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.frankditz.echo.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Echo.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Echo";
+			};
+			name = Debug;
+		};
+		B10000000000000000000072 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.frankditz.echo.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Echo.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Echo";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -381,6 +563,15 @@
 			buildConfigurations = (
 				A10000000000000000000072 /* Debug */,
 				A10000000000000000000073 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B10000000000000000000070 /* Build configuration list for PBXNativeTarget "EchoTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B10000000000000000000071 /* Debug */,
+				B10000000000000000000072 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
