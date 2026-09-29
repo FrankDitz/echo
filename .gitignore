@@ -1,0 +1,33 @@
+# macOS
+.DS_Store
+
+# Xcode user state
+*.xcuserstate
+xcuserdata/
+*.xccheckout
+*.moved-aside
+
+# Build products
+build/
+DerivedData/
+*.ipa
+*.dSYM
+*.dSYM.zip
+
+# Swift Package Manager caches
+.build/
+.swiftpm/xcode/package.xcworkspace/xcuserdata/
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+*.p12
+*.pem
+
+# Local journal data and exports
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+Exports/
+
