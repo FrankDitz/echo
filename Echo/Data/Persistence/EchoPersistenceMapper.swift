@@ -67,6 +67,50 @@ enum EchoPersistenceMapper {
     )
   }
 
+  static func makeOrganizedJournalRecord(
+    from journal: EchoOrganizedJournal
+  ) throws -> PersistentEchoOrganizedJournal {
+    let dayPayload = try encodeDay(journal.day)
+    return PersistentEchoOrganizedJournal(
+      id: journal.id,
+      dayKey: dayPayload.base64EncodedString(),
+      dayPayload: dayPayload,
+      createdAt: journal.createdAt,
+      modifiedAt: journal.modifiedAt,
+      body: journal.body,
+      sourceEntryIDsPayload: try encodeEntryIDs(journal.sourceEntryIDs),
+      generatorRawValue: journal.generator.rawValue
+    )
+  }
+
+  static func update(
+    _ record: PersistentEchoOrganizedJournal,
+    from journal: EchoOrganizedJournal
+  ) throws {
+    let dayPayload = try encodeDay(journal.day)
+    record.dayKey = dayPayload.base64EncodedString()
+    record.dayPayload = dayPayload
+    record.createdAt = journal.createdAt
+    record.modifiedAt = journal.modifiedAt
+    record.body = journal.body
+    record.sourceEntryIDsPayload = try encodeEntryIDs(journal.sourceEntryIDs)
+    record.generatorRawValue = journal.generator.rawValue
+  }
+
+  static func makeOrganizedJournal(
+    from record: PersistentEchoOrganizedJournal
+  ) throws -> EchoOrganizedJournal {
+    EchoOrganizedJournal(
+      id: record.id,
+      day: try decodeDay(record.dayPayload),
+      createdAt: record.createdAt,
+      modifiedAt: record.modifiedAt,
+      body: record.body,
+      sourceEntryIDs: try decodeEntryIDs(record.sourceEntryIDsPayload),
+      generator: EchoJournalGenerator(rawValue: record.generatorRawValue)
+    )
+  }
+
   private static func encodeDay(_ day: EchoDayIdentifier) throws -> Data {
     let encoder = JSONEncoder()
     encoder.outputFormatting = [.sortedKeys]
@@ -75,5 +119,13 @@ enum EchoPersistenceMapper {
 
   private static func decodeDay(_ data: Data) throws -> EchoDayIdentifier {
     try JSONDecoder().decode(EchoDayIdentifier.self, from: data)
+  }
+
+  private static func encodeEntryIDs(_ ids: [UUID]) throws -> Data {
+    try JSONEncoder().encode(ids)
+  }
+
+  private static func decodeEntryIDs(_ data: Data) throws -> [UUID] {
+    try JSONDecoder().decode([UUID].self, from: data)
   }
 }
