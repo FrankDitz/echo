@@ -7,6 +7,7 @@ struct EchoApp: App {
   private let todayViewModel: TodayViewModel
   private let timelineViewModel: TimelineViewModel
   private let highlightViewModel: EntryHighlightViewModel
+  private let highlightsViewModel: HighlightsViewModel
 
   init() {
     do {
@@ -17,6 +18,11 @@ struct EchoApp: App {
       todayViewModel = TodayViewModel(repository: entryRepository)
       timelineViewModel = TimelineViewModel(repository: entryRepository)
       highlightViewModel = EntryHighlightViewModel(repository: highlightRepository)
+      highlightsViewModel = HighlightsViewModel(
+        entryRepository: entryRepository,
+        highlightRepository: highlightRepository,
+        entryHighlightViewModel: highlightViewModel
+      )
     } catch {
       preconditionFailure("Echo could not initialize its local data store.")
     }
@@ -27,7 +33,8 @@ struct EchoApp: App {
       AppShellView(
         todayViewModel: todayViewModel,
         timelineViewModel: timelineViewModel,
-        highlightViewModel: highlightViewModel
+        highlightViewModel: highlightViewModel,
+        highlightsViewModel: highlightsViewModel
       )
     }
     .modelContainer(modelContainer)

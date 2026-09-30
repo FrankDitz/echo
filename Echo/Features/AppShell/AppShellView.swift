@@ -4,6 +4,7 @@ struct AppShellView: View {
   let todayViewModel: TodayViewModel
   let timelineViewModel: TimelineViewModel
   let highlightViewModel: EntryHighlightViewModel
+  let highlightsViewModel: HighlightsViewModel
 
   @State private var selection: AppSection = .today
   @State private var isShowingSettings = false
@@ -29,11 +30,7 @@ struct AppShellView: View {
             Label("Timeline", systemImage: "clock")
           }
 
-        placeholder(
-          title: "Highlights",
-          systemImage: "bookmark",
-          description: "Meaningful moments will be easy to revisit."
-        )
+        HighlightsView(viewModel: highlightsViewModel)
         .tag(AppSection.highlights)
         .tabItem {
           Label("Highlights", systemImage: "bookmark")
@@ -52,17 +49,6 @@ struct AppShellView: View {
     }
   }
 
-  private func placeholder(
-    title: String,
-    systemImage: String,
-    description: String
-  ) -> some View {
-    ContentUnavailableView(
-      title,
-      systemImage: systemImage,
-      description: Text(description)
-    )
-  }
 }
 
 private enum AppSection: Hashable {
