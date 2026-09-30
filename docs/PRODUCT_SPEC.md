@@ -34,7 +34,7 @@ Writing never requires a mood, tag, prompt, rating, category, or other metadata 
 
 ## Timeline and day detail
 
-Timeline groups previous entries by calendar day. Day Detail prioritizes readable chronological entries and later accommodates an organized journal, highlights, media, and Hub-provided context.
+Timeline groups previous entries by calendar day. Day Detail prioritizes readable chronological entries, presents an optional organized journal separately from its raw sources, and later accommodates media and Hub-provided context.
 
 ## Highlights
 
@@ -54,4 +54,4 @@ It excludes accounts, authentication, sync, a backend, real AI calls, Hub or Amb
 
 ## Current implementation boundary
 
-Phase 5 adds whole-entry curation. Entries can be highlighted or unhighlighted from Today and Day Detail, and Highlights joins those independent relationships to their locally stored source entries in newest-highlighted-first order. Selecting a highlight opens its complete original day, scrolls to the source entry, and gives it restrained visual emphasis. Missing source records are omitted safely. The implementation still contains no AI service, provider credential, network call, or sample personal data.
+Phase 6 completes the functional MVP with a provider-neutral assistance boundary and a deterministic offline implementation. Cleanup and polish results are stored separately from immutable raw writing. Day Detail can generate or regenerate a separately persisted organized journal while retaining its ordered source-entry identities and continuing to display every original entry. SwiftData schema V2 adds organized journals through an explicit lightweight migration. The implementation contains no external model, provider credential, network call, logging of journal content, or sample personal data.
