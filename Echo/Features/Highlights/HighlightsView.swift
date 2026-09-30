@@ -3,6 +3,8 @@ import SwiftUI
 struct HighlightsView: View {
   let viewModel: HighlightsViewModel
   let highlightViewModel: EntryHighlightViewModel
+  let aiService: any EchoAIService
+  let journalRepository: any EchoOrganizedJournalRepository
 
   @State private var selectedItem: HighlightedEntry?
 
@@ -28,6 +30,8 @@ struct HighlightsView: View {
       DayDetailView(
         day: item.sourceDay,
         highlightViewModel: highlightViewModel,
+        aiService: aiService,
+        journalRepository: journalRepository,
         focusedEntryID: item.entry.id
       )
     }

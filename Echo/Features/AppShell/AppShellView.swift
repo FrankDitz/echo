@@ -6,6 +6,7 @@ struct AppShellView: View {
   let highlightViewModel: EntryHighlightViewModel
   let highlightsViewModel: HighlightsViewModel
   let aiService: any EchoAIService
+  let journalRepository: any EchoOrganizedJournalRepository
 
   @State private var selection: AppSection = .today
   @State private var isShowingSettings = false
@@ -25,7 +26,9 @@ struct AppShellView: View {
 
         TimelineView(
           viewModel: timelineViewModel,
-          highlightViewModel: highlightViewModel
+          highlightViewModel: highlightViewModel,
+          aiService: aiService,
+          journalRepository: journalRepository
         )
           .tag(AppSection.timeline)
           .tabItem {
@@ -34,7 +37,9 @@ struct AppShellView: View {
 
         HighlightsView(
           viewModel: highlightsViewModel,
-          highlightViewModel: highlightViewModel
+          highlightViewModel: highlightViewModel,
+          aiService: aiService,
+          journalRepository: journalRepository
         )
         .tag(AppSection.highlights)
         .tabItem {

@@ -3,6 +3,8 @@ import SwiftUI
 struct TimelineView: View {
   let viewModel: TimelineViewModel
   let highlightViewModel: EntryHighlightViewModel
+  let aiService: any EchoAIService
+  let journalRepository: any EchoOrganizedJournalRepository
 
   @Environment(\.timeZone) private var timeZone
 
@@ -52,7 +54,12 @@ struct TimelineView: View {
     } else {
       ForEach(viewModel.days) { day in
         NavigationLink {
-          DayDetailView(day: day, highlightViewModel: highlightViewModel)
+          DayDetailView(
+            day: day,
+            highlightViewModel: highlightViewModel,
+            aiService: aiService,
+            journalRepository: journalRepository
+          )
         } label: {
           TimelineDayRow(day: day, timeZone: timeZone)
         }
