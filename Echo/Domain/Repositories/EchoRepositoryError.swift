@@ -6,4 +6,7 @@ enum EchoRepositoryError: Error, Equatable, Sendable {
   case duplicateHighlight(UUID)
   case duplicateHighlightTarget(EchoHighlightTarget)
   case highlightNotFound(UUID)
+  case duplicateOrganizedJournal(UUID)
+  case duplicateOrganizedJournalDay(EchoDayIdentifier)
+  case organizedJournalNotFound(UUID)
 }

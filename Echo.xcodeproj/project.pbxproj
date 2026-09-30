@@ -49,6 +49,12 @@
 		L10000000000000000000001 /* EchoAIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = L10000000000000000000021 /* EchoAIService.swift */; };
 		L10000000000000000000002 /* DeterministicLocalAIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = L10000000000000000000022 /* DeterministicLocalAIService.swift */; };
 		L10000000000000000000003 /* EchoAIServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = L10000000000000000000023 /* EchoAIServiceTests.swift */; };
+		M10000000000000000000001 /* EchoOrganizedJournal.swift in Sources */ = {isa = PBXBuildFile; fileRef = M10000000000000000000021 /* EchoOrganizedJournal.swift */; };
+		M10000000000000000000002 /* EchoOrganizedJournalRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = M10000000000000000000022 /* EchoOrganizedJournalRepository.swift */; };
+		M10000000000000000000003 /* PersistentEchoOrganizedJournal.swift in Sources */ = {isa = PBXBuildFile; fileRef = M10000000000000000000023 /* PersistentEchoOrganizedJournal.swift */; };
+		M10000000000000000000004 /* SwiftDataEchoOrganizedJournalRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = M10000000000000000000024 /* SwiftDataEchoOrganizedJournalRepository.swift */; };
+		M10000000000000000000005 /* EchoOrganizedJournalTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = M10000000000000000000025 /* EchoOrganizedJournalTests.swift */; };
+		M10000000000000000000006 /* SwiftDataEchoOrganizedJournalRepositoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = M10000000000000000000026 /* SwiftDataEchoOrganizedJournalRepositoryTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -106,6 +112,12 @@
 		L10000000000000000000021 /* EchoAIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoAIService.swift; sourceTree = "<group>"; };
 		L10000000000000000000022 /* DeterministicLocalAIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeterministicLocalAIService.swift; sourceTree = "<group>"; };
 		L10000000000000000000023 /* EchoAIServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoAIServiceTests.swift; sourceTree = "<group>"; };
+		M10000000000000000000021 /* EchoOrganizedJournal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoOrganizedJournal.swift; sourceTree = "<group>"; };
+		M10000000000000000000022 /* EchoOrganizedJournalRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoOrganizedJournalRepository.swift; sourceTree = "<group>"; };
+		M10000000000000000000023 /* PersistentEchoOrganizedJournal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistentEchoOrganizedJournal.swift; sourceTree = "<group>"; };
+		M10000000000000000000024 /* SwiftDataEchoOrganizedJournalRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataEchoOrganizedJournalRepository.swift; sourceTree = "<group>"; };
+		M10000000000000000000025 /* EchoOrganizedJournalTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoOrganizedJournalTests.swift; sourceTree = "<group>"; };
+		M10000000000000000000026 /* SwiftDataEchoOrganizedJournalRepositoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataEchoOrganizedJournalRepositoryTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -244,6 +256,7 @@
 				B10000000000000000000023 /* EchoEntry.swift */,
 				B10000000000000000000024 /* EchoDay.swift */,
 				B10000000000000000000025 /* EchoHighlight.swift */,
+				M10000000000000000000021 /* EchoOrganizedJournal.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -254,6 +267,7 @@
 				B10000000000000000000026 /* EchoEntryRepository.swift */,
 				B10000000000000000000027 /* EchoHighlightRepository.swift */,
 				C10000000000000000000021 /* EchoRepositoryError.swift */,
+				M10000000000000000000022 /* EchoOrganizedJournalRepository.swift */,
 			);
 			path = Repositories;
 			sourceTree = "<group>";
@@ -273,6 +287,8 @@
 				J10000000000000000000023 /* EntryHighlightViewModelTests.swift */,
 				K10000000000000000000023 /* HighlightsViewModelTests.swift */,
 				L10000000000000000000023 /* EchoAIServiceTests.swift */,
+				M10000000000000000000025 /* EchoOrganizedJournalTests.swift */,
+				M10000000000000000000026 /* SwiftDataEchoOrganizedJournalRepositoryTests.swift */,
 			);
 			path = EchoTests;
 			sourceTree = "<group>";
@@ -293,6 +309,7 @@
 			children = (
 				C10000000000000000000022 /* PersistentEchoEntry.swift */,
 				C10000000000000000000023 /* PersistentEchoHighlight.swift */,
+				M10000000000000000000023 /* PersistentEchoOrganizedJournal.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -302,6 +319,7 @@
 			children = (
 				C10000000000000000000027 /* SwiftDataEchoEntryRepository.swift */,
 				C10000000000000000000028 /* SwiftDataEchoHighlightRepository.swift */,
+				M10000000000000000000024 /* SwiftDataEchoOrganizedJournalRepository.swift */,
 			);
 			path = Repositories;
 			sourceTree = "<group>";
@@ -488,6 +506,10 @@
 				K10000000000000000000002 /* HighlightsView.swift in Sources */,
 				L10000000000000000000001 /* EchoAIService.swift in Sources */,
 				L10000000000000000000002 /* DeterministicLocalAIService.swift in Sources */,
+				M10000000000000000000001 /* EchoOrganizedJournal.swift in Sources */,
+				M10000000000000000000002 /* EchoOrganizedJournalRepository.swift in Sources */,
+				M10000000000000000000003 /* PersistentEchoOrganizedJournal.swift in Sources */,
+				M10000000000000000000004 /* SwiftDataEchoOrganizedJournalRepository.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -507,6 +529,8 @@
 				J10000000000000000000003 /* EntryHighlightViewModelTests.swift in Sources */,
 				K10000000000000000000003 /* HighlightsViewModelTests.swift in Sources */,
 				L10000000000000000000003 /* EchoAIServiceTests.swift in Sources */,
+				M10000000000000000000005 /* EchoOrganizedJournalTests.swift in Sources */,
+				M10000000000000000000006 /* SwiftDataEchoOrganizedJournalRepositoryTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
