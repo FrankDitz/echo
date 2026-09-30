@@ -5,6 +5,7 @@ struct AppShellView: View {
   let timelineViewModel: TimelineViewModel
   let highlightViewModel: EntryHighlightViewModel
   let highlightsViewModel: HighlightsViewModel
+  let aiService: any EchoAIService
 
   @State private var selection: AppSection = .today
   @State private var isShowingSettings = false
@@ -14,7 +15,8 @@ struct AppShellView: View {
       TabView(selection: $selection) {
         TodayView(
           viewModel: todayViewModel,
-          highlightViewModel: highlightViewModel
+          highlightViewModel: highlightViewModel,
+          aiService: aiService
         )
           .tag(AppSection.today)
           .tabItem {

@@ -8,13 +8,16 @@ struct EchoApp: App {
   private let timelineViewModel: TimelineViewModel
   private let highlightViewModel: EntryHighlightViewModel
   private let highlightsViewModel: HighlightsViewModel
+  private let aiService: any EchoAIService
 
   init() {
     do {
       let container = try EchoModelContainerFactory.makePersistent()
       let entryRepository = SwiftDataEchoEntryRepository(modelContainer: container)
       let highlightRepository = SwiftDataEchoHighlightRepository(modelContainer: container)
+      let aiService = DeterministicLocalAIService()
       modelContainer = container
+      self.aiService = aiService
       todayViewModel = TodayViewModel(repository: entryRepository)
       timelineViewModel = TimelineViewModel(repository: entryRepository)
       highlightViewModel = EntryHighlightViewModel(repository: highlightRepository)
@@ -34,7 +37,8 @@ struct EchoApp: App {
         todayViewModel: todayViewModel,
         timelineViewModel: timelineViewModel,
         highlightViewModel: highlightViewModel,
-        highlightsViewModel: highlightsViewModel
+        highlightsViewModel: highlightsViewModel,
+        aiService: aiService
       )
     }
     .modelContainer(modelContainer)

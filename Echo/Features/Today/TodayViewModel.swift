@@ -126,6 +126,28 @@ final class TodayViewModel {
     saveState = .idle
   }
 
+  @discardableResult
+  func saveAssistedText(entryID: UUID, text: String) async -> Bool {
+    guard containsWriting(text),
+      let index = entries.firstIndex(where: { $0.id == entryID })
+    else {
+      return false
+    }
+
+    var entry = entries[index]
+    entry.setPolishedText(text, at: now())
+
+    do {
+      try await repository.update(entry)
+      entries[index] = entry
+      failure = nil
+      return true
+    } catch {
+      failure = .updateEntry
+      return false
+    }
+  }
+
   private func containsWriting(_ text: String) -> Bool {
     text.contains(where: { !$0.isWhitespace })
   }
