@@ -2,7 +2,7 @@
 
 Echo is a private, low-friction journal and life archive for iPhone and Mac. It is designed to feel like a quiet conversation with yourself: write once at the end of a day, capture several small moments, or simply leave the day alone.
 
-> **Status:** Phase 4 — Today and Timeline are complete. Echo supports fast local writing, focused editing, historical day summaries, and readable Day Detail navigation.
+> **Status:** Phase 5 — Today, Timeline, and Highlights are complete. Echo supports fast local writing, historical browsing, and a curated collection of meaningful entries.
 
 ## Foundation
 
@@ -19,6 +19,8 @@ Echo is a private, low-friction journal and life archive for iPhone and Mac. It 
 - Confirmed entry deletion through compact action and context menus
 - A newest-first Timeline with previous-day entry counts and previews
 - Readable Day Detail screens with complete chronological entries
+- Persisted whole-entry highlights available from Today and Day Detail
+- A newest-highlighted-first collection with navigation back to the source day and entry
 - Fictional-data domain and persistence tests using Swift Testing
 
 The shared target keeps the product and domain code consistent across Apple platforms. Platform-specific behavior will be isolated only when the platforms genuinely differ.

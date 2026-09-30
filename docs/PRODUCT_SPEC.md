@@ -38,7 +38,7 @@ Timeline groups previous entries by calendar day. Day Detail prioritizes readabl
 
 ## Highlights
 
-The MVP highlights entire entries. The eventual model should be able to reference passages, media, organized journals, or other Echo entities without invalidating the first version.
+The MVP highlights entire entries from Today or Day Detail. Highlights presents the curated collection by most recently highlighted, supports removal, and opens the original Day Detail with the selected entry emphasized and its surrounding entries intact. The eventual model should be able to reference passages, media, organized journals, or other Echo entities without invalidating the first version.
 
 ## Raw and assisted writing
 
@@ -54,4 +54,4 @@ It excludes accounts, authentication, sync, a backend, real AI calls, Hub or Amb
 
 ## Current implementation boundary
 
-Phase 4 adds historical browsing. Timeline groups previous entries into newest-first day summaries with counts and previews, while Day Detail presents each day’s complete raw entries chronologically. Captured calendar-day components drive date presentation so later time-zone changes do not silently relabel a memory. Historical views are read-focused; highlight interactions remain in Phase 5, and the implementation still contains no AI service or sample personal data.
+Phase 5 adds whole-entry curation. Entries can be highlighted or unhighlighted from Today and Day Detail, and Highlights joins those independent relationships to their locally stored source entries in newest-highlighted-first order. Selecting a highlight opens its complete original day, scrolls to the source entry, and gives it restrained visual emphasis. Missing source records are omitted safely. The implementation still contains no AI service, provider credential, network call, or sample personal data.
