@@ -30,7 +30,10 @@ struct AppShellView: View {
             Label("Timeline", systemImage: "clock")
           }
 
-        HighlightsView(viewModel: highlightsViewModel)
+        HighlightsView(
+          viewModel: highlightsViewModel,
+          highlightViewModel: highlightViewModel
+        )
         .tag(AppSection.highlights)
         .tabItem {
           Label("Highlights", systemImage: "bookmark")
