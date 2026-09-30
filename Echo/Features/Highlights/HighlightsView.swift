@@ -2,6 +2,9 @@ import SwiftUI
 
 struct HighlightsView: View {
   let viewModel: HighlightsViewModel
+  let highlightViewModel: EntryHighlightViewModel
+
+  @State private var selectedItem: HighlightedEntry?
 
   var body: some View {
     ScrollView {
@@ -20,6 +23,13 @@ struct HighlightsView: View {
     }
     .refreshable {
       await viewModel.load()
+    }
+    .navigationDestination(item: $selectedItem) { item in
+      DayDetailView(
+        day: item.sourceDay,
+        highlightViewModel: highlightViewModel,
+        focusedEntryID: item.entry.id
+      )
     }
   }
 
@@ -48,11 +58,15 @@ struct HighlightsView: View {
       .frame(maxWidth: .infinity, minHeight: 320)
     } else {
       ForEach(viewModel.items) { item in
-        HighlightedEntryRow(item: item) {
-          Task {
-            await viewModel.remove(entryID: item.entry.id)
+        HighlightedEntryRow(
+          item: item,
+          onOpen: { selectedItem = item },
+          onRemove: {
+            Task {
+              await viewModel.remove(entryID: item.entry.id)
+            }
           }
-        }
+        )
       }
     }
 
@@ -85,6 +99,7 @@ struct HighlightsView: View {
 
 private struct HighlightedEntryRow: View {
   let item: HighlightedEntry
+  let onOpen: () -> Void
   let onRemove: () -> Void
 
   var body: some View {
@@ -101,11 +116,21 @@ private struct HighlightedEntryRow: View {
         .accessibilityLabel("Highlight actions")
       }
 
-      Text(item.entry.rawText)
-        .font(.body)
-        .lineSpacing(4)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .textSelection(.enabled)
+      Button(action: onOpen) {
+        VStack(alignment: .leading, spacing: 12) {
+          Text(item.entry.rawText)
+            .font(.body)
+            .lineSpacing(4)
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+          Label("View in Day Detail", systemImage: "arrow.right")
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(.secondary)
+        }
+        .contentShape(Rectangle())
+      }
+      .buttonStyle(.plain)
+      .accessibilityHint("Opens the original day and entry")
     }
     .padding(18)
     .background(.background, in: RoundedRectangle(cornerRadius: 18))

@@ -1,9 +1,10 @@
 import Foundation
 import Observation
 
-struct HighlightedEntry: Identifiable, Equatable, Sendable {
+struct HighlightedEntry: Identifiable, Hashable, Sendable {
   let highlight: EchoHighlight
   let entry: EchoEntry
+  let sourceDay: EchoDay
 
   var id: UUID { highlight.id }
 }
@@ -49,14 +50,22 @@ final class HighlightsViewModel {
       async let highlightsRequest = highlightRepository.allHighlights()
       let (entries, highlights) = try await (entriesRequest, highlightsRequest)
       let entriesByID = Dictionary(uniqueKeysWithValues: entries.map { ($0.id, $0) })
+      let daysByID = Dictionary(
+        uniqueKeysWithValues: EchoDay.grouping(entries).map { ($0.id, $0) }
+      )
 
       items = highlights.compactMap { highlight in
         guard highlight.target.kind == .entry,
-          let entry = entriesByID[highlight.target.entityID]
+          let entry = entriesByID[highlight.target.entityID],
+          let sourceDay = daysByID[entry.day]
         else {
           return nil
         }
-        return HighlightedEntry(highlight: highlight, entry: entry)
+        return HighlightedEntry(
+          highlight: highlight,
+          entry: entry,
+          sourceDay: sourceDay
+        )
       }
       .sorted(by: newestFirst)
       failure = nil

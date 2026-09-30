@@ -45,7 +45,41 @@ struct HighlightsViewModelTests {
     await viewModel.load()
 
     #expect(viewModel.items.map(\.entry) == [secondEntry, firstEntry])
+    #expect(viewModel.items[0].sourceDay.entries == [secondEntry])
     #expect(viewModel.failure == nil)
+  }
+
+  @Test("A highlight retains every entry from its source day")
+  func sourceDayContext() async throws {
+    let calendar = try makeGregorianCalendar(timeZone: "UTC")
+    let first = EchoEntry(
+      createdAt: try makeDate("2026-10-02T09:00:00Z"),
+      calendar: calendar,
+      rawText: "A fictional morning entry."
+    )
+    let highlighted = EchoEntry(
+      createdAt: try makeDate("2026-10-02T17:00:00Z"),
+      calendar: calendar,
+      rawText: "A fictional evening entry."
+    )
+    let highlight = EchoHighlight(
+      target: .entry(highlighted.id),
+      createdAt: try makeDate("2026-10-04T09:00:00Z")
+    )
+    let entryRepository = HighlightsEntryRepositoryStub(entries: [highlighted, first])
+    let highlightRepository = HighlightsRepositoryStub(highlights: [highlight])
+    let interactionViewModel = EntryHighlightViewModel(repository: highlightRepository)
+    let viewModel = HighlightsViewModel(
+      entryRepository: entryRepository,
+      highlightRepository: highlightRepository,
+      entryHighlightViewModel: interactionViewModel
+    )
+
+    await viewModel.load()
+
+    let item = try #require(viewModel.items.first)
+    #expect(item.entry == highlighted)
+    #expect(item.sourceDay.entries == [first, highlighted])
   }
 
   @Test("Removing a highlight updates persistence and the collection")
