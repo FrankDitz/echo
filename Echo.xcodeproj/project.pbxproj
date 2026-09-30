@@ -46,6 +46,9 @@
 		K10000000000000000000001 /* HighlightsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = K10000000000000000000021 /* HighlightsViewModel.swift */; };
 		K10000000000000000000002 /* HighlightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = K10000000000000000000022 /* HighlightsView.swift */; };
 		K10000000000000000000003 /* HighlightsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = K10000000000000000000023 /* HighlightsViewModelTests.swift */; };
+		L10000000000000000000001 /* EchoAIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = L10000000000000000000021 /* EchoAIService.swift */; };
+		L10000000000000000000002 /* DeterministicLocalAIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = L10000000000000000000022 /* DeterministicLocalAIService.swift */; };
+		L10000000000000000000003 /* EchoAIServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = L10000000000000000000023 /* EchoAIServiceTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -100,6 +103,9 @@
 		K10000000000000000000021 /* HighlightsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighlightsViewModel.swift; sourceTree = "<group>"; };
 		K10000000000000000000022 /* HighlightsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighlightsView.swift; sourceTree = "<group>"; };
 		K10000000000000000000023 /* HighlightsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighlightsViewModelTests.swift; sourceTree = "<group>"; };
+		L10000000000000000000021 /* EchoAIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoAIService.swift; sourceTree = "<group>"; };
+		L10000000000000000000022 /* DeterministicLocalAIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeterministicLocalAIService.swift; sourceTree = "<group>"; };
+		L10000000000000000000023 /* EchoAIServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoAIServiceTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -194,6 +200,7 @@
 		A10000000000000000000008 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				L10000000000000000000040 /* AI */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -265,6 +272,7 @@
 				G10000000000000000000022 /* TimelineViewModelTests.swift */,
 				J10000000000000000000023 /* EntryHighlightViewModelTests.swift */,
 				K10000000000000000000023 /* HighlightsViewModelTests.swift */,
+				L10000000000000000000023 /* EchoAIServiceTests.swift */,
 			);
 			path = EchoTests;
 			sourceTree = "<group>";
@@ -341,6 +349,15 @@
 				K10000000000000000000022 /* HighlightsView.swift */,
 			);
 			path = Highlights;
+			sourceTree = "<group>";
+		};
+		L10000000000000000000040 /* AI */ = {
+			isa = PBXGroup;
+			children = (
+				L10000000000000000000021 /* EchoAIService.swift */,
+				L10000000000000000000022 /* DeterministicLocalAIService.swift */,
+			);
+			path = AI;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -469,6 +486,8 @@
 				J10000000000000000000002 /* EntryHighlightButton.swift in Sources */,
 				K10000000000000000000001 /* HighlightsViewModel.swift in Sources */,
 				K10000000000000000000002 /* HighlightsView.swift in Sources */,
+				L10000000000000000000001 /* EchoAIService.swift in Sources */,
+				L10000000000000000000002 /* DeterministicLocalAIService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -487,6 +506,7 @@
 				G10000000000000000000002 /* TimelineViewModelTests.swift in Sources */,
 				J10000000000000000000003 /* EntryHighlightViewModelTests.swift in Sources */,
 				K10000000000000000000003 /* HighlightsViewModelTests.swift in Sources */,
+				L10000000000000000000003 /* EchoAIServiceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
