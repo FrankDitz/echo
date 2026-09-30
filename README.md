@@ -2,7 +2,7 @@
 
 Echo is a private, low-friction journal and life archive for iPhone and Mac. It is designed to feel like a quiet conversation with yourself: write once at the end of a day, capture several small moments, or simply leave the day alone.
 
-> **Status:** Phase 5 — Today, Timeline, and Highlights are complete. Echo supports fast local writing, historical browsing, and a curated collection of meaningful entries.
+> **Status:** Phase 6 — the functional MVP is complete. Echo supports local writing, historical browsing, highlights, deterministic assisted drafts, and organized daily journals without contacting an external AI provider.
 
 ## Foundation
 
@@ -21,6 +21,8 @@ Echo is a private, low-friction journal and life archive for iPhone and Mac. It 
 - Readable Day Detail screens with complete chronological entries
 - Persisted whole-entry highlights available from Today and Day Detail
 - A newest-highlighted-first collection with navigation back to the source day and entry
+- Offline deterministic cleanup and polish drafts that never replace raw writing
+- Persisted organized daily journals with complete source-entry provenance
 - Fictional-data domain and persistence tests using Swift Testing
 
 The shared target keeps the product and domain code consistent across Apple platforms. Platform-specific behavior will be isolated only when the platforms genuinely differ.
@@ -102,7 +104,7 @@ Echo/
   Features/     SwiftUI presentation grouped by user-facing feature
   Domain/       Platform-independent models and repository contracts
   Data/         SwiftData persistence adapters and repository implementations
-  Services/     Replaceable external capabilities, including AI (Phase 6)
+  Services/     Replaceable external capabilities, including the local AI stand-in
   Hub/          Future Hub boundary; no Hub implementation in the MVP
   Shared/       Focused UI utilities and resources
 ```

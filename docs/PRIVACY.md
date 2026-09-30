@@ -4,7 +4,7 @@ Journal content can be among the most sensitive data a person keeps. Echo treats
 
 ## Current behavior
 
-Phase 2 stores journal data locally in the application's sandbox. The application has no account system, networking, analytics, advertising, external AI provider, cloud sync, or third-party dependency. Its SwiftData configuration explicitly disables CloudKit and requests no protected-system permissions.
+Journal data and assisted output remain in the application's local sandbox. The application has no account system, networking, analytics, advertising, external AI provider, cloud sync, or third-party dependency. Phase 6 uses a deterministic in-process stand-in that performs no inference, credential lookup, network request, or content logging. SwiftData explicitly disables CloudKit and the application requests no protected-system permissions.
 
 The source repository is public. It must never contain real journal content, credentials, API keys, tokens, private exports, local database files, personal media, or screenshots of personal entries. Application code must not log entry text. Tests, previews, demos, and documentation use fictional data only.
 

@@ -10,8 +10,9 @@ Each phase is implemented, built, tested where behavior exists, reviewed, commit
 - **Phase 3 — Today (complete):** fast text capture, current-date loading, chronological entries, calm loading and empty states, focused editing with explicit save feedback, and confirmed deletion.
 - **Phase 4 — Timeline (complete):** previous-day filtering and newest-first summaries, entry counts and previews, captured-date presentation, refresh states, native Day Detail navigation, and readable chronological entries.
 - **Phase 5 — Highlights (complete):** highlight and unhighlight entries, browse a newest-highlighted-first curated collection, remove highlights, and navigate to the emphasized source entry within its complete day context.
-- **Phase 6 — AI architecture:** provider-neutral protocol, deterministic local mock, cleanup, polish, day organization, organized-journal model, and immutability tests. No provider credential or real journal content may enter the app bundle, fixtures, logs, or Git.
-- **Phase 7 — MVP review:** full builds and tests, architecture and privacy review, naming cleanup, documentation refresh, staged-data scan, and full reachable-history scan.
+- **Phase 6 — AI architecture (complete):** provider-neutral cleanup, polish, and day-organization contracts; a deterministic offline implementation; separately persisted assisted text; versioned organized-journal storage; Day Detail generation and regeneration; and provenance, durability, failure, and immutability tests. No provider credential, network call, or real journal content enters the app bundle, fixtures, logs, or Git.
+- **Phase 7 — Visual design and polish:** cohesive typography, spacing, color, reusable presentation components, motion, icons, dark mode, accessibility, platform adaptation, and simulator review across Today, Timeline, Day Detail, Highlights, and assisted-writing experiences.
+- **Phase 8 — MVP review:** full builds and tests, architecture and privacy review, naming cleanup, documentation refresh, staged-data scan, and full reachable-history scan.
 
 ## Near-term improvements
 
@@ -21,7 +22,7 @@ Each phase is implemented, built, tested where behavior exists, reviewed, commit
 - Photos and video attachments
 - Voice notes, playback, and transcription
 - People, places, and custom tags
-- Editable and regeneratable organized journals
+- Editable organized journals
 - Export to Markdown and PDF
 - iCloud synchronization
 - Face ID or Touch ID app locking
