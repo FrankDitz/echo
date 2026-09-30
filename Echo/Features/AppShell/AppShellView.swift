@@ -3,6 +3,7 @@ import SwiftUI
 struct AppShellView: View {
   let todayViewModel: TodayViewModel
   let timelineViewModel: TimelineViewModel
+  let highlightViewModel: EntryHighlightViewModel
 
   @State private var selection: AppSection = .today
   @State private var isShowingSettings = false
@@ -10,13 +11,19 @@ struct AppShellView: View {
   var body: some View {
     NavigationStack {
       TabView(selection: $selection) {
-        TodayView(viewModel: todayViewModel)
+        TodayView(
+          viewModel: todayViewModel,
+          highlightViewModel: highlightViewModel
+        )
           .tag(AppSection.today)
           .tabItem {
             Label("Today", systemImage: "sun.max")
           }
 
-        TimelineView(viewModel: timelineViewModel)
+        TimelineView(
+          viewModel: timelineViewModel,
+          highlightViewModel: highlightViewModel
+        )
           .tag(AppSection.timeline)
           .tabItem {
             Label("Timeline", systemImage: "clock")

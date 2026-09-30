@@ -6,14 +6,17 @@ struct EchoApp: App {
   private let modelContainer: ModelContainer
   private let todayViewModel: TodayViewModel
   private let timelineViewModel: TimelineViewModel
+  private let highlightViewModel: EntryHighlightViewModel
 
   init() {
     do {
       let container = try EchoModelContainerFactory.makePersistent()
       let entryRepository = SwiftDataEchoEntryRepository(modelContainer: container)
+      let highlightRepository = SwiftDataEchoHighlightRepository(modelContainer: container)
       modelContainer = container
       todayViewModel = TodayViewModel(repository: entryRepository)
       timelineViewModel = TimelineViewModel(repository: entryRepository)
+      highlightViewModel = EntryHighlightViewModel(repository: highlightRepository)
     } catch {
       preconditionFailure("Echo could not initialize its local data store.")
     }
@@ -23,7 +26,8 @@ struct EchoApp: App {
     WindowGroup {
       AppShellView(
         todayViewModel: todayViewModel,
-        timelineViewModel: timelineViewModel
+        timelineViewModel: timelineViewModel,
+        highlightViewModel: highlightViewModel
       )
     }
     .modelContainer(modelContainer)

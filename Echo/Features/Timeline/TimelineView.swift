@@ -2,6 +2,7 @@ import SwiftUI
 
 struct TimelineView: View {
   let viewModel: TimelineViewModel
+  let highlightViewModel: EntryHighlightViewModel
 
   @Environment(\.timeZone) private var timeZone
 
@@ -51,7 +52,7 @@ struct TimelineView: View {
     } else {
       ForEach(viewModel.days) { day in
         NavigationLink {
-          DayDetailView(day: day)
+          DayDetailView(day: day, highlightViewModel: highlightViewModel)
         } label: {
           TimelineDayRow(day: day, timeZone: timeZone)
         }
