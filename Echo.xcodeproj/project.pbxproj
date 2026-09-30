@@ -43,6 +43,9 @@
 		J10000000000000000000001 /* EntryHighlightViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = J10000000000000000000021 /* EntryHighlightViewModel.swift */; };
 		J10000000000000000000002 /* EntryHighlightButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = J10000000000000000000022 /* EntryHighlightButton.swift */; };
 		J10000000000000000000003 /* EntryHighlightViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = J10000000000000000000023 /* EntryHighlightViewModelTests.swift */; };
+		K10000000000000000000001 /* HighlightsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = K10000000000000000000021 /* HighlightsViewModel.swift */; };
+		K10000000000000000000002 /* HighlightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = K10000000000000000000022 /* HighlightsView.swift */; };
+		K10000000000000000000003 /* HighlightsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = K10000000000000000000023 /* HighlightsViewModelTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -94,6 +97,9 @@
 		J10000000000000000000021 /* EntryHighlightViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryHighlightViewModel.swift; sourceTree = "<group>"; };
 		J10000000000000000000022 /* EntryHighlightButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryHighlightButton.swift; sourceTree = "<group>"; };
 		J10000000000000000000023 /* EntryHighlightViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryHighlightViewModelTests.swift; sourceTree = "<group>"; };
+		K10000000000000000000021 /* HighlightsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighlightsViewModel.swift; sourceTree = "<group>"; };
+		K10000000000000000000022 /* HighlightsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighlightsView.swift; sourceTree = "<group>"; };
+		K10000000000000000000023 /* HighlightsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighlightsViewModelTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -258,6 +264,7 @@
 				D10000000000000000000022 /* TodayViewModelTests.swift */,
 				G10000000000000000000022 /* TimelineViewModelTests.swift */,
 				J10000000000000000000023 /* EntryHighlightViewModelTests.swift */,
+				K10000000000000000000023 /* HighlightsViewModelTests.swift */,
 			);
 			path = EchoTests;
 			sourceTree = "<group>";
@@ -330,6 +337,8 @@
 			children = (
 				J10000000000000000000021 /* EntryHighlightViewModel.swift */,
 				J10000000000000000000022 /* EntryHighlightButton.swift */,
+				K10000000000000000000021 /* HighlightsViewModel.swift */,
+				K10000000000000000000022 /* HighlightsView.swift */,
 			);
 			path = Highlights;
 			sourceTree = "<group>";
@@ -458,6 +467,8 @@
 				I10000000000000000000001 /* DayDetailView.swift in Sources */,
 				J10000000000000000000001 /* EntryHighlightViewModel.swift in Sources */,
 				J10000000000000000000002 /* EntryHighlightButton.swift in Sources */,
+				K10000000000000000000001 /* HighlightsViewModel.swift in Sources */,
+				K10000000000000000000002 /* HighlightsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -475,6 +486,7 @@
 				D10000000000000000000002 /* TodayViewModelTests.swift in Sources */,
 				G10000000000000000000002 /* TimelineViewModelTests.swift in Sources */,
 				J10000000000000000000003 /* EntryHighlightViewModelTests.swift in Sources */,
+				K10000000000000000000003 /* HighlightsViewModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
