@@ -2,6 +2,7 @@ import SwiftUI
 
 struct TodayView: View {
   let viewModel: TodayViewModel
+  let highlightViewModel: EntryHighlightViewModel
 
   @State private var draft = ""
   @State private var selectedEntry: EchoEntry?
@@ -24,6 +25,7 @@ struct TodayView: View {
     .background(groupedBackground)
     .task {
       await viewModel.load()
+      await highlightViewModel.load()
     }
     .sheet(item: $selectedEntry) { entry in
       EntryEditorView(entry: entry) { rawText in
@@ -134,6 +136,7 @@ struct TodayView: View {
         ForEach(viewModel.entries) { entry in
           TodayEntryRow(
             entry: entry,
+            highlightViewModel: highlightViewModel,
             onOpen: { selectedEntry = entry },
             onDelete: { confirmDeletion(of: entry) }
           )
@@ -207,6 +210,7 @@ struct TodayView: View {
 
 private struct TodayEntryRow: View {
   let entry: EchoEntry
+  let highlightViewModel: EntryHighlightViewModel
   let onOpen: () -> Void
   let onDelete: () -> Void
 
@@ -229,6 +233,7 @@ private struct TodayEntryRow: View {
       .accessibilityHint("Opens the entry editor")
 
       Menu("Entry Actions", systemImage: "ellipsis") {
+        EntryHighlightButton(entryID: entry.id, viewModel: highlightViewModel)
         Button("Edit", systemImage: "pencil", action: onOpen)
         Button("Delete", systemImage: "trash", role: .destructive, action: onDelete)
       }
@@ -237,6 +242,7 @@ private struct TodayEntryRow: View {
     }
     .padding(.vertical, 4)
     .contextMenu {
+      EntryHighlightButton(entryID: entry.id, viewModel: highlightViewModel)
       Button("Edit", systemImage: "pencil", action: onOpen)
       Button("Delete", systemImage: "trash", role: .destructive, action: onDelete)
     }

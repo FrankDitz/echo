@@ -2,6 +2,7 @@ import SwiftUI
 
 struct DayDetailView: View {
   let day: EchoDay
+  let highlightViewModel: EntryHighlightViewModel
 
   @Environment(\.timeZone) private var timeZone
 
@@ -18,6 +19,9 @@ struct DayDetailView: View {
     }
     .background(groupedBackground)
     .navigationTitle("Day Detail")
+    .task {
+      await highlightViewModel.load()
+    }
   }
 
   private var header: some View {
@@ -37,7 +41,7 @@ struct DayDetailView: View {
   private var entries: some View {
     VStack(alignment: .leading, spacing: 0) {
       ForEach(day.entries) { entry in
-        DayDetailEntry(entry: entry)
+        DayDetailEntry(entry: entry, highlightViewModel: highlightViewModel)
         if entry.id != day.entries.last?.id {
           Divider()
             .padding(.vertical, 20)
@@ -71,6 +75,7 @@ struct DayDetailView: View {
 
 private struct DayDetailEntry: View {
   let entry: EchoEntry
+  let highlightViewModel: EntryHighlightViewModel
 
   var body: some View {
     VStack(alignment: .leading, spacing: 10) {
@@ -82,6 +87,9 @@ private struct DayDetailEntry: View {
         .lineSpacing(5)
         .frame(maxWidth: .infinity, alignment: .leading)
         .textSelection(.enabled)
+      EntryHighlightButton(entryID: entry.id, viewModel: highlightViewModel)
+        .buttonStyle(.borderless)
+        .font(.subheadline)
     }
     .accessibilityElement(children: .combine)
   }

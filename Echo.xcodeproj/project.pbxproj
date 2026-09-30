@@ -40,6 +40,9 @@
 		G10000000000000000000002 /* TimelineViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = G10000000000000000000022 /* TimelineViewModelTests.swift */; };
 		H10000000000000000000001 /* TimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = H10000000000000000000021 /* TimelineView.swift */; };
 		I10000000000000000000001 /* DayDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = I10000000000000000000021 /* DayDetailView.swift */; };
+		J10000000000000000000001 /* EntryHighlightViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = J10000000000000000000021 /* EntryHighlightViewModel.swift */; };
+		J10000000000000000000002 /* EntryHighlightButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = J10000000000000000000022 /* EntryHighlightButton.swift */; };
+		J10000000000000000000003 /* EntryHighlightViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = J10000000000000000000023 /* EntryHighlightViewModelTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -88,6 +91,9 @@
 		G10000000000000000000022 /* TimelineViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineViewModelTests.swift; sourceTree = "<group>"; };
 		H10000000000000000000021 /* TimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineView.swift; sourceTree = "<group>"; };
 		I10000000000000000000021 /* DayDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayDetailView.swift; sourceTree = "<group>"; };
+		J10000000000000000000021 /* EntryHighlightViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryHighlightViewModel.swift; sourceTree = "<group>"; };
+		J10000000000000000000022 /* EntryHighlightButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryHighlightButton.swift; sourceTree = "<group>"; };
+		J10000000000000000000023 /* EntryHighlightViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryHighlightViewModelTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -156,6 +162,7 @@
 				F10000000000000000000040 /* EntryEditor */,
 				G10000000000000000000040 /* Timeline */,
 				I10000000000000000000040 /* DayDetail */,
+				J10000000000000000000040 /* Highlights */,
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -250,6 +257,7 @@
 				C1000000000000000000002B /* EchoModelContainerFactoryTests.swift */,
 				D10000000000000000000022 /* TodayViewModelTests.swift */,
 				G10000000000000000000022 /* TimelineViewModelTests.swift */,
+				J10000000000000000000023 /* EntryHighlightViewModelTests.swift */,
 			);
 			path = EchoTests;
 			sourceTree = "<group>";
@@ -315,6 +323,15 @@
 				I10000000000000000000021 /* DayDetailView.swift */,
 			);
 			path = DayDetail;
+			sourceTree = "<group>";
+		};
+		J10000000000000000000040 /* Highlights */ = {
+			isa = PBXGroup;
+			children = (
+				J10000000000000000000021 /* EntryHighlightViewModel.swift */,
+				J10000000000000000000022 /* EntryHighlightButton.swift */,
+			);
+			path = Highlights;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -439,6 +456,8 @@
 				G10000000000000000000001 /* TimelineViewModel.swift in Sources */,
 				H10000000000000000000001 /* TimelineView.swift in Sources */,
 				I10000000000000000000001 /* DayDetailView.swift in Sources */,
+				J10000000000000000000001 /* EntryHighlightViewModel.swift in Sources */,
+				J10000000000000000000002 /* EntryHighlightButton.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -455,6 +474,7 @@
 				C1000000000000000000000B /* EchoModelContainerFactoryTests.swift in Sources */,
 				D10000000000000000000002 /* TodayViewModelTests.swift in Sources */,
 				G10000000000000000000002 /* TimelineViewModelTests.swift in Sources */,
+				J10000000000000000000003 /* EntryHighlightViewModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
