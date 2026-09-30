@@ -5,14 +5,25 @@ struct DayDetailView: View {
   let highlightViewModel: EntryHighlightViewModel
   var focusedEntryID: UUID?
 
+  @State private var organizationViewModel: DayOrganizationViewModel
+
   init(
     day: EchoDay,
     highlightViewModel: EntryHighlightViewModel,
+    aiService: any EchoAIService,
+    journalRepository: any EchoOrganizedJournalRepository,
     focusedEntryID: UUID? = nil
   ) {
     self.day = day
     self.highlightViewModel = highlightViewModel
     self.focusedEntryID = focusedEntryID
+    _organizationViewModel = State(
+      initialValue: DayOrganizationViewModel(
+        day: day,
+        aiService: aiService,
+        repository: journalRepository
+      )
+    )
   }
 
   @Environment(\.timeZone) private var timeZone
@@ -22,6 +33,7 @@ struct DayDetailView: View {
       ScrollView {
         LazyVStack(alignment: .leading, spacing: 28) {
           header
+          organizedJournal
           entries
         }
         .frame(maxWidth: 720, alignment: .leading)
@@ -33,11 +45,61 @@ struct DayDetailView: View {
       .navigationTitle("Day Detail")
       .task {
         await highlightViewModel.load()
+        await organizationViewModel.load()
         if let focusedEntryID {
           proxy.scrollTo(focusedEntryID, anchor: .center)
         }
       }
     }
+  }
+
+  private var organizedJournal: some View {
+    VStack(alignment: .leading, spacing: 14) {
+      HStack {
+        Label("Organized Journal", systemImage: "wand.and.stars")
+          .font(.title3.weight(.semibold))
+        Spacer()
+        Button(
+          organizationViewModel.journal == nil ? "Organize Day" : "Regenerate",
+          systemImage: organizationViewModel.journal == nil ? "wand.and.stars" : "arrow.clockwise"
+        ) {
+          Task { await organizationViewModel.generate() }
+        }
+        .buttonStyle(.bordered)
+        .disabled(
+          organizationViewModel.isLoading || organizationViewModel.isGenerating
+        )
+      }
+
+      if organizationViewModel.isLoading {
+        ProgressView("Loading organized journal…")
+      } else if organizationViewModel.isGenerating {
+        ProgressView("Organizing this day…")
+      } else if let journal = organizationViewModel.journal {
+        Text(journal.body)
+          .font(.body)
+          .lineSpacing(5)
+          .textSelection(.enabled)
+        Text("Created locally from \(journal.sourceEntryIDs.count) raw \(journal.sourceEntryIDs.count == 1 ? "entry" : "entries").")
+          .font(.caption)
+          .foregroundStyle(.secondary)
+      } else {
+        Text("Create a readable daily narrative while keeping every original entry unchanged.")
+          .font(.subheadline)
+          .foregroundStyle(.secondary)
+      }
+
+      if organizationViewModel.failure != nil {
+        Label(
+          "The organized journal could not be loaded or saved.",
+          systemImage: "exclamationmark.triangle"
+        )
+        .font(.footnote)
+        .foregroundStyle(.red)
+      }
+    }
+    .padding(18)
+    .background(Color.accentColor.opacity(0.06), in: RoundedRectangle(cornerRadius: 18))
   }
 
   private var header: some View {

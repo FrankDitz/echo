@@ -55,6 +55,8 @@
 		M10000000000000000000004 /* SwiftDataEchoOrganizedJournalRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = M10000000000000000000024 /* SwiftDataEchoOrganizedJournalRepository.swift */; };
 		M10000000000000000000005 /* EchoOrganizedJournalTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = M10000000000000000000025 /* EchoOrganizedJournalTests.swift */; };
 		M10000000000000000000006 /* SwiftDataEchoOrganizedJournalRepositoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = M10000000000000000000026 /* SwiftDataEchoOrganizedJournalRepositoryTests.swift */; };
+		N10000000000000000000001 /* DayOrganizationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = N10000000000000000000021 /* DayOrganizationViewModel.swift */; };
+		N10000000000000000000002 /* DayOrganizationViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = N10000000000000000000022 /* DayOrganizationViewModelTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -118,6 +120,8 @@
 		M10000000000000000000024 /* SwiftDataEchoOrganizedJournalRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataEchoOrganizedJournalRepository.swift; sourceTree = "<group>"; };
 		M10000000000000000000025 /* EchoOrganizedJournalTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoOrganizedJournalTests.swift; sourceTree = "<group>"; };
 		M10000000000000000000026 /* SwiftDataEchoOrganizedJournalRepositoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataEchoOrganizedJournalRepositoryTests.swift; sourceTree = "<group>"; };
+		N10000000000000000000021 /* DayOrganizationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayOrganizationViewModel.swift; sourceTree = "<group>"; };
+		N10000000000000000000022 /* DayOrganizationViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayOrganizationViewModelTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -289,6 +293,7 @@
 				L10000000000000000000023 /* EchoAIServiceTests.swift */,
 				M10000000000000000000025 /* EchoOrganizedJournalTests.swift */,
 				M10000000000000000000026 /* SwiftDataEchoOrganizedJournalRepositoryTests.swift */,
+				N10000000000000000000022 /* DayOrganizationViewModelTests.swift */,
 			);
 			path = EchoTests;
 			sourceTree = "<group>";
@@ -354,6 +359,7 @@
 			isa = PBXGroup;
 			children = (
 				I10000000000000000000021 /* DayDetailView.swift */,
+				N10000000000000000000021 /* DayOrganizationViewModel.swift */,
 			);
 			path = DayDetail;
 			sourceTree = "<group>";
@@ -510,6 +516,7 @@
 				M10000000000000000000002 /* EchoOrganizedJournalRepository.swift in Sources */,
 				M10000000000000000000003 /* PersistentEchoOrganizedJournal.swift in Sources */,
 				M10000000000000000000004 /* SwiftDataEchoOrganizedJournalRepository.swift in Sources */,
+				N10000000000000000000001 /* DayOrganizationViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -531,6 +538,7 @@
 				L10000000000000000000003 /* EchoAIServiceTests.swift in Sources */,
 				M10000000000000000000005 /* EchoOrganizedJournalTests.swift in Sources */,
 				M10000000000000000000006 /* SwiftDataEchoOrganizedJournalRepositoryTests.swift in Sources */,
+				N10000000000000000000002 /* DayOrganizationViewModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -9,6 +9,7 @@ struct EchoApp: App {
   private let highlightViewModel: EntryHighlightViewModel
   private let highlightsViewModel: HighlightsViewModel
   private let aiService: any EchoAIService
+  private let journalRepository: any EchoOrganizedJournalRepository
 
   init() {
     do {
@@ -16,8 +17,12 @@ struct EchoApp: App {
       let entryRepository = SwiftDataEchoEntryRepository(modelContainer: container)
       let highlightRepository = SwiftDataEchoHighlightRepository(modelContainer: container)
       let aiService = DeterministicLocalAIService()
+      let journalRepository = SwiftDataEchoOrganizedJournalRepository(
+        modelContainer: container
+      )
       modelContainer = container
       self.aiService = aiService
+      self.journalRepository = journalRepository
       todayViewModel = TodayViewModel(repository: entryRepository)
       timelineViewModel = TimelineViewModel(repository: entryRepository)
       highlightViewModel = EntryHighlightViewModel(repository: highlightRepository)
@@ -38,7 +43,8 @@ struct EchoApp: App {
         timelineViewModel: timelineViewModel,
         highlightViewModel: highlightViewModel,
         highlightsViewModel: highlightsViewModel,
-        aiService: aiService
+        aiService: aiService,
+        journalRepository: journalRepository
       )
     }
     .modelContainer(modelContainer)
