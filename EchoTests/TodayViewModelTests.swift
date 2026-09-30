@@ -147,6 +147,65 @@ struct TodayViewModelTests {
     #expect(viewModel.entries == [entry])
     #expect(viewModel.failure == .deleteEntry)
   }
+
+  @Test("Saving assisted text never replaces the original writing")
+  func savingAssistedText() async throws {
+    let createdAt = try makeDate("2026-10-03T09:00:00Z")
+    let assistedAt = try makeDate("2026-10-03T12:00:00Z")
+    let calendar = try makeGregorianCalendar(timeZone: "UTC")
+    let entry = EchoEntry(
+      createdAt: createdAt,
+      calendar: calendar,
+      rawText: "fictional original wording"
+    )
+    let repository = TodayEntryRepositoryStub(entries: [entry])
+    let viewModel = TodayViewModel(
+      repository: repository,
+      calendar: calendar,
+      now: { assistedAt }
+    )
+    await viewModel.load()
+
+    let saved = await viewModel.saveAssistedText(
+      entryID: entry.id,
+      text: "Fictional original wording."
+    )
+
+    let stored = try #require(await repository.entry(id: entry.id))
+    #expect(saved)
+    #expect(stored.rawText == "fictional original wording")
+    #expect(stored.polishedText == "Fictional original wording.")
+    #expect(stored.modifiedAt == assistedAt)
+    #expect(viewModel.entries.first == stored)
+  }
+
+  @Test("Assisted text is published only after persistence succeeds")
+  func assistedTextPersistenceFailure() async throws {
+    let createdAt = try makeDate("2026-10-03T09:00:00Z")
+    let calendar = try makeGregorianCalendar(timeZone: "UTC")
+    let entry = EchoEntry(
+      createdAt: createdAt,
+      calendar: calendar,
+      rawText: "A fictional unchanged note."
+    )
+    let repository = TodayEntryRepositoryStub(entries: [entry])
+    let viewModel = TodayViewModel(
+      repository: repository,
+      calendar: calendar,
+      now: { createdAt }
+    )
+    await viewModel.load()
+    await repository.setFailure(.update)
+
+    let saved = await viewModel.saveAssistedText(
+      entryID: entry.id,
+      text: "A fictional assisted note."
+    )
+
+    #expect(!saved)
+    #expect(viewModel.entries == [entry])
+    #expect(viewModel.failure == .updateEntry)
+  }
 }
 
 private actor TodayEntryRepositoryStub: EchoEntryRepository {

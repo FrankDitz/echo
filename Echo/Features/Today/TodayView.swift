@@ -3,6 +3,7 @@ import SwiftUI
 struct TodayView: View {
   let viewModel: TodayViewModel
   let highlightViewModel: EntryHighlightViewModel
+  let aiService: any EchoAIService
 
   @State private var draft = ""
   @State private var selectedEntry: EchoEntry?
@@ -28,9 +29,16 @@ struct TodayView: View {
       await highlightViewModel.load()
     }
     .sheet(item: $selectedEntry) { entry in
-      EntryEditorView(entry: entry) { rawText in
-        await viewModel.updateEntry(id: entry.id, rawText: rawText)
-      }
+      EntryEditorView(
+        entry: entry,
+        aiService: aiService,
+        onSave: { rawText in
+          await viewModel.updateEntry(id: entry.id, rawText: rawText)
+        },
+        onSaveAssistedText: { text in
+          await viewModel.saveAssistedText(entryID: entry.id, text: text)
+        }
+      )
     }
     .confirmationDialog(
       "Delete this entry?",
