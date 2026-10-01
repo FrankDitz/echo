@@ -66,7 +66,7 @@ struct TodayView: View {
       .foregroundStyle(.secondary)
 
       Text("What stayed with you?")
-        .font(EchoTypography.editorialPrompt)
+        .font(EchoTypography.editorialDisplay)
         .accessibilityAddTraits(.isHeader)
     }
     .shadow(color: world.contentShadow, radius: 10, y: 3)

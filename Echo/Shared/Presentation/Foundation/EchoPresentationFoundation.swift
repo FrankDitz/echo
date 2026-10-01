@@ -31,7 +31,7 @@ enum EchoShape {
 enum EchoTypography {
   static let wordmark = Font.system(.largeTitle, design: .serif).weight(.bold)
   static let primaryNavigation = Font.subheadline.weight(.semibold)
-  static let editorialPrompt = Font.system(.largeTitle, design: .serif).weight(.medium)
+  static let editorialDisplay = Font.system(.largeTitle, design: .serif).weight(.medium)
   static let editorialEyebrow = Font.caption.weight(.semibold)
   static let screenTitle = Font.largeTitle.weight(.bold)
   static let screenSubtitle = Font.title3
