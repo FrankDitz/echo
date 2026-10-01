@@ -3,6 +3,7 @@ import SwiftUI
 enum EchoPrimarySection: String, CaseIterable, Identifiable {
   case today = "Today"
   case timeline = "Timeline"
+  case reflection = "Day Reflection"
   case highlights = "Highlights"
 
   var id: Self { self }

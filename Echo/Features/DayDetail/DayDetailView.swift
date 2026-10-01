@@ -1,5 +1,68 @@
 import SwiftUI
 
+struct DayReflectionView: View {
+  let todayViewModel: TodayViewModel
+  let timelineViewModel: TimelineViewModel
+  let highlightViewModel: EntryHighlightViewModel
+  let aiService: any EchoAIService
+  let journalRepository: any EchoOrganizedJournalRepository
+
+  var body: some View {
+    Group {
+      if let latestDay {
+        DayDetailView(
+          day: latestDay,
+          highlightViewModel: highlightViewModel,
+          aiService: aiService,
+          journalRepository: journalRepository
+        )
+        .id(latestDay.id)
+      } else if todayViewModel.isLoading || timelineViewModel.isLoading {
+        EchoPage(spacing: EchoLayout.compactSectionSpacing) {
+          reflectionHeader
+          EchoLoadingState(title: "Loading your reflection…")
+        }
+      } else {
+        EchoPage(spacing: EchoLayout.compactSectionSpacing) {
+          reflectionHeader
+          EchoSurface {
+            EchoEmptyState(
+              title: "A reflection needs a day",
+              systemImage: "sparkles.rectangle.stack",
+              description: "Write an entry first, then Echo can organize the day without changing your original words.",
+              minHeight: EchoLayout.mediumStateHeight
+            )
+          }
+        }
+      }
+    }
+    .task {
+      await todayViewModel.load()
+      await timelineViewModel.load()
+    }
+  }
+
+  private var latestDay: EchoDay? {
+    EchoDay.grouping(todayViewModel.entries).last ?? timelineViewModel.days.first
+  }
+
+  private var reflectionHeader: some View {
+    VStack(alignment: .leading, spacing: EchoLayout.inlineSpacing) {
+      Text("DAY REFLECTION")
+        .font(EchoTypography.editorialEyebrow)
+        .tracking(1.5)
+        .foregroundStyle(.secondary)
+      Text("Make sense of the day.")
+        .font(EchoTypography.editorialDisplay)
+        .accessibilityAddTraits(.isHeader)
+      Text("Your original entries stay intact while Echo shapes a readable narrative.")
+        .font(EchoTypography.supporting)
+        .foregroundStyle(.secondary)
+    }
+    .accessibilityElement(children: .combine)
+  }
+}
+
 struct DayDetailView: View {
   let day: EchoDay
   let highlightViewModel: EntryHighlightViewModel

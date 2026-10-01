@@ -42,6 +42,14 @@ struct AppShellView: View {
         aiService: aiService,
         journalRepository: journalRepository
       )
+    case .reflection:
+      DayReflectionView(
+        todayViewModel: todayViewModel,
+        timelineViewModel: timelineViewModel,
+        highlightViewModel: highlightViewModel,
+        aiService: aiService,
+        journalRepository: journalRepository
+      )
     case .highlights:
       HighlightsView(
         viewModel: highlightsViewModel,
