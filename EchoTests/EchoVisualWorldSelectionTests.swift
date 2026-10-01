@@ -30,11 +30,20 @@ struct EchoVisualWorldSelectionTests {
     let store = InMemoryVisualWorldPreferenceStore(selectedID: .tealImmersion)
     let selection = EchoVisualWorldSelection(preferenceStore: store)
 
-    selection.select(.sodiumFog)
+    selection.select(.electricBlueHour)
 
-    #expect(selection.selectedID == .sodiumFog)
-    #expect(selection.selectedWorld.id == .sodiumFog)
-    #expect(store.savedIDs == [.sodiumFog])
+    #expect(selection.selectedID == .electricBlueHour)
+    #expect(selection.selectedWorld.id == .electricBlueHour)
+    #expect(store.savedIDs == [.electricBlueHour])
+  }
+
+  @Test("Every shipped identifier resolves to its matching visual world")
+  func resolvingShippedWorlds() {
+    #expect(EchoVisualWorldID.allCases.count == 4)
+
+    for id in EchoVisualWorldID.allCases {
+      #expect(EchoVisualWorld.resolve(id).id == id)
+    }
   }
 
   @Test("UserDefaults stores only the selected world's stable identifier")
@@ -44,12 +53,12 @@ struct EchoVisualWorldSelectionTests {
     defer { defaults.removePersistentDomain(forName: suiteName) }
     let store = UserDefaultsEchoVisualWorldPreferenceStore(userDefaults: defaults)
 
-    store.saveSelectedWorldID(.sodiumFog)
+    store.saveSelectedWorldID(.electricBlueHour)
 
     #expect(
       defaults.string(
         forKey: UserDefaultsEchoVisualWorldPreferenceStore.selectedWorldKey
-      ) == EchoVisualWorldID.sodiumFog.rawValue
+      ) == EchoVisualWorldID.electricBlueHour.rawValue
     )
     let persistedValues = try #require(
       defaults.persistentDomain(forName: suiteName)
