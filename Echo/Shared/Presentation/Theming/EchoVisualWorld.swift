@@ -3,6 +3,7 @@ import SwiftUI
 enum EchoVisualWorldID: String, CaseIterable, Codable {
   case tealImmersion = "teal-immersion"
   case crimsonStatic = "crimson-static"
+  case sodiumFog = "sodium-fog"
 }
 
 extension EchoVisualWorldID: Identifiable {
@@ -59,12 +60,31 @@ struct EchoVisualWorld {
     contentShadow: Color.black.opacity(0.66)
   )
 
+  static let sodiumFog = EchoVisualWorld(
+    id: .sodiumFog,
+    displayName: "Sodium Fog",
+    paletteDescription: "Concrete, olive-gray fog, sodium amber, and red signal light.",
+    backgroundAssetName: "SodiumFogBackground",
+    canvas: Color(red: 0.075, green: 0.07, blue: 0.05),
+    primaryText: Color(red: 1, green: 0.97, blue: 0.87),
+    secondaryText: Color(red: 0.82, green: 0.78, blue: 0.64),
+    accent: Color(red: 1, green: 0.62, blue: 0.12),
+    separator: Color(red: 0.88, green: 0.69, blue: 0.34).opacity(0.38),
+    error: Color(red: 1, green: 0.29, blue: 0.22),
+    saved: Color(red: 0.76, green: 0.82, blue: 0.57),
+    surfaceFill: Color(red: 0.11, green: 0.105, blue: 0.075).opacity(0.81),
+    selectedFill: Color(red: 0.48, green: 0.31, blue: 0.07).opacity(0.48),
+    contentShadow: Color.black.opacity(0.7)
+  )
+
   static func resolve(_ id: EchoVisualWorldID) -> EchoVisualWorld {
     switch id {
     case .tealImmersion:
       .tealImmersion
     case .crimsonStatic:
       .crimsonStatic
+    case .sodiumFog:
+      .sodiumFog
     }
   }
 }

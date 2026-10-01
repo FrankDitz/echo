@@ -136,3 +136,66 @@ The Mac asset was reviewed before inclusion. It retains the approved Teal Immers
 ### Review notes
 
 Both assets were reviewed before inclusion. They depict an anonymous fictional city, contain no people, readable text, recognizable marks, personal content, or embedded color profile, and reserve calm regions for application content. The landscape version is a native composition rather than an enlarged portrait crop.
+
+## Sodium Fog background
+
+- **Assets:** `Echo/Shared/Resources/Assets.xcassets/SodiumFogBackground.imageset/sodium-fog-background.png` and `sodium-fog-background-mac.png`
+- **Created:** October 1, 2026
+- **Method:** OpenAI built-in image generation using Teal Immersion and Crimson Static only as visual-system references, followed by a separate native landscape generation using the approved Sodium Fog portrait result
+- **Purpose:** Production portrait and landscape backgrounds for the Sodium Fog visual world
+
+### Portrait generation prompt
+
+> Use case: stylized-concept
+>
+> Asset type: production portrait background artwork for a private iPhone journaling app visual world named Sodium Fog
+>
+> Input images: Images 1 and 2 are the approved Teal Immersion and Crimson Static artworks and visual-system references only; create a clearly distinct original Sodium Fog scene while matching their mature editorial quality, Mirror City identity, useful negative space, and restrained realism
+>
+> Primary request: an original fogbound nocturnal city of monumental concrete forms, service viaducts, and rain-dark water, illuminated by sparse sodium-amber lamps with only a few restrained red signal lights; adult, modern, sleek, architectural, quietly tough, and professional
+>
+> Scene/backdrop: anonymous fictional waterfront city at night, low heavy concrete structures and angular brutalist towers dissolving into layered olive-gray fog, an elevated transit span, wet retaining walls, and reflections across dark water; no recognizable real location
+>
+> Style/medium: premium cinematic editorial environment art with restrained photographic realism, subtle 35mm grain, and sophisticated industrial atmosphere, suitable behind a polished native Apple app
+>
+> Composition/framing: tall portrait phone canvas; architectural mass, sodium lamps, and fog detail concentrated around the upper third and outer edges; a broad calm low-detail charcoal-olive reading region through the center and lower-middle; useful negative space near the top for navigation and near the bottom for controls; safe under varied phone crops
+>
+> Lighting/mood: nocturnal, disciplined, grounded, contemplative, masculine without aggression; diffused sodium amber through dense fog, graphite shadows, muted olive-gray concrete, small distant red aviation or rail signals; mysterious but not threatening
+>
+> Color palette: charcoal concrete, olive-gray fog, dirty warm ivory, sodium amber, blackened bronze, with extremely sparse restrained signal red; absolutely no teal, cyan, saturated blue, purple, magenta, or broad red wash
+>
+> Materials/textures: board-formed concrete, weathered steel, rain-dark glass, black water, wet aggregate, fine fog, restrained film grain; crisp enough for high-resolution display but calm behind text
+>
+> Constraints: standalone background art only; original fictional city; no people, faces, focal vehicles, readable signage, text, logos, trademarks, watermarks, borders, UI controls, journal writing, signatures, or metadata-like overlays; no direct imitation of existing artwork; do not merely recolor either reference
+>
+> Avoid: apocalypse, decay porn, military imagery, gore, horror, fire, generic cyberpunk neon overload, gaming HUD, yellow monochrome, orange color cast across the entire image, cartoon look, distressed typography, giant glowing objects, high-school edginess, excessive pure-black empty space
+
+### Mac generation prompt
+
+> Use case: stylized-concept
+>
+> Asset type: production wide desktop background artwork for the macOS version of a private journaling app visual world named Sodium Fog
+>
+> Input images: Image 1 is the approved portrait Sodium Fog artwork and a visual-world reference only; create a new native landscape composition rather than stretching, cropping, or merely extending it
+>
+> Primary request: create a high-detail wide fogbound nocturnal Mirror City scene that clearly belongs to the same visual world as Image 1, with a broad original anonymous concrete waterfront, monumental viaducts, olive-gray fog, sparse sodium-amber lamps, and a few restrained red signals; adult, modern, sleek, architectural, quietly tough, and professional
+>
+> Scene/backdrop: broad fictional waterfront city at night with low heavy concrete masses, angular brutalist towers dissolving into fog, an elevated transit span crossing the scene, wet retaining walls, black water, and long diffused amber reflections; no recognizable real location
+>
+> Style/medium: premium cinematic editorial environment art with restrained photographic realism and subtle 35mm grain, matching the atmosphere, material treatment, and sophistication of Image 1
+>
+> Composition/framing: native 16:10 landscape desktop composition; architectural mass, fog, and controlled sodium light concentrated across the upper third and outer edges; preserve a broad calm low-detail charcoal-olive reading region through the center and lower-middle for app content; balance the entire width so common Mac window crops remain intentional; retain visible dark-water reflection without centering one giant tower; no portrait-image stretching
+>
+> Lighting/mood: nocturnal, disciplined, grounded, contemplative, masculine without aggression; diffused sodium amber through dense fog, graphite shadows, muted olive-gray concrete, tiny distant red aviation or rail signals; mysterious but not threatening
+>
+> Color palette: charcoal concrete, olive-gray fog, dirty warm ivory, sodium amber, blackened bronze, extremely sparse restrained signal red; absolutely no teal, cyan, saturated blue, purple, magenta, or broad red wash
+>
+> Materials/textures: board-formed concrete, weathered steel, rain-dark glass, black water, subtle surface ripples, wet aggregate, fine fog, restrained film grain; crisp and richly detailed at large desktop-window scale but calm behind text
+>
+> Constraints: standalone background art only; original fictional city; no people, faces, focal vehicles, readable signage, text, logos, trademarks, watermarks, borders, UI controls, journal writing, signatures, or metadata-like overlays; preserve the Sodium Fog visual identity without copying any real artwork or location
+>
+> Avoid: apocalypse, decay porn, military imagery, gore, horror, fire, upscaling artifacts, softness, blurry buildings, generic cyberpunk neon overload, gaming HUD, yellow monochrome, orange color cast across the entire image, cartoon look, distressed typography, giant glowing objects, high-school edginess, excessive pure-black empty space
+
+### Review notes
+
+Both assets were reviewed before inclusion. They depict an anonymous fictional concrete city, contain no people, readable text, recognizable marks, personal content, or embedded color profile, and reserve calm regions for application content. The landscape version is a native composition rather than an enlarged portrait crop.

@@ -30,11 +30,11 @@ struct EchoVisualWorldSelectionTests {
     let store = InMemoryVisualWorldPreferenceStore(selectedID: .tealImmersion)
     let selection = EchoVisualWorldSelection(preferenceStore: store)
 
-    selection.select(.crimsonStatic)
+    selection.select(.sodiumFog)
 
-    #expect(selection.selectedID == .crimsonStatic)
-    #expect(selection.selectedWorld.id == .crimsonStatic)
-    #expect(store.savedIDs == [.crimsonStatic])
+    #expect(selection.selectedID == .sodiumFog)
+    #expect(selection.selectedWorld.id == .sodiumFog)
+    #expect(store.savedIDs == [.sodiumFog])
   }
 
   @Test("UserDefaults stores only the selected world's stable identifier")
@@ -44,12 +44,12 @@ struct EchoVisualWorldSelectionTests {
     defer { defaults.removePersistentDomain(forName: suiteName) }
     let store = UserDefaultsEchoVisualWorldPreferenceStore(userDefaults: defaults)
 
-    store.saveSelectedWorldID(.crimsonStatic)
+    store.saveSelectedWorldID(.sodiumFog)
 
     #expect(
       defaults.string(
         forKey: UserDefaultsEchoVisualWorldPreferenceStore.selectedWorldKey
-      ) == EchoVisualWorldID.crimsonStatic.rawValue
+      ) == EchoVisualWorldID.sodiumFog.rawValue
     )
     let persistedValues = try #require(
       defaults.persistentDomain(forName: suiteName)
