@@ -102,6 +102,13 @@ Feature screens consume semantic values. They must not switch on individual worl
 - Primary text uses warm ivory, secondary text uses muted khaki, and sodium amber is reserved for selection and action. A restrained red signal remains available for errors without becoming the world's dominant color.
 - The world avoids teal, cyan, saturated blue, purple, and broad red washes, separating it from both Teal Immersion and Crimson Static rather than recoloring their artwork.
 
+### Electric Blue Hour production treatment
+
+- `ElectricBlueHourBackground.imageset` contains separate portrait and native 16:10 Mac compositions. Both depict an original fictional steel-and-glass waterfront with no people, text, logos, personal media, or embedded location details.
+- Storm clouds, sharper architectural silhouettes, and controlled electric detail stay concentrated around the upper third and outer edges. A calmer deep-cobalt canal region supports journal controls and reading surfaces.
+- Primary text uses an icy near-white, secondary text uses muted steel blue, and electric cyan is reserved for selection and action. Peacock green distinguishes saved state while coral remains reserved for errors.
+- The clearer blue-hour horizon, colder glass-and-steel geometry, and limited fog keep this world distinct from Teal Immersion rather than presenting a brighter recolor.
+
 ## Accessibility and platform rules
 
 - Text contrast is validated against the rendered artwork, not only against palette swatches.
