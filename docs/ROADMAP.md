@@ -22,7 +22,7 @@ Each deliverable uses its own short-lived branch and pull request. A deliverable
 2. **Theme-neutral UI foundation (complete):** add semantic typography, spacing, shape, material, and motion tokens without encoding a particular visual world in feature screens.
 3. **Reusable presentation components (complete):** extract the page scaffold, navigation, capture control, entry presentation, date navigation, reflection sections, and shared loading, empty, and error states as their first real consumers are migrated.
 4. **Teal Immersion default world (complete):** create production background artwork, define its presentation values, and apply the approved Mirror City composition across Today, Timeline, Day Detail, Highlights, Entry Editor, and assisted-writing states.
-5. **Theme selection:** add an accessible visual-world selector and persist only the stable selected-world identifier in application preferences. Selection must not touch SwiftData journal records.
+5. **Theme selection (complete):** add an accessible visual-world selector and persist only the stable selected-world identifier in application preferences. Selection must not touch SwiftData journal records.
 6. **Additional visual worlds:** add Crimson Static, Sodium Fog, and Electric Blue Hour independently, validating each background crop, contrast, and component treatment before the next world is introduced.
 7. **Motion and icon polish:** add purposeful transitions, feedback, and an Echo icon vocabulary while honoring Reduce Motion and avoiding ornamental animation.
 8. **Platform and accessibility review:** validate supported iPhone, iPad, and Mac layouts; Dynamic Type; VoiceOver labels and order; contrast; keyboard behavior; reduced transparency; and light-sensitive presentation.

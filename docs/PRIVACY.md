@@ -12,6 +12,8 @@ The source repository is public. It must never contain real journal content, cre
 
 Phase 2 keeps entries and highlights in the system-provided application container through versioned SwiftData records and repository adapters. Production code does not derive a store location from the repository, current working directory, application bundle, or a relative path. Tests use in-memory or unique disposable stores and never copy the developer's personal container.
 
+The selected visual world is not journal data. Echo stores only its stable, non-sensitive identifier in application preferences through `UserDefaults`; theme selection does not read from or write to SwiftData. Background artwork remains public, fictional application media and is never derived from personal entries or runtime photos.
+
 The initial schema establishes an explicit migration boundary, and CRUD plus persistence across container recreation are tested with fictional data. Backups, deletion semantics, and file protection need explicit verification before claiming stronger guarantees. Database files, sidecars, exports, backups, and runtime-media directories are ignored and rejected by repository safety checks.
 
 ## AI processing
