@@ -101,7 +101,6 @@ struct DayDetailView: View {
         DayReflectionSection(viewModel: organizationViewModel)
         entries
       }
-      .navigationTitle("Day Detail")
       .task {
         await highlightViewModel.load()
         await organizationViewModel.load()
@@ -113,18 +112,33 @@ struct DayDetailView: View {
   }
 
   private var entries: some View {
-    EchoSurface(padding: EchoLayout.editorPadding) {
+    EchoSurface(padding: 0) {
       VStack(alignment: .leading, spacing: 0) {
+        HStack(alignment: .firstTextBaseline) {
+          Text("Original entries")
+            .font(EchoTypography.contentTitle)
+          Spacer()
+          Text(day.entryCount, format: .number)
+            .font(EchoTypography.metadata)
+            .foregroundStyle(.secondary)
+            .accessibilityLabel(entryCountLabel)
+        }
+        .padding(.horizontal, EchoLayout.surfacePadding)
+        .padding(.vertical, EchoLayout.contentSpacing)
+
+        Divider()
+
         ForEach(day.entries) { entry in
           DayDetailEntry(
             entry: entry,
             highlightViewModel: highlightViewModel,
-            isFocusedSource: entry.id == focusedEntryID
+            isFocusedSource: entry.id == focusedEntryID,
+            isReflectionSource: organizationViewModel.journal?.sourceEntryIDs.contains(entry.id) == true
           )
           .id(entry.id)
           if entry.id != day.entries.last?.id {
             Divider()
-              .padding(.vertical, EchoLayout.editorPadding)
+              .padding(.leading, EchoLayout.surfacePadding + 38)
           }
         }
       }
@@ -144,17 +158,28 @@ private struct DayDateHeader: View {
   let date: Date
   let entryCountLabel: String
 
+  @Environment(\.echoVisualWorld) private var world
+
   var body: some View {
     VStack(alignment: .leading, spacing: EchoLayout.inlineSpacing) {
-      Text(date, format: .dateTime.weekday(.wide))
-        .font(.title3.weight(.medium))
+      Text(
+        date.formatted(
+          .dateTime.weekday(.wide).month(.wide).day().year()
+        ).uppercased()
+      )
+        .font(EchoTypography.editorialEyebrow)
+        .tracking(1.5)
         .foregroundStyle(.secondary)
-      Text(date, format: .dateTime.month(.wide).day().year())
-        .font(EchoTypography.screenTitle)
+
+      Text("Day Reflection")
+        .font(EchoTypography.editorialDisplay)
+        .accessibilityAddTraits(.isHeader)
+
       Text(entryCountLabel)
         .font(EchoTypography.supporting)
         .foregroundStyle(.secondary)
     }
+    .shadow(color: world.contentShadow, radius: 10, y: 3)
     .accessibilityElement(children: .combine)
   }
 }
@@ -162,26 +187,18 @@ private struct DayDateHeader: View {
 private struct DayReflectionSection: View {
   let viewModel: DayOrganizationViewModel
 
+  @Environment(\.echoVisualWorld) private var world
+
   var body: some View {
     EchoSurface(
       style: .accent(opacity: EchoMaterialMetrics.organizedJournalFillOpacity)
     ) {
-      VStack(alignment: .leading, spacing: EchoLayout.contentSpacing) {
-        HStack {
-          Label("Organized Journal", systemImage: "wand.and.stars")
-            .font(EchoTypography.contentTitle)
-          Spacer()
-          Button(
-            viewModel.journal == nil ? "Organize Day" : "Regenerate",
-            systemImage: viewModel.journal == nil ? "wand.and.stars" : "arrow.clockwise"
-          ) {
-            Task { await viewModel.generate() }
-          }
-          .buttonStyle(.bordered)
-          .disabled(viewModel.isLoading || viewModel.isGenerating)
-        }
-
+      VStack(alignment: .leading, spacing: EchoLayout.sectionSpacing) {
         reflectionContent
+
+        if !viewModel.isLoading {
+          reflectionAction
+        }
 
         if viewModel.failure != nil {
           EchoErrorState(message: "The organized journal could not be loaded or saved.")
@@ -198,17 +215,55 @@ private struct DayReflectionSection: View {
       EchoLoadingState(title: "Organizing this day…", minHeight: 0)
     } else if let journal = viewModel.journal {
       Text(journal.body)
-        .font(EchoTypography.body)
-        .lineSpacing(5)
+        .font(EchoTypography.editorialNarrative)
+        .lineSpacing(6)
         .textSelection(.enabled)
-      Text("Created locally from \(journal.sourceEntryIDs.count) raw \(journal.sourceEntryIDs.count == 1 ? "entry" : "entries").")
-        .font(.caption)
-        .foregroundStyle(.secondary)
+
+      Divider()
+
+      VStack(alignment: .leading, spacing: EchoLayout.tightSpacing) {
+        Label("Created privately on this device", systemImage: "lock.shield")
+        Text(
+          "\(journal.sourceEntryIDs.count) original \(journal.sourceEntryIDs.count == 1 ? "entry" : "entries") · Updated \(journal.modifiedAt.formatted(.dateTime.month(.abbreviated).day().hour().minute()))"
+        )
+      }
+      .font(EchoTypography.metadata)
+      .foregroundStyle(.secondary)
     } else {
-      Text("Create a readable daily narrative while keeping every original entry unchanged.")
-        .font(EchoTypography.supporting)
-        .foregroundStyle(.secondary)
+      VStack(alignment: .leading, spacing: EchoLayout.rowSpacing) {
+        Image(systemName: "sparkles.rectangle.stack")
+          .font(.title2.weight(.semibold))
+          .foregroundStyle(world.accent)
+        Text("Bring the day into focus")
+          .font(EchoTypography.sectionTitle)
+        Text("Echo can shape these entries into a readable reflection while keeping every original word unchanged.")
+          .font(EchoTypography.supporting)
+          .foregroundStyle(.secondary)
+      }
     }
+  }
+
+  private var reflectionAction: some View {
+    Button {
+      Task { await viewModel.generate() }
+    } label: {
+      HStack {
+        Spacer()
+        Label(
+          viewModel.journal == nil ? "Organize Day" : "Regenerate Reflection",
+          systemImage: viewModel.journal == nil ? "square.stack.3d.up" : "arrow.clockwise"
+        )
+        .font(.body.weight(.semibold))
+        Spacer()
+      }
+      .frame(minHeight: 28)
+      .padding(.vertical, EchoLayout.tightSpacing)
+      .foregroundStyle(world.canvas)
+      .background(world.accent, in: RoundedRectangle(cornerRadius: EchoShape.embeddedRadius))
+      .contentShape(RoundedRectangle(cornerRadius: EchoShape.embeddedRadius))
+    }
+    .buttonStyle(.plain)
+    .disabled(viewModel.isGenerating)
   }
 }
 
@@ -218,21 +273,41 @@ private struct DayDetailEntry: View {
   let entry: EchoEntry
   let highlightViewModel: EntryHighlightViewModel
   let isFocusedSource: Bool
+  let isReflectionSource: Bool
 
   var body: some View {
-    VStack(alignment: .leading, spacing: EchoLayout.inlineSpacing) {
-      EchoEntryPresentation(
-        text: entry.rawText,
-        lineSpacing: 5,
-        allowsSelection: true
-      ) {
-        Text(entry.createdAt, format: .dateTime.hour().minute())
+    HStack(alignment: .top, spacing: EchoLayout.rowSpacing) {
+      Image(systemName: isReflectionSource ? "text.page.fill" : "text.page")
+        .font(.body.weight(.medium))
+        .foregroundStyle(isReflectionSource ? world.accent : world.secondaryText)
+        .frame(width: 26, height: 26)
+        .accessibilityHidden(true)
+
+      VStack(alignment: .leading, spacing: EchoLayout.tightSpacing) {
+        HStack(alignment: .firstTextBaseline) {
+          Text(entry.createdAt, format: .dateTime.hour().minute())
+            .font(EchoTypography.metadata)
+            .foregroundStyle(.secondary)
+          if isReflectionSource {
+            Text("USED IN REFLECTION")
+              .font(EchoTypography.editorialEyebrow)
+              .foregroundStyle(world.accent)
+          }
+        }
+
+        Text(entry.rawText)
+          .font(EchoTypography.body)
+          .lineSpacing(4)
+          .textSelection(.enabled)
+          .frame(maxWidth: .infinity, alignment: .leading)
       }
+
       EntryHighlightButton(entryID: entry.id, viewModel: highlightViewModel)
         .buttonStyle(.borderless)
-        .font(.subheadline)
+        .labelStyle(.iconOnly)
+        .font(.body)
     }
-    .padding(isFocusedSource ? EchoLayout.focusedContentInset : 0)
+    .padding(EchoLayout.surfacePadding)
     .background(
       isFocusedSource
         ? world.selectedFill
@@ -249,6 +324,15 @@ private struct DayDetailEntry: View {
       }
     }
     .accessibilityElement(children: .combine)
-    .accessibilityValue(isFocusedSource ? "Highlighted source entry" : "")
+    .accessibilityValue(accessibilityValue)
+  }
+
+  private var accessibilityValue: String {
+    [
+      isReflectionSource ? "Used in reflection" : nil,
+      isFocusedSource ? "Focused source entry" : nil,
+    ]
+    .compactMap { $0 }
+    .joined(separator: ", ")
   }
 }
