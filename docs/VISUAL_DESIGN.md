@@ -81,6 +81,13 @@ Feature screens consume semantic values. They must not switch on individual worl
 - Assets are reviewed at the smallest and largest supported phone sizes before shipping.
 - Theme assets may be public repository content; personal runtime photos and journal-derived imagery may never become theme assets.
 
+### Teal Immersion production treatment
+
+- The production artwork is `TealImmersionBackground.imageset/teal-immersion-background.png`, an original generated fictional city with no people, text, logos, personal media, or embedded location details.
+- Phone presentation uses a portrait `scaledToFill` crop anchored to the top. The luminous skyline occupies the upper third while the quieter petroleum-teal center and lower region support capture, entries, and long-form writing.
+- Wider iPad and Mac windows retain the top focal anchor and allow the outer city edges to crop. Semantic surface fills and the world overlay protect readability where the background becomes more detailed.
+- The asset-generation prompt and provenance are recorded in `ARTWORK_PROVENANCE.md` so future variants can be reviewed against the same privacy and originality boundary.
+
 ## Accessibility and platform rules
 
 - Text contrast is validated against the rendered artwork, not only against palette swatches.
