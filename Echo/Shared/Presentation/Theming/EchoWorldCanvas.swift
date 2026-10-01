@@ -17,6 +17,7 @@ struct EchoWorldCanvas<Content: View>: View {
           .scaledToFill()
           .frame(width: proxy.size.width, height: proxy.size.height, alignment: .top)
           .clipped()
+          .ignoresSafeArea()
       }
       .accessibilityHidden(true)
 

@@ -12,15 +12,30 @@ struct TodayView: View {
   @FocusState private var isComposerFocused: Bool
 
   var body: some View {
-    EchoPage(spacing: EchoLayout.compactSectionSpacing) {
-      promptHeader
-      TodayCaptureControl(
-        draft: $draft,
-        isFocused: $isComposerFocused,
-        saveState: viewModel.saveState,
-        onSubmit: submitDraft
-      )
-      entrySection
+    EchoWorldCanvas {
+      GeometryReader { proxy in
+        ScrollView {
+          LazyVStack(alignment: .leading, spacing: EchoLayout.compactSectionSpacing) {
+            Color.clear
+              .frame(height: heroOffset(for: proxy.size.height))
+              .accessibilityHidden(true)
+
+            promptHeader
+            TodayCaptureControl(
+              draft: $draft,
+              isFocused: $isComposerFocused,
+              saveState: viewModel.saveState,
+              onSubmit: submitDraft
+            )
+            entrySection
+          }
+          .frame(maxWidth: EchoLayout.contentMaxWidth, alignment: .leading)
+          .padding(.horizontal, EchoLayout.pageHorizontalPadding)
+          .padding(.bottom, EchoLayout.pageVerticalPadding)
+          .frame(maxWidth: .infinity)
+          .frame(minHeight: proxy.size.height, alignment: .top)
+        }
+      }
     }
     .task {
       await viewModel.load()
@@ -55,86 +70,93 @@ struct TodayView: View {
   }
 
   private var promptHeader: some View {
-    VStack(alignment: .leading, spacing: EchoLayout.inlineSpacing) {
-      Text(
-        viewModel.displayedDate.formatted(
-          .dateTime.weekday(.wide).month(.wide).day().year()
-        ).uppercased()
-      )
-      .font(EchoTypography.editorialEyebrow)
-      .tracking(1.5)
-      .foregroundStyle(.secondary)
-
-      Text("What stayed with you?")
-        .font(EchoTypography.editorialDisplay)
-        .accessibilityAddTraits(.isHeader)
-    }
+    Text("What stayed with you?")
+      .font(EchoTypography.editorialPrompt)
+      .accessibilityAddTraits(.isHeader)
     .shadow(color: world.contentShadow, radius: 10, y: 3)
-    .accessibilityElement(children: .combine)
   }
 
   private var entrySection: some View {
-    EchoSurface(padding: 0) {
-      VStack(alignment: .leading, spacing: 0) {
-        HStack {
-          Text("Raw entries")
-            .font(EchoTypography.contentTitle)
+    VStack(alignment: .leading, spacing: 0) {
+      HStack {
+        Text("Raw entries")
+          .font(EchoTypography.contentTitle)
 
-          Spacer()
+        Spacer()
 
-          if !viewModel.entries.isEmpty {
-            Text(viewModel.entries.count, format: .number)
-              .font(EchoTypography.metadata)
-              .foregroundStyle(.secondary)
-              .accessibilityLabel(
-                "\(viewModel.entries.count) \(viewModel.entries.count == 1 ? "entry" : "entries")"
-              )
-          }
-        }
-        .padding(.horizontal, EchoLayout.surfacePadding)
-        .padding(.vertical, EchoLayout.contentSpacing)
-
-        Divider()
-
-        if viewModel.isLoading && viewModel.entries.isEmpty {
-          EchoLoadingState(
-            title: "Loading today’s entries…",
-            minHeight: EchoLayout.compactStateHeight
-          )
-          .padding(.horizontal, EchoLayout.surfacePadding)
-        } else if viewModel.entries.isEmpty {
-          EchoEmptyState(
-            title: "A quiet day so far",
-            systemImage: "text.page",
-            description: "Write whenever there is something you want to remember.",
-            minHeight: EchoLayout.compactStateHeight
-          )
-          .padding(.horizontal, EchoLayout.surfacePadding)
-        } else {
-          ForEach(viewModel.entries) { entry in
-            TodayEntryRow(
-              entry: entry,
-              highlightViewModel: highlightViewModel,
-              onOpen: { selectedEntry = entry },
-              onDelete: { confirmDeletion(of: entry) }
+        if !viewModel.entries.isEmpty {
+          Text(viewModel.entries.count, format: .number)
+            .font(EchoTypography.metadata)
+            .foregroundStyle(.secondary)
+            .accessibilityLabel(
+              "\(viewModel.entries.count) \(viewModel.entries.count == 1 ? "entry" : "entries")"
             )
-            .padding(.horizontal, EchoLayout.surfacePadding)
-            if entry.id != viewModel.entries.last?.id {
-              Divider()
-                .padding(.leading, EchoLayout.surfacePadding)
-            }
-          }
-        }
-
-        if let failureMessage {
-          EchoErrorState(message: failureMessage)
-            .padding(EchoLayout.surfacePadding)
         }
       }
+      .padding(.horizontal, EchoLayout.surfacePadding)
+      .padding(.vertical, EchoLayout.contentSpacing)
+
+      Divider()
+
+      if viewModel.isLoading && viewModel.entries.isEmpty {
+        EchoLoadingState(
+          title: "Loading today’s entries…",
+          minHeight: 104
+        )
+        .padding(.horizontal, EchoLayout.surfacePadding)
+      } else if viewModel.entries.isEmpty {
+        VStack(alignment: .leading, spacing: EchoLayout.tightSpacing) {
+          Text("A quiet day so far")
+            .font(EchoTypography.body.weight(.semibold))
+          Text("Write whenever there is something you want to remember.")
+            .font(EchoTypography.supporting)
+            .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(EchoLayout.surfacePadding)
+      } else {
+        ForEach(viewModel.entries) { entry in
+          TodayEntryRow(
+            entry: entry,
+            highlightViewModel: highlightViewModel,
+            onOpen: { selectedEntry = entry },
+            onDelete: { confirmDeletion(of: entry) }
+          )
+          .padding(.horizontal, EchoLayout.surfacePadding)
+          if entry.id != viewModel.entries.last?.id {
+            Divider()
+              .padding(.leading, EchoLayout.surfacePadding)
+          }
+        }
+      }
+
+      if let failureMessage {
+        EchoErrorState(message: failureMessage)
+          .padding(EchoLayout.surfacePadding)
+      }
     }
+    .background {
+      RoundedRectangle(cornerRadius: EchoShape.surfaceRadius)
+        .fill(.ultraThinMaterial)
+      RoundedRectangle(cornerRadius: EchoShape.surfaceRadius)
+        .fill(world.canvas.opacity(0.4))
+    }
+    .overlay {
+      RoundedRectangle(cornerRadius: EchoShape.surfaceRadius)
+        .stroke(world.separator, lineWidth: EchoShape.hairlineWidth)
+    }
+    .shadow(color: world.contentShadow.opacity(0.22), radius: 16, y: 7)
   }
 
   @Environment(\.echoVisualWorld) private var world
+  @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+
+  private func heroOffset(for availableHeight: CGFloat) -> CGFloat {
+    if horizontalSizeClass == .compact {
+      return min(max(availableHeight * 0.36, 140), 300)
+    }
+    return min(max(availableHeight * 0.27, 96), 230)
+  }
 
   private var failureMessage: String? {
     switch viewModel.failure {
@@ -188,15 +210,20 @@ private struct TodayCaptureControl: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: EchoLayout.inlineSpacing) {
-      HStack(alignment: .bottom, spacing: EchoLayout.rowSpacing) {
-        Image(systemName: "square.and.pencil")
-          .font(.body.weight(.semibold))
+      HStack(spacing: EchoLayout.rowSpacing) {
+        Image(systemName: "waveform")
+          .font(.title3.weight(.medium))
           .foregroundStyle(world.accent)
-          .frame(minHeight: 32)
+          .frame(width: 30, height: 30)
+          .accessibilityHidden(true)
 
-        TextField("Write a thought, moment, or idea…", text: $draft, axis: .vertical)
+        Rectangle()
+          .fill(world.separator)
+          .frame(width: EchoShape.hairlineWidth, height: 30)
+
+        TextField("Type a thought…", text: $draft, axis: .vertical)
           .focused(isFocused)
-          .lineLimit(1...6)
+          .lineLimit(1...4)
           .textFieldStyle(.plain)
           .font(EchoTypography.body)
           .accessibilityLabel("New journal entry")
@@ -204,38 +231,36 @@ private struct TodayCaptureControl: View {
         Button(action: onSubmit) {
           Image(systemName: "arrow.up")
             .font(.body.weight(.bold))
-            .frame(width: 32, height: 32)
+            .foregroundStyle(world.canvas)
+            .frame(width: 42, height: 42)
+            .background(world.accent, in: Circle())
         }
-        .buttonStyle(.borderedProminent)
-        .buttonBorderShape(.circle)
+        .buttonStyle(.plain)
         .disabled(!containsWriting)
+        .opacity(containsWriting ? 1 : 0.48)
         .keyboardShortcut(.return, modifiers: [.command])
         .accessibilityLabel("Save entry")
       }
-      .padding(.horizontal, EchoLayout.focusedContentInset)
-      .padding(.vertical, EchoLayout.rowSpacing)
+      .padding(.leading, EchoLayout.contentSpacing)
+      .padding(.trailing, EchoLayout.inlineSpacing)
+      .padding(.vertical, EchoLayout.inlineSpacing)
       .background {
-        RoundedRectangle(cornerRadius: EchoShape.surfaceRadius)
+        Capsule()
           .fill(.ultraThinMaterial)
-        RoundedRectangle(cornerRadius: EchoShape.surfaceRadius)
-          .fill(world.surfaceFill)
+        Capsule()
+          .fill(world.canvas.opacity(0.38))
       }
       .overlay {
-        RoundedRectangle(cornerRadius: EchoShape.surfaceRadius)
+        Capsule()
           .stroke(world.separator, lineWidth: EchoShape.hairlineWidth)
       }
-      .shadow(color: world.contentShadow.opacity(0.2), radius: 14, y: 6)
+      .shadow(color: world.contentShadow.opacity(0.24), radius: 14, y: 6)
 
-      HStack(spacing: EchoLayout.inlineSpacing) {
+      if saveState != .idle {
         saveStatus
-        Spacer()
-        #if os(macOS)
-          Text("⌘↩ to save")
-            .foregroundStyle(world.secondaryText)
-        #endif
+          .font(EchoTypography.status)
+          .padding(.horizontal, EchoLayout.contentSpacing)
       }
-      .font(EchoTypography.status)
-      .padding(.horizontal, EchoLayout.microSpacing)
     }
   }
 
@@ -243,8 +268,7 @@ private struct TodayCaptureControl: View {
   private var saveStatus: some View {
     switch saveState {
     case .idle:
-      Text("Private on this device")
-        .foregroundStyle(world.secondaryText)
+      EmptyView()
     case .saving:
       ProgressView()
         .controlSize(.small)
@@ -280,7 +304,7 @@ private struct TodayEntryRow: View {
         Text(entry.rawText)
           .font(EchoTypography.body)
           .lineSpacing(4)
-          .lineLimit(6)
+          .lineLimit(3)
           .multilineTextAlignment(.leading)
           .frame(maxWidth: .infinity, alignment: .leading)
           .contentShape(Rectangle())
@@ -296,7 +320,7 @@ private struct TodayEntryRow: View {
       .labelStyle(.iconOnly)
       .accessibilityLabel("Entry actions")
     }
-    .padding(.vertical, EchoLayout.rowSpacing)
+    .padding(.vertical, EchoLayout.contentSpacing)
     .contextMenu {
       EntryHighlightButton(entryID: entry.id, viewModel: highlightViewModel)
       Button("Edit", systemImage: "pencil", action: onOpen)
