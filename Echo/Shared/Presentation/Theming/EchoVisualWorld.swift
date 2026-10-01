@@ -4,9 +4,14 @@ enum EchoVisualWorldID: String, CaseIterable, Codable {
   case tealImmersion = "teal-immersion"
 }
 
+extension EchoVisualWorldID: Identifiable {
+  var id: Self { self }
+}
+
 struct EchoVisualWorld {
   let id: EchoVisualWorldID
   let displayName: String
+  let paletteDescription: String
   let backgroundAssetName: String
   let canvas: Color
   let primaryText: Color
@@ -22,6 +27,7 @@ struct EchoVisualWorld {
   static let tealImmersion = EchoVisualWorld(
     id: .tealImmersion,
     displayName: "Teal Immersion",
+    paletteDescription: "Petroleum teal, luminous aqua, and warm city light.",
     backgroundAssetName: "TealImmersionBackground",
     canvas: Color(red: 0.015, green: 0.11, blue: 0.13),
     primaryText: Color(red: 0.94, green: 0.99, blue: 0.98),
@@ -34,6 +40,13 @@ struct EchoVisualWorld {
     selectedFill: Color(red: 0.08, green: 0.48, blue: 0.47).opacity(0.42),
     contentShadow: Color.black.opacity(0.55)
   )
+
+  static func resolve(_ id: EchoVisualWorldID) -> EchoVisualWorld {
+    switch id {
+    case .tealImmersion:
+      .tealImmersion
+    }
+  }
 }
 
 private struct EchoVisualWorldKey: EnvironmentKey {

@@ -65,6 +65,9 @@
 		Q10000000000000000000005 /* EchoEntryPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = Q10000000000000000000025 /* EchoEntryPresentation.swift */; };
 		R10000000000000000000001 /* EchoVisualWorld.swift in Sources */ = {isa = PBXBuildFile; fileRef = R10000000000000000000021 /* EchoVisualWorld.swift */; };
 		R10000000000000000000002 /* EchoWorldCanvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = R10000000000000000000022 /* EchoWorldCanvas.swift */; };
+		S10000000000000000000001 /* EchoVisualWorldSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = S10000000000000000000021 /* EchoVisualWorldSelection.swift */; };
+		S10000000000000000000002 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = S10000000000000000000022 /* SettingsView.swift */; };
+		S10000000000000000000003 /* EchoVisualWorldSelectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = S10000000000000000000023 /* EchoVisualWorldSelectionTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -138,6 +141,9 @@
 		Q10000000000000000000025 /* EchoEntryPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoEntryPresentation.swift; sourceTree = "<group>"; };
 		R10000000000000000000021 /* EchoVisualWorld.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoVisualWorld.swift; sourceTree = "<group>"; };
 		R10000000000000000000022 /* EchoWorldCanvas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoWorldCanvas.swift; sourceTree = "<group>"; };
+		S10000000000000000000021 /* EchoVisualWorldSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoVisualWorldSelection.swift; sourceTree = "<group>"; };
+		S10000000000000000000022 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		S10000000000000000000023 /* EchoVisualWorldSelectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoVisualWorldSelectionTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -207,6 +213,7 @@
 				G10000000000000000000040 /* Timeline */,
 				I10000000000000000000040 /* DayDetail */,
 				J10000000000000000000040 /* Highlights */,
+				S10000000000000000000040 /* Settings */,
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -311,6 +318,7 @@
 				M10000000000000000000025 /* EchoOrganizedJournalTests.swift */,
 				M10000000000000000000026 /* SwiftDataEchoOrganizedJournalRepositoryTests.swift */,
 				N10000000000000000000022 /* DayOrganizationViewModelTests.swift */,
+				S10000000000000000000023 /* EchoVisualWorldSelectionTests.swift */,
 			);
 			path = EchoTests;
 			sourceTree = "<group>";
@@ -436,8 +444,17 @@
 			children = (
 				R10000000000000000000021 /* EchoVisualWorld.swift */,
 				R10000000000000000000022 /* EchoWorldCanvas.swift */,
+				S10000000000000000000021 /* EchoVisualWorldSelection.swift */,
 			);
 			path = Theming;
+			sourceTree = "<group>";
+		};
+		S10000000000000000000040 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				S10000000000000000000022 /* SettingsView.swift */,
+			);
+			path = Settings;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -581,6 +598,8 @@
 				Q10000000000000000000005 /* EchoEntryPresentation.swift in Sources */,
 				R10000000000000000000001 /* EchoVisualWorld.swift in Sources */,
 				R10000000000000000000002 /* EchoWorldCanvas.swift in Sources */,
+				S10000000000000000000001 /* EchoVisualWorldSelection.swift in Sources */,
+				S10000000000000000000002 /* SettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -603,6 +622,7 @@
 				M10000000000000000000005 /* EchoOrganizedJournalTests.swift in Sources */,
 				M10000000000000000000006 /* SwiftDataEchoOrganizedJournalRepositoryTests.swift in Sources */,
 				N10000000000000000000002 /* DayOrganizationViewModelTests.swift in Sources */,
+				S10000000000000000000003 /* EchoVisualWorldSelectionTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -7,6 +7,7 @@ struct AppShellView: View {
   let highlightsViewModel: HighlightsViewModel
   let aiService: any EchoAIService
   let journalRepository: any EchoOrganizedJournalRepository
+  let visualWorldSelection: EchoVisualWorldSelection
 
   @State private var selection: AppSection = .today
   @State private var isShowingSettings = false
@@ -55,7 +56,7 @@ struct AppShellView: View {
       }
     }
     .sheet(isPresented: $isShowingSettings) {
-      SettingsPlaceholderView()
+      SettingsView(visualWorldSelection: visualWorldSelection)
     }
   }
 
@@ -66,30 +67,4 @@ private enum AppSection: Hashable {
   case timeline
   case highlights
 
-}
-
-private struct SettingsPlaceholderView: View {
-  @Environment(\.dismiss) private var dismiss
-
-  var body: some View {
-    NavigationStack {
-      EchoWorldCanvas {
-        EchoEmptyState(
-          title: "Settings",
-          systemImage: "gearshape",
-          description: "Preferences will be added as Echo grows.",
-          minHeight: 0
-        )
-      }
-      .navigationTitle("Settings")
-      .toolbar {
-        ToolbarItem(placement: .confirmationAction) {
-          Button("Done") {
-            dismiss()
-          }
-        }
-      }
-    }
-    .frame(minWidth: 340, minHeight: 240)
-  }
 }

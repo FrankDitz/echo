@@ -3,6 +3,8 @@ import SwiftUI
 
 @main
 struct EchoApp: App {
+  @State private var visualWorldSelection = EchoVisualWorldSelection()
+
   private let modelContainer: ModelContainer
   private let todayViewModel: TodayViewModel
   private let timelineViewModel: TimelineViewModel
@@ -44,10 +46,11 @@ struct EchoApp: App {
         highlightViewModel: highlightViewModel,
         highlightsViewModel: highlightsViewModel,
         aiService: aiService,
-        journalRepository: journalRepository
+        journalRepository: journalRepository,
+        visualWorldSelection: visualWorldSelection
       )
-      .environment(\.echoVisualWorld, .tealImmersion)
-      .tint(EchoVisualWorld.tealImmersion.accent)
+      .environment(\.echoVisualWorld, visualWorldSelection.selectedWorld)
+      .tint(visualWorldSelection.selectedWorld.accent)
       .preferredColorScheme(.dark)
     }
     .modelContainer(modelContainer)
