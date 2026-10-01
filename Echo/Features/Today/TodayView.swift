@@ -13,14 +13,14 @@ struct TodayView: View {
 
   var body: some View {
     ScrollView {
-      LazyVStack(alignment: .leading, spacing: 28) {
+      LazyVStack(alignment: .leading, spacing: EchoLayout.sectionSpacing) {
         dateHeader
         quickComposer
         entrySection
       }
-      .frame(maxWidth: 720, alignment: .leading)
-      .padding(.horizontal, 20)
-      .padding(.vertical, 24)
+      .frame(maxWidth: EchoLayout.contentMaxWidth, alignment: .leading)
+      .padding(.horizontal, EchoLayout.pageHorizontalPadding)
+      .padding(.vertical, EchoLayout.pageVerticalPadding)
       .frame(maxWidth: .infinity)
     }
     .background(groupedBackground)
@@ -57,32 +57,32 @@ struct TodayView: View {
   }
 
   private var dateHeader: some View {
-    VStack(alignment: .leading, spacing: 6) {
+    VStack(alignment: .leading, spacing: EchoLayout.tightSpacing) {
       Text("Today")
-        .font(.largeTitle.weight(.bold))
+        .font(EchoTypography.screenTitle)
       Text(
         viewModel.displayedDate.formatted(
           .dateTime.weekday(.wide).month(.wide).day().year()
         )
       )
-      .font(.title3)
+      .font(EchoTypography.screenSubtitle)
       .foregroundStyle(.secondary)
     }
     .accessibilityElement(children: .combine)
   }
 
   private var quickComposer: some View {
-    VStack(alignment: .leading, spacing: 14) {
+    VStack(alignment: .leading, spacing: EchoLayout.contentSpacing) {
       TextField("Write something…", text: $draft, axis: .vertical)
         .focused($isComposerFocused)
         .lineLimit(3...10)
         .textFieldStyle(.plain)
-        .font(.body)
+        .font(EchoTypography.body)
         .accessibilityLabel("New journal entry")
 
       Divider()
 
-      HStack(spacing: 12) {
+      HStack(spacing: EchoLayout.rowSpacing) {
         saveStatus
         Spacer()
         Button("New Entry", systemImage: "plus") {
@@ -93,11 +93,14 @@ struct TodayView: View {
         .keyboardShortcut(.return, modifiers: [.command])
       }
     }
-    .padding(18)
-    .background(.background, in: RoundedRectangle(cornerRadius: 18))
+    .padding(EchoLayout.surfacePadding)
+    .background(.background, in: RoundedRectangle(cornerRadius: EchoShape.surfaceRadius))
     .overlay {
-      RoundedRectangle(cornerRadius: 18)
-        .stroke(Color.secondary.opacity(0.2), lineWidth: 0.5)
+      RoundedRectangle(cornerRadius: EchoShape.surfaceRadius)
+        .stroke(
+          Color.secondary.opacity(EchoMaterialMetrics.subtleBorderOpacity),
+          lineWidth: EchoShape.hairlineWidth
+        )
     }
   }
 
@@ -126,9 +129,9 @@ struct TodayView: View {
   }
 
   private var entrySection: some View {
-    VStack(alignment: .leading, spacing: 14) {
+    VStack(alignment: .leading, spacing: EchoLayout.contentSpacing) {
       Text("Today’s Entries")
-        .font(.title2.weight(.semibold))
+        .font(EchoTypography.sectionTitle)
 
       if viewModel.isLoading && viewModel.entries.isEmpty {
         ProgressView("Loading today’s entries…")
@@ -156,7 +159,7 @@ struct TodayView: View {
 
       if let failureMessage {
         Label(failureMessage, systemImage: "exclamationmark.triangle")
-          .font(.footnote)
+          .font(EchoTypography.status)
           .foregroundStyle(.red)
       }
     }
@@ -223,14 +226,14 @@ private struct TodayEntryRow: View {
   let onDelete: () -> Void
 
   var body: some View {
-    HStack(alignment: .top, spacing: 12) {
+    HStack(alignment: .top, spacing: EchoLayout.rowSpacing) {
       Button(action: onOpen) {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: EchoLayout.inlineSpacing) {
           Text(entry.createdAt, format: .dateTime.hour().minute())
-            .font(.caption.weight(.semibold))
+            .font(EchoTypography.metadata)
             .foregroundStyle(.secondary)
           Text(entry.rawText)
-            .font(.body)
+            .font(EchoTypography.body)
             .lineSpacing(4)
             .lineLimit(6)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -248,7 +251,7 @@ private struct TodayEntryRow: View {
       .labelStyle(.iconOnly)
       .accessibilityLabel("Entry actions")
     }
-    .padding(.vertical, 4)
+    .padding(.vertical, EchoLayout.microSpacing)
     .contextMenu {
       EntryHighlightButton(entryID: entry.id, viewModel: highlightViewModel)
       Button("Edit", systemImage: "pencil", action: onOpen)

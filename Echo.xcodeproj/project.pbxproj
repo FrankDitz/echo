@@ -57,6 +57,7 @@
 		M10000000000000000000006 /* SwiftDataEchoOrganizedJournalRepositoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = M10000000000000000000026 /* SwiftDataEchoOrganizedJournalRepositoryTests.swift */; };
 		N10000000000000000000001 /* DayOrganizationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = N10000000000000000000021 /* DayOrganizationViewModel.swift */; };
 		N10000000000000000000002 /* DayOrganizationViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = N10000000000000000000022 /* DayOrganizationViewModelTests.swift */; };
+		P10000000000000000000001 /* EchoPresentationFoundation.swift in Sources */ = {isa = PBXBuildFile; fileRef = P10000000000000000000021 /* EchoPresentationFoundation.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -122,6 +123,7 @@
 		M10000000000000000000026 /* SwiftDataEchoOrganizedJournalRepositoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataEchoOrganizedJournalRepositoryTests.swift; sourceTree = "<group>"; };
 		N10000000000000000000021 /* DayOrganizationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayOrganizationViewModel.swift; sourceTree = "<group>"; };
 		N10000000000000000000022 /* DayOrganizationViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayOrganizationViewModelTests.swift; sourceTree = "<group>"; };
+		P10000000000000000000021 /* EchoPresentationFoundation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoPresentationFoundation.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -231,6 +233,7 @@
 		A1000000000000000000000A /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				P10000000000000000000040 /* Presentation */,
 				A1000000000000000000000C /* Resources */,
 			);
 			path = Shared;
@@ -384,6 +387,22 @@
 			path = AI;
 			sourceTree = "<group>";
 		};
+		P10000000000000000000040 /* Presentation */ = {
+			isa = PBXGroup;
+			children = (
+				P10000000000000000000041 /* Foundation */,
+			);
+			path = Presentation;
+			sourceTree = "<group>";
+		};
+		P10000000000000000000041 /* Foundation */ = {
+			isa = PBXGroup;
+			children = (
+				P10000000000000000000021 /* EchoPresentationFoundation.swift */,
+			);
+			path = Foundation;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -517,6 +536,7 @@
 				M10000000000000000000003 /* PersistentEchoOrganizedJournal.swift in Sources */,
 				M10000000000000000000004 /* SwiftDataEchoOrganizedJournalRepository.swift in Sources */,
 				N10000000000000000000001 /* DayOrganizationViewModel.swift in Sources */,
+				P10000000000000000000001 /* EchoPresentationFoundation.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

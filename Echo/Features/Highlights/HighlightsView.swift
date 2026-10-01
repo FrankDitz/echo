@@ -10,13 +10,13 @@ struct HighlightsView: View {
 
   var body: some View {
     ScrollView {
-      LazyVStack(alignment: .leading, spacing: 24) {
+      LazyVStack(alignment: .leading, spacing: EchoLayout.compactSectionSpacing) {
         header
         content
       }
-      .frame(maxWidth: 720, alignment: .leading)
-      .padding(.horizontal, 20)
-      .padding(.vertical, 24)
+      .frame(maxWidth: EchoLayout.contentMaxWidth, alignment: .leading)
+      .padding(.horizontal, EchoLayout.pageHorizontalPadding)
+      .padding(.vertical, EchoLayout.pageVerticalPadding)
       .frame(maxWidth: .infinity)
     }
     .background(groupedBackground)
@@ -38,11 +38,11 @@ struct HighlightsView: View {
   }
 
   private var header: some View {
-    VStack(alignment: .leading, spacing: 6) {
+    VStack(alignment: .leading, spacing: EchoLayout.tightSpacing) {
       Text("Highlights")
-        .font(.largeTitle.weight(.bold))
+        .font(EchoTypography.screenTitle)
       Text("Meaningful moments, kept close.")
-        .font(.title3)
+        .font(EchoTypography.screenSubtitle)
         .foregroundStyle(.secondary)
     }
     .accessibilityElement(children: .combine)
@@ -76,7 +76,7 @@ struct HighlightsView: View {
 
     if let failureMessage {
       Label(failureMessage, systemImage: "exclamationmark.triangle")
-        .font(.footnote)
+        .font(EchoTypography.status)
         .foregroundStyle(.red)
     }
   }
@@ -107,7 +107,7 @@ private struct HighlightedEntryRow: View {
   let onRemove: () -> Void
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 12) {
+    VStack(alignment: .leading, spacing: EchoLayout.rowSpacing) {
       HStack(alignment: .firstTextBaseline) {
         Text(item.entry.createdAt, format: .dateTime.weekday(.abbreviated).month(.abbreviated).day().year())
           .font(.subheadline.weight(.semibold))
@@ -121,9 +121,9 @@ private struct HighlightedEntryRow: View {
       }
 
       Button(action: onOpen) {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: EchoLayout.rowSpacing) {
           Text(item.entry.rawText)
-            .font(.body)
+            .font(EchoTypography.body)
             .lineSpacing(4)
             .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -136,11 +136,14 @@ private struct HighlightedEntryRow: View {
       .buttonStyle(.plain)
       .accessibilityHint("Opens the original day and entry")
     }
-    .padding(18)
-    .background(.background, in: RoundedRectangle(cornerRadius: 18))
+    .padding(EchoLayout.surfacePadding)
+    .background(.background, in: RoundedRectangle(cornerRadius: EchoShape.surfaceRadius))
     .overlay {
-      RoundedRectangle(cornerRadius: 18)
-        .stroke(Color.secondary.opacity(0.2), lineWidth: 0.5)
+      RoundedRectangle(cornerRadius: EchoShape.surfaceRadius)
+        .stroke(
+          Color.secondary.opacity(EchoMaterialMetrics.subtleBorderOpacity),
+          lineWidth: EchoShape.hairlineWidth
+        )
     }
     .contextMenu {
       Button("Remove Highlight", systemImage: "bookmark.slash", action: onRemove)

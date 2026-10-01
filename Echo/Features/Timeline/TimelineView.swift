@@ -10,13 +10,13 @@ struct TimelineView: View {
 
   var body: some View {
     ScrollView {
-      LazyVStack(alignment: .leading, spacing: 24) {
+      LazyVStack(alignment: .leading, spacing: EchoLayout.compactSectionSpacing) {
         header
         timelineContent
       }
-      .frame(maxWidth: 720, alignment: .leading)
-      .padding(.horizontal, 20)
-      .padding(.vertical, 24)
+      .frame(maxWidth: EchoLayout.contentMaxWidth, alignment: .leading)
+      .padding(.horizontal, EchoLayout.pageHorizontalPadding)
+      .padding(.vertical, EchoLayout.pageVerticalPadding)
       .frame(maxWidth: .infinity)
     }
     .background(groupedBackground)
@@ -29,11 +29,11 @@ struct TimelineView: View {
   }
 
   private var header: some View {
-    VStack(alignment: .leading, spacing: 6) {
+    VStack(alignment: .leading, spacing: EchoLayout.tightSpacing) {
       Text("Timeline")
-        .font(.largeTitle.weight(.bold))
+        .font(EchoTypography.screenTitle)
       Text("Previous days, kept in one quiet place.")
-        .font(.title3)
+        .font(EchoTypography.screenSubtitle)
         .foregroundStyle(.secondary)
     }
     .accessibilityElement(children: .combine)
@@ -72,7 +72,7 @@ struct TimelineView: View {
           "The timeline could not be refreshed. Showing the last loaded days.",
           systemImage: "exclamationmark.triangle"
         )
-        .font(.footnote)
+        .font(EchoTypography.status)
         .foregroundStyle(.red)
       }
     }
@@ -92,10 +92,10 @@ private struct TimelineDayRow: View {
   let timeZone: TimeZone
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 12) {
+    VStack(alignment: .leading, spacing: EchoLayout.rowSpacing) {
       HStack(alignment: .firstTextBaseline) {
         Text(displayDate, format: .dateTime.weekday(.wide).month(.wide).day().year())
-          .font(.title3.weight(.semibold))
+          .font(EchoTypography.contentTitle)
         Spacer()
         Text(entryCountLabel)
           .font(.caption.weight(.medium))
@@ -107,18 +107,21 @@ private struct TimelineDayRow: View {
 
       if let preview = day.entries.last?.rawText {
         Text(preview)
-          .font(.body)
+          .font(EchoTypography.body)
           .foregroundStyle(.secondary)
           .lineLimit(3)
           .lineSpacing(3)
           .frame(maxWidth: .infinity, alignment: .leading)
       }
     }
-    .padding(18)
-    .background(.background, in: RoundedRectangle(cornerRadius: 18))
+    .padding(EchoLayout.surfacePadding)
+    .background(.background, in: RoundedRectangle(cornerRadius: EchoShape.surfaceRadius))
     .overlay {
-      RoundedRectangle(cornerRadius: 18)
-        .stroke(Color.secondary.opacity(0.2), lineWidth: 0.5)
+      RoundedRectangle(cornerRadius: EchoShape.surfaceRadius)
+        .stroke(
+          Color.secondary.opacity(EchoMaterialMetrics.subtleBorderOpacity),
+          lineWidth: EchoShape.hairlineWidth
+        )
     }
     .accessibilityElement(children: .combine)
   }

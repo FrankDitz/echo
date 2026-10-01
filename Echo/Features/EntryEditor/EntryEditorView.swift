@@ -35,10 +35,10 @@ struct EntryEditorView: View {
 
   var body: some View {
     NavigationStack {
-      VStack(alignment: .leading, spacing: 12) {
+      VStack(alignment: .leading, spacing: EchoLayout.rowSpacing) {
         TextEditor(text: $draft)
           .focused($isEditorFocused)
-          .font(.body)
+          .font(EchoTypography.body)
           .lineSpacing(5)
           .scrollContentBackground(.hidden)
           .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -56,7 +56,7 @@ struct EntryEditorView: View {
         }
         .font(.footnote)
       }
-      .padding(20)
+      .padding(EchoLayout.editorPadding)
       .navigationTitle("Entry")
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
@@ -98,7 +98,7 @@ struct EntryEditorView: View {
     .interactiveDismissDisabled(isDirty)
     .task {
       // Wait for the presented sheet to become the active focus scope.
-      try? await Task.sleep(for: .milliseconds(300))
+      try? await Task.sleep(for: EchoMotion.editorFocusDelay)
       isEditorFocused = true
     }
     .onChange(of: draft) {
@@ -110,31 +110,34 @@ struct EntryEditorView: View {
   @ViewBuilder
   private var assistanceSection: some View {
     if isGeneratingAssistance {
-      HStack(spacing: 10) {
+      HStack(spacing: EchoLayout.inlineSpacing) {
         ProgressView()
           .controlSize(.small)
         Text("Preparing an assisted draft…")
       }
-      .font(.footnote)
+      .font(EchoTypography.status)
       .foregroundStyle(.secondary)
     } else if let assistedText {
-      VStack(alignment: .leading, spacing: 8) {
+      VStack(alignment: .leading, spacing: EchoLayout.inlineSpacing) {
         Label("Assisted Draft", systemImage: "wand.and.stars")
           .font(.headline)
         Text(assistedText)
-          .font(.body)
+          .font(EchoTypography.body)
           .lineSpacing(4)
           .textSelection(.enabled)
         Text("Your original writing is preserved above.")
           .font(.caption)
           .foregroundStyle(.secondary)
       }
-      .padding(14)
+      .padding(EchoLayout.focusedContentInset)
       .frame(maxWidth: .infinity, alignment: .leading)
-      .background(Color.accentColor.opacity(0.08), in: RoundedRectangle(cornerRadius: 12))
+      .background(
+        Color.accentColor.opacity(EchoMaterialMetrics.assistedWritingFillOpacity),
+        in: RoundedRectangle(cornerRadius: EchoShape.embeddedRadius)
+      )
     } else if assistanceFailed {
       Label("Writing assistance could not be generated or saved.", systemImage: "exclamationmark.triangle")
-        .font(.footnote)
+        .font(EchoTypography.status)
         .foregroundStyle(.red)
     }
   }
