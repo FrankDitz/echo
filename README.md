@@ -115,6 +115,7 @@ See [Architecture](docs/ARCHITECTURE.md) for dependency rules and decisions.
 
 - [Product specification](docs/PRODUCT_SPEC.md)
 - [Architecture](docs/ARCHITECTURE.md)
+- [Visual design](docs/VISUAL_DESIGN.md)
 - [Roadmap](docs/ROADMAP.md)
 - [Future Hub integration](docs/HUB_INTEGRATION.md)
 - [Privacy](docs/PRIVACY.md)
