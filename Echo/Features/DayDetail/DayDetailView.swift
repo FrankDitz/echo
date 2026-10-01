@@ -30,18 +30,14 @@ struct DayDetailView: View {
 
   var body: some View {
     ScrollViewReader { proxy in
-      ScrollView {
-        LazyVStack(alignment: .leading, spacing: EchoLayout.sectionSpacing) {
-          header
-          organizedJournal
-          entries
-        }
-        .frame(maxWidth: EchoLayout.contentMaxWidth, alignment: .leading)
-        .padding(.horizontal, EchoLayout.pageHorizontalPadding)
-        .padding(.vertical, EchoLayout.pageVerticalPadding)
-        .frame(maxWidth: .infinity)
+      EchoPage(spacing: EchoLayout.sectionSpacing) {
+        DayDateHeader(
+          date: displayDate,
+          entryCountLabel: entryCountLabel
+        )
+        DayReflectionSection(viewModel: organizationViewModel)
+        entries
       }
-      .background(groupedBackground)
       .navigationTitle("Day Detail")
       .task {
         await highlightViewModel.load()
@@ -53,95 +49,22 @@ struct DayDetailView: View {
     }
   }
 
-  private var organizedJournal: some View {
-    VStack(alignment: .leading, spacing: EchoLayout.contentSpacing) {
-      HStack {
-        Label("Organized Journal", systemImage: "wand.and.stars")
-          .font(EchoTypography.contentTitle)
-        Spacer()
-        Button(
-          organizationViewModel.journal == nil ? "Organize Day" : "Regenerate",
-          systemImage: organizationViewModel.journal == nil ? "wand.and.stars" : "arrow.clockwise"
-        ) {
-          Task { await organizationViewModel.generate() }
-        }
-        .buttonStyle(.bordered)
-        .disabled(
-          organizationViewModel.isLoading || organizationViewModel.isGenerating
-        )
-      }
-
-      if organizationViewModel.isLoading {
-        ProgressView("Loading organized journal…")
-      } else if organizationViewModel.isGenerating {
-        ProgressView("Organizing this day…")
-      } else if let journal = organizationViewModel.journal {
-        Text(journal.body)
-          .font(EchoTypography.body)
-          .lineSpacing(5)
-          .textSelection(.enabled)
-        Text("Created locally from \(journal.sourceEntryIDs.count) raw \(journal.sourceEntryIDs.count == 1 ? "entry" : "entries").")
-          .font(.caption)
-          .foregroundStyle(.secondary)
-      } else {
-        Text("Create a readable daily narrative while keeping every original entry unchanged.")
-          .font(EchoTypography.supporting)
-          .foregroundStyle(.secondary)
-      }
-
-      if organizationViewModel.failure != nil {
-        Label(
-          "The organized journal could not be loaded or saved.",
-          systemImage: "exclamationmark.triangle"
-        )
-        .font(EchoTypography.status)
-        .foregroundStyle(.red)
-      }
-    }
-    .padding(EchoLayout.surfacePadding)
-    .background(
-      Color.accentColor.opacity(EchoMaterialMetrics.organizedJournalFillOpacity),
-      in: RoundedRectangle(cornerRadius: EchoShape.surfaceRadius)
-    )
-  }
-
-  private var header: some View {
-    VStack(alignment: .leading, spacing: EchoLayout.inlineSpacing) {
-      Text(displayDate, format: .dateTime.weekday(.wide))
-        .font(.title3.weight(.medium))
-        .foregroundStyle(.secondary)
-      Text(displayDate, format: .dateTime.month(.wide).day().year())
-        .font(EchoTypography.screenTitle)
-      Text(entryCountLabel)
-        .font(EchoTypography.supporting)
-        .foregroundStyle(.secondary)
-    }
-    .accessibilityElement(children: .combine)
-  }
-
   private var entries: some View {
-    VStack(alignment: .leading, spacing: 0) {
-      ForEach(day.entries) { entry in
-        DayDetailEntry(
-          entry: entry,
-          highlightViewModel: highlightViewModel,
-          isFocusedSource: entry.id == focusedEntryID
-        )
-        .id(entry.id)
-        if entry.id != day.entries.last?.id {
-          Divider()
-            .padding(.vertical, EchoLayout.editorPadding)
+    EchoSurface(padding: EchoLayout.editorPadding) {
+      VStack(alignment: .leading, spacing: 0) {
+        ForEach(day.entries) { entry in
+          DayDetailEntry(
+            entry: entry,
+            highlightViewModel: highlightViewModel,
+            isFocusedSource: entry.id == focusedEntryID
+          )
+          .id(entry.id)
+          if entry.id != day.entries.last?.id {
+            Divider()
+              .padding(.vertical, EchoLayout.editorPadding)
+          }
         }
       }
-    }
-    .padding(EchoLayout.editorPadding)
-    .background(.background, in: RoundedRectangle(cornerRadius: EchoShape.surfaceRadius))
-    .overlay {
-      RoundedRectangle(cornerRadius: EchoShape.surfaceRadius)
-        .stroke(
-          Color.secondary.opacity(EchoMaterialMetrics.subtleBorderOpacity),
-          lineWidth: EchoShape.hairlineWidth
-        )
     }
   }
 
@@ -152,13 +75,77 @@ struct DayDetailView: View {
   private var entryCountLabel: String {
     day.entryCount == 1 ? "1 entry" : "\(day.entryCount) entries"
   }
+}
 
-  private var groupedBackground: Color {
-    #if os(iOS)
-      Color(uiColor: .systemGroupedBackground)
-    #else
-      Color(nsColor: .windowBackgroundColor)
-    #endif
+private struct DayDateHeader: View {
+  let date: Date
+  let entryCountLabel: String
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: EchoLayout.inlineSpacing) {
+      Text(date, format: .dateTime.weekday(.wide))
+        .font(.title3.weight(.medium))
+        .foregroundStyle(.secondary)
+      Text(date, format: .dateTime.month(.wide).day().year())
+        .font(EchoTypography.screenTitle)
+      Text(entryCountLabel)
+        .font(EchoTypography.supporting)
+        .foregroundStyle(.secondary)
+    }
+    .accessibilityElement(children: .combine)
+  }
+}
+
+private struct DayReflectionSection: View {
+  let viewModel: DayOrganizationViewModel
+
+  var body: some View {
+    EchoSurface(
+      style: .accent(opacity: EchoMaterialMetrics.organizedJournalFillOpacity)
+    ) {
+      VStack(alignment: .leading, spacing: EchoLayout.contentSpacing) {
+        HStack {
+          Label("Organized Journal", systemImage: "wand.and.stars")
+            .font(EchoTypography.contentTitle)
+          Spacer()
+          Button(
+            viewModel.journal == nil ? "Organize Day" : "Regenerate",
+            systemImage: viewModel.journal == nil ? "wand.and.stars" : "arrow.clockwise"
+          ) {
+            Task { await viewModel.generate() }
+          }
+          .buttonStyle(.bordered)
+          .disabled(viewModel.isLoading || viewModel.isGenerating)
+        }
+
+        reflectionContent
+
+        if viewModel.failure != nil {
+          EchoErrorState(message: "The organized journal could not be loaded or saved.")
+        }
+      }
+    }
+  }
+
+  @ViewBuilder
+  private var reflectionContent: some View {
+    if viewModel.isLoading {
+      EchoLoadingState(title: "Loading organized journal…", minHeight: 0)
+    } else if viewModel.isGenerating {
+      EchoLoadingState(title: "Organizing this day…", minHeight: 0)
+    } else if let journal = viewModel.journal {
+      Text(journal.body)
+        .font(EchoTypography.body)
+        .lineSpacing(5)
+        .textSelection(.enabled)
+      Text("Created locally from \(journal.sourceEntryIDs.count) raw \(journal.sourceEntryIDs.count == 1 ? "entry" : "entries").")
+        .font(.caption)
+        .foregroundStyle(.secondary)
+    } else {
+      Text("Create a readable daily narrative while keeping every original entry unchanged.")
+        .font(EchoTypography.supporting)
+        .foregroundStyle(.secondary)
+    }
   }
 }
 
@@ -169,14 +156,13 @@ private struct DayDetailEntry: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: EchoLayout.inlineSpacing) {
-      Text(entry.createdAt, format: .dateTime.hour().minute())
-        .font(EchoTypography.metadata)
-        .foregroundStyle(.secondary)
-      Text(entry.rawText)
-        .font(EchoTypography.body)
-        .lineSpacing(5)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .textSelection(.enabled)
+      EchoEntryPresentation(
+        text: entry.rawText,
+        lineSpacing: 5,
+        allowsSelection: true
+      ) {
+        Text(entry.createdAt, format: .dateTime.hour().minute())
+      }
       EntryHighlightButton(entryID: entry.id, viewModel: highlightViewModel)
         .buttonStyle(.borderless)
         .font(.subheadline)

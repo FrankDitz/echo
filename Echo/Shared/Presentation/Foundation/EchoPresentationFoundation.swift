@@ -14,6 +14,10 @@ enum EchoLayout {
   static let surfacePadding: CGFloat = 18
   static let editorPadding: CGFloat = 20
   static let focusedContentInset: CGFloat = 14
+  static let compactStateHeight: CGFloat = 160
+  static let mediumStateHeight: CGFloat = 220
+  static let regularStateHeight: CGFloat = 280
+  static let largeStateHeight: CGFloat = 320
 }
 
 enum EchoShape {

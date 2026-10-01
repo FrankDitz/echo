@@ -12,18 +12,21 @@ struct TodayView: View {
   @FocusState private var isComposerFocused: Bool
 
   var body: some View {
-    ScrollView {
-      LazyVStack(alignment: .leading, spacing: EchoLayout.sectionSpacing) {
-        dateHeader
-        quickComposer
-        entrySection
-      }
-      .frame(maxWidth: EchoLayout.contentMaxWidth, alignment: .leading)
-      .padding(.horizontal, EchoLayout.pageHorizontalPadding)
-      .padding(.vertical, EchoLayout.pageVerticalPadding)
-      .frame(maxWidth: .infinity)
+    EchoPage(spacing: EchoLayout.sectionSpacing) {
+      EchoScreenHeader(
+        title: "Today",
+        subtitle: viewModel.displayedDate.formatted(
+          .dateTime.weekday(.wide).month(.wide).day().year()
+        )
+      )
+      TodayCaptureControl(
+        draft: $draft,
+        isFocused: $isComposerFocused,
+        saveState: viewModel.saveState,
+        onSubmit: submitDraft
+      )
+      entrySection
     }
-    .background(groupedBackground)
     .task {
       await viewModel.load()
       await highlightViewModel.load()
@@ -56,93 +59,23 @@ struct TodayView: View {
     }
   }
 
-  private var dateHeader: some View {
-    VStack(alignment: .leading, spacing: EchoLayout.tightSpacing) {
-      Text("Today")
-        .font(EchoTypography.screenTitle)
-      Text(
-        viewModel.displayedDate.formatted(
-          .dateTime.weekday(.wide).month(.wide).day().year()
-        )
-      )
-      .font(EchoTypography.screenSubtitle)
-      .foregroundStyle(.secondary)
-    }
-    .accessibilityElement(children: .combine)
-  }
-
-  private var quickComposer: some View {
-    VStack(alignment: .leading, spacing: EchoLayout.contentSpacing) {
-      TextField("Write something…", text: $draft, axis: .vertical)
-        .focused($isComposerFocused)
-        .lineLimit(3...10)
-        .textFieldStyle(.plain)
-        .font(EchoTypography.body)
-        .accessibilityLabel("New journal entry")
-
-      Divider()
-
-      HStack(spacing: EchoLayout.rowSpacing) {
-        saveStatus
-        Spacer()
-        Button("New Entry", systemImage: "plus") {
-          submitDraft()
-        }
-        .buttonStyle(.borderedProminent)
-        .disabled(!containsWriting)
-        .keyboardShortcut(.return, modifiers: [.command])
-      }
-    }
-    .padding(EchoLayout.surfacePadding)
-    .background(.background, in: RoundedRectangle(cornerRadius: EchoShape.surfaceRadius))
-    .overlay {
-      RoundedRectangle(cornerRadius: EchoShape.surfaceRadius)
-        .stroke(
-          Color.secondary.opacity(EchoMaterialMetrics.subtleBorderOpacity),
-          lineWidth: EchoShape.hairlineWidth
-        )
-    }
-  }
-
-  @ViewBuilder
-  private var saveStatus: some View {
-    switch viewModel.saveState {
-    case .idle:
-      #if os(macOS)
-        Text("⌘↩ to save")
-          .foregroundStyle(.tertiary)
-      #else
-        Text("Ready when you are")
-          .foregroundStyle(.tertiary)
-      #endif
-    case .saving:
-      ProgressView()
-        .controlSize(.small)
-        .accessibilityLabel("Saving")
-    case .saved:
-      Label("Saved", systemImage: "checkmark.circle.fill")
-        .foregroundStyle(.secondary)
-    case .failed:
-      Label("Not saved", systemImage: "exclamationmark.circle")
-        .foregroundStyle(.red)
-    }
-  }
-
   private var entrySection: some View {
     VStack(alignment: .leading, spacing: EchoLayout.contentSpacing) {
       Text("Today’s Entries")
         .font(EchoTypography.sectionTitle)
 
       if viewModel.isLoading && viewModel.entries.isEmpty {
-        ProgressView("Loading today’s entries…")
-          .frame(maxWidth: .infinity, minHeight: 160)
-      } else if viewModel.entries.isEmpty {
-        ContentUnavailableView(
-          "A quiet day so far",
-          systemImage: "text.page",
-          description: Text("Write whenever there is something you want to remember.")
+        EchoLoadingState(
+          title: "Loading today’s entries…",
+          minHeight: EchoLayout.compactStateHeight
         )
-        .frame(maxWidth: .infinity, minHeight: 220)
+      } else if viewModel.entries.isEmpty {
+        EchoEmptyState(
+          title: "A quiet day so far",
+          systemImage: "text.page",
+          description: "Write whenever there is something you want to remember.",
+          minHeight: EchoLayout.mediumStateHeight
+        )
       } else {
         ForEach(viewModel.entries) { entry in
           TodayEntryRow(
@@ -158,15 +91,9 @@ struct TodayView: View {
       }
 
       if let failureMessage {
-        Label(failureMessage, systemImage: "exclamationmark.triangle")
-          .font(EchoTypography.status)
-          .foregroundStyle(.red)
+        EchoErrorState(message: failureMessage)
       }
     }
-  }
-
-  private var containsWriting: Bool {
-    draft.contains(where: { !$0.isWhitespace })
   }
 
   private var failureMessage: String? {
@@ -209,13 +136,64 @@ struct TodayView: View {
       }
     }
   }
+}
 
-  private var groupedBackground: Color {
-    #if os(iOS)
-      Color(uiColor: .systemGroupedBackground)
-    #else
-      Color(nsColor: .windowBackgroundColor)
-    #endif
+private struct TodayCaptureControl: View {
+  @Binding var draft: String
+  let isFocused: FocusState<Bool>.Binding
+  let saveState: TodayEntrySaveState
+  let onSubmit: () -> Void
+
+  var body: some View {
+    EchoSurface {
+      VStack(alignment: .leading, spacing: EchoLayout.contentSpacing) {
+        TextField("Write something…", text: $draft, axis: .vertical)
+          .focused(isFocused)
+          .lineLimit(3...10)
+          .textFieldStyle(.plain)
+          .font(EchoTypography.body)
+          .accessibilityLabel("New journal entry")
+
+        Divider()
+
+        HStack(spacing: EchoLayout.rowSpacing) {
+          saveStatus
+          Spacer()
+          Button("New Entry", systemImage: "plus", action: onSubmit)
+            .buttonStyle(.borderedProminent)
+            .disabled(!containsWriting)
+            .keyboardShortcut(.return, modifiers: [.command])
+        }
+      }
+    }
+  }
+
+  @ViewBuilder
+  private var saveStatus: some View {
+    switch saveState {
+    case .idle:
+      #if os(macOS)
+        Text("⌘↩ to save")
+          .foregroundStyle(.tertiary)
+      #else
+        Text("Ready when you are")
+          .foregroundStyle(.tertiary)
+      #endif
+    case .saving:
+      ProgressView()
+        .controlSize(.small)
+        .accessibilityLabel("Saving")
+    case .saved:
+      Label("Saved", systemImage: "checkmark.circle.fill")
+        .foregroundStyle(.secondary)
+    case .failed:
+      Label("Not saved", systemImage: "exclamationmark.circle")
+        .foregroundStyle(.red)
+    }
+  }
+
+  private var containsWriting: Bool {
+    draft.contains(where: { !$0.isWhitespace })
   }
 }
 
@@ -228,15 +206,8 @@ private struct TodayEntryRow: View {
   var body: some View {
     HStack(alignment: .top, spacing: EchoLayout.rowSpacing) {
       Button(action: onOpen) {
-        VStack(alignment: .leading, spacing: EchoLayout.inlineSpacing) {
+        EchoEntryPresentation(text: entry.rawText, lineLimit: 6) {
           Text(entry.createdAt, format: .dateTime.hour().minute())
-            .font(EchoTypography.metadata)
-            .foregroundStyle(.secondary)
-          Text(entry.rawText)
-            .font(EchoTypography.body)
-            .lineSpacing(4)
-            .lineLimit(6)
-            .frame(maxWidth: .infinity, alignment: .leading)
         }
         .contentShape(Rectangle())
       }
