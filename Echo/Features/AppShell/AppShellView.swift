@@ -9,62 +9,46 @@ struct AppShellView: View {
   let journalRepository: any EchoOrganizedJournalRepository
   let visualWorldSelection: EchoVisualWorldSelection
 
-  @State private var selection: AppSection = .today
+  @State private var selection: EchoPrimarySection = .today
   @State private var isShowingSettings = false
 
   var body: some View {
     NavigationStack {
-      TabView(selection: $selection) {
-        TodayView(
-          viewModel: todayViewModel,
-          highlightViewModel: highlightViewModel,
-          aiService: aiService
-        )
-          .tag(AppSection.today)
-          .tabItem {
-            Label("Today", systemImage: "sun.max")
-          }
-
-        TimelineView(
-          viewModel: timelineViewModel,
-          highlightViewModel: highlightViewModel,
-          aiService: aiService,
-          journalRepository: journalRepository
-        )
-          .tag(AppSection.timeline)
-          .tabItem {
-            Label("Timeline", systemImage: "clock")
-          }
-
-        HighlightsView(
-          viewModel: highlightsViewModel,
-          highlightViewModel: highlightViewModel,
-          aiService: aiService,
-          journalRepository: journalRepository
-        )
-        .tag(AppSection.highlights)
-        .tabItem {
-          Label("Highlights", systemImage: "bookmark")
-        }
-      }
-      .toolbar {
-        ToolbarItem(placement: .primaryAction) {
-          Button("Settings", systemImage: "gearshape") {
+      selectedContent
+        .safeAreaInset(edge: .top, spacing: 0) {
+          EchoPrimaryNavigation(selection: $selection) {
             isShowingSettings = true
           }
         }
-      }
     }
     .sheet(isPresented: $isShowingSettings) {
       SettingsView(visualWorldSelection: visualWorldSelection)
     }
   }
 
-}
-
-private enum AppSection: Hashable {
-  case today
-  case timeline
-  case highlights
-
+  @ViewBuilder
+  private var selectedContent: some View {
+    switch selection {
+    case .today:
+      TodayView(
+        viewModel: todayViewModel,
+        highlightViewModel: highlightViewModel,
+        aiService: aiService
+      )
+    case .timeline:
+      TimelineView(
+        viewModel: timelineViewModel,
+        highlightViewModel: highlightViewModel,
+        aiService: aiService,
+        journalRepository: journalRepository
+      )
+    case .highlights:
+      HighlightsView(
+        viewModel: highlightsViewModel,
+        highlightViewModel: highlightViewModel,
+        aiService: aiService,
+        journalRepository: journalRepository
+      )
+    }
+  }
 }
