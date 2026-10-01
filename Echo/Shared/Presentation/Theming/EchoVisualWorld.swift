@@ -4,6 +4,7 @@ enum EchoVisualWorldID: String, CaseIterable, Codable {
   case tealImmersion = "teal-immersion"
   case crimsonStatic = "crimson-static"
   case sodiumFog = "sodium-fog"
+  case electricBlueHour = "electric-blue-hour"
 }
 
 extension EchoVisualWorldID: Identifiable {
@@ -77,6 +78,23 @@ struct EchoVisualWorld {
     contentShadow: Color.black.opacity(0.7)
   )
 
+  static let electricBlueHour = EchoVisualWorld(
+    id: .electricBlueHour,
+    displayName: "Electric Blue Hour",
+    paletteDescription: "Storm blue, peacock teal, electric cyan, and warm window light.",
+    backgroundAssetName: "ElectricBlueHourBackground",
+    canvas: Color(red: 0.015, green: 0.07, blue: 0.14),
+    primaryText: Color(red: 0.93, green: 0.98, blue: 1),
+    secondaryText: Color(red: 0.64, green: 0.82, blue: 0.9),
+    accent: Color(red: 0.16, green: 0.75, blue: 1),
+    separator: Color(red: 0.3, green: 0.7, blue: 0.9).opacity(0.38),
+    error: Color(red: 0.98, green: 0.36, blue: 0.3),
+    saved: Color(red: 0.31, green: 0.9, blue: 0.75),
+    surfaceFill: Color(red: 0.02, green: 0.1, blue: 0.18).opacity(0.78),
+    selectedFill: Color(red: 0.05, green: 0.32, blue: 0.62).opacity(0.46),
+    contentShadow: Color.black.opacity(0.68)
+  )
+
   static func resolve(_ id: EchoVisualWorldID) -> EchoVisualWorld {
     switch id {
     case .tealImmersion:
@@ -85,6 +103,8 @@ struct EchoVisualWorld {
       .crimsonStatic
     case .sodiumFog:
       .sodiumFog
+    case .electricBlueHour:
+      .electricBlueHour
     }
   }
 }

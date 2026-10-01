@@ -199,3 +199,66 @@ Both assets were reviewed before inclusion. They depict an anonymous fictional c
 ### Review notes
 
 Both assets were reviewed before inclusion. They depict an anonymous fictional concrete city, contain no people, readable text, recognizable marks, personal content, or embedded color profile, and reserve calm regions for application content. The landscape version is a native composition rather than an enlarged portrait crop.
+
+## Electric Blue Hour background
+
+- **Assets:** `Echo/Shared/Resources/Assets.xcassets/ElectricBlueHourBackground.imageset/electric-blue-hour-background.png` and `electric-blue-hour-background-mac.png`
+- **Created:** October 1, 2026
+- **Method:** OpenAI built-in image generation using Teal Immersion and Sodium Fog only as visual-system references, followed by a separate native landscape generation using the approved Electric Blue Hour portrait result
+- **Purpose:** Production portrait and landscape backgrounds for the Electric Blue Hour visual world
+
+### Portrait generation prompt
+
+> Use case: stylized-concept
+>
+> Asset type: production portrait background artwork for a private iPhone journaling app visual world named Electric Blue Hour
+>
+> Input images: Images 1 and 2 are the approved Teal Immersion and Sodium Fog artworks and visual-system references only; create a clearly distinct original Electric Blue Hour scene while matching their mature editorial quality, Mirror City identity, useful negative space, and restrained realism
+>
+> Primary request: an original storm-blue city at the last edge of blue hour, reflected through a long rain-slick canal and dark glass, with precise electric-cyan light traces, peacock-teal water, and sparse warm windows; adult, modern, sleek, cinematic, energetic, quietly tough, and professional
+>
+> Scene/backdrop: anonymous fictional waterfront city just after sunset, sharp steel-and-glass silhouettes, staggered bridges and angular facades beneath layered storm clouds, distant architecture reflected in a broad canal; no recognizable real location
+>
+> Style/medium: premium cinematic editorial environment art with restrained photographic realism, clean architectural detail, subtle film grain, and a sophisticated cold-weather atmosphere, suitable behind a polished native Apple app
+>
+> Composition/framing: tall portrait phone canvas; storm sky, architectural silhouettes, and brighter electric detail concentrated around the upper third and outer edges; a broad calm low-detail deep-cobalt reading region through the center and lower-middle; useful negative space near the top for navigation and near the bottom for controls; safe under varied phone crops
+>
+> Lighting/mood: late blue hour rather than full night; focused, lucid, forward-looking, masculine without aggression; cold cobalt ambient light, thin cyan reflections and edge lights, deep peacock-teal water, sparse warm amber windows as human contrast; dramatic but not threatening
+>
+> Color palette: storm blue, midnight cobalt, peacock teal, precise electric cyan, steel gray, and tiny restrained warm amber window light; absolutely no purple, magenta, broad red wash, olive fog, or cyan monochrome
+>
+> Materials/textures: rain-dark steel, brushed aluminum, smoked glass, wet stone, deep canal water, thin mist, restrained grain; crisp enough for high-resolution display but calm behind text
+>
+> Constraints: standalone background art only; original fictional city; no people, faces, focal vehicles, readable signage, text, logos, trademarks, watermarks, borders, UI controls, journal writing, signatures, or metadata-like overlays; no direct imitation of existing artwork; do not merely recolor either reference
+>
+> Avoid: generic cyberpunk neon overload, gaming HUD, sci-fi spacecraft, lightning bolts, purple-magenta lighting, heavy teal fog, cartoon look, distressed typography, giant glowing objects, high-school edginess, excessive pure-black empty space
+
+### Mac generation prompt
+
+> Use case: stylized-concept
+>
+> Asset type: production wide desktop background artwork for the macOS version of a private journaling app visual world named Electric Blue Hour
+>
+> Input images: Image 1 is the approved portrait Electric Blue Hour artwork and a visual-world reference only; create a new native landscape composition rather than stretching, cropping, or merely extending it
+>
+> Primary request: create a high-detail wide storm-blue Mirror City scene at the last edge of blue hour that clearly belongs to the same visual world as Image 1, with a broad original anonymous steel-and-glass waterfront, angular bridges, precise electric-cyan reflections, peacock-teal water, and sparse warm windows; adult, modern, sleek, cinematic, energetic, quietly tough, and professional
+>
+> Scene/backdrop: broad fictional waterfront city just after sunset with sharp steel-and-glass silhouettes, staggered bridges, angular facades beneath layered storm clouds, thin mist, and long reflections across a deep canal; no recognizable real location
+>
+> Style/medium: premium cinematic editorial environment art with restrained photographic realism, clean architectural detail, subtle film grain, and sophisticated cold-weather atmosphere, matching Image 1
+>
+> Composition/framing: native 16:10 landscape desktop composition; storm sky, architecture, and controlled electric detail concentrated across the upper third and outer edges; preserve a broad calm low-detail deep-cobalt reading region through the center and lower-middle for app content; balance the entire width so common Mac window crops remain intentional; retain visible water reflection without centering one giant tower; no portrait-image stretching
+>
+> Lighting/mood: late blue hour rather than full night; focused, lucid, forward-looking, masculine without aggression; cold cobalt ambient light, thin cyan reflections and edge lights, deep peacock-teal water, sparse warm amber windows as human contrast; dramatic but not threatening
+>
+> Color palette: storm blue, midnight cobalt, peacock teal, precise electric cyan, steel gray, and tiny restrained warm amber window light; absolutely no purple, magenta, broad red wash, olive fog, or cyan monochrome
+>
+> Materials/textures: rain-dark steel, brushed aluminum, smoked glass, wet stone, deep canal water, subtle ripples, thin mist, restrained grain; crisp and richly detailed at large desktop-window scale but calm behind text
+>
+> Constraints: standalone background art only; original fictional city; no people, faces, focal vehicles, readable signage, text, logos, trademarks, watermarks, borders, UI controls, journal writing, signatures, or metadata-like overlays; preserve the Electric Blue Hour visual identity without copying any real artwork or location
+>
+> Avoid: generic cyberpunk neon overload, gaming HUD, sci-fi spacecraft, lightning bolts, purple-magenta lighting, heavy teal fog, upscaling artifacts, softness, blurry buildings, cartoon look, distressed typography, giant glowing objects, high-school edginess, excessive pure-black empty space
+
+### Review notes
+
+Both assets were reviewed before inclusion. They depict an anonymous fictional steel-and-glass city, contain no people, readable text, recognizable marks, personal content, or embedded color profile, and reserve calm regions for application content. The landscape version is a native composition rather than an enlarged portrait crop.
