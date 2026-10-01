@@ -73,10 +73,11 @@ private struct SettingsPlaceholderView: View {
 
   var body: some View {
     NavigationStack {
-      ContentUnavailableView(
-        "Settings",
+      EchoEmptyState(
+        title: "Settings",
         systemImage: "gearshape",
-        description: Text("Preferences will be added as Echo grows.")
+        description: "Preferences will be added as Echo grows.",
+        minHeight: 0
       )
       .navigationTitle("Settings")
       .toolbar {

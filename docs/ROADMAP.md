@@ -20,7 +20,7 @@ Each deliverable uses its own short-lived branch and pull request. A deliverable
 
 1. **Presentation architecture (complete):** document UI ownership, shared-component boundaries, visual-world constraints, privacy rules, and the source layout that later deliverables will fill. Do not add placeholder production types or move feature files without a concrete ownership improvement.
 2. **Theme-neutral UI foundation (complete):** add semantic typography, spacing, shape, material, and motion tokens without encoding a particular visual world in feature screens.
-3. **Reusable presentation components:** extract the page scaffold, navigation, capture control, entry presentation, date navigation, reflection sections, and shared loading, empty, and error states as their first real consumers are migrated.
+3. **Reusable presentation components (complete):** extract the page scaffold, navigation, capture control, entry presentation, date navigation, reflection sections, and shared loading, empty, and error states as their first real consumers are migrated.
 4. **Teal Immersion default world:** create production background artwork, define its presentation values, and apply the approved Mirror City composition across Today, Timeline, Day Detail, Highlights, Entry Editor, and assisted-writing states.
 5. **Theme selection:** add an accessible visual-world selector and persist only the stable selected-world identifier in application preferences. Selection must not touch SwiftData journal records.
 6. **Additional visual worlds:** add Crimson Static, Sodium Fog, and Electric Blue Hour independently, validating each background crop, contrast, and component treatment before the next world is introduced.

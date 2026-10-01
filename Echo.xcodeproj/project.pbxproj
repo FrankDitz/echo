@@ -58,6 +58,11 @@
 		N10000000000000000000001 /* DayOrganizationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = N10000000000000000000021 /* DayOrganizationViewModel.swift */; };
 		N10000000000000000000002 /* DayOrganizationViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = N10000000000000000000022 /* DayOrganizationViewModelTests.swift */; };
 		P10000000000000000000001 /* EchoPresentationFoundation.swift in Sources */ = {isa = PBXBuildFile; fileRef = P10000000000000000000021 /* EchoPresentationFoundation.swift */; };
+		Q10000000000000000000001 /* EchoPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = Q10000000000000000000021 /* EchoPage.swift */; };
+		Q10000000000000000000002 /* EchoScreenHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = Q10000000000000000000022 /* EchoScreenHeader.swift */; };
+		Q10000000000000000000003 /* EchoSurface.swift in Sources */ = {isa = PBXBuildFile; fileRef = Q10000000000000000000023 /* EchoSurface.swift */; };
+		Q10000000000000000000004 /* EchoContentState.swift in Sources */ = {isa = PBXBuildFile; fileRef = Q10000000000000000000024 /* EchoContentState.swift */; };
+		Q10000000000000000000005 /* EchoEntryPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = Q10000000000000000000025 /* EchoEntryPresentation.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -124,6 +129,11 @@
 		N10000000000000000000021 /* DayOrganizationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayOrganizationViewModel.swift; sourceTree = "<group>"; };
 		N10000000000000000000022 /* DayOrganizationViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayOrganizationViewModelTests.swift; sourceTree = "<group>"; };
 		P10000000000000000000021 /* EchoPresentationFoundation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoPresentationFoundation.swift; sourceTree = "<group>"; };
+		Q10000000000000000000021 /* EchoPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoPage.swift; sourceTree = "<group>"; };
+		Q10000000000000000000022 /* EchoScreenHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoScreenHeader.swift; sourceTree = "<group>"; };
+		Q10000000000000000000023 /* EchoSurface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoSurface.swift; sourceTree = "<group>"; };
+		Q10000000000000000000024 /* EchoContentState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoContentState.swift; sourceTree = "<group>"; };
+		Q10000000000000000000025 /* EchoEntryPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoEntryPresentation.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -391,6 +401,7 @@
 			isa = PBXGroup;
 			children = (
 				P10000000000000000000041 /* Foundation */,
+				Q10000000000000000000040 /* Components */,
 			);
 			path = Presentation;
 			sourceTree = "<group>";
@@ -401,6 +412,18 @@
 				P10000000000000000000021 /* EchoPresentationFoundation.swift */,
 			);
 			path = Foundation;
+			sourceTree = "<group>";
+		};
+		Q10000000000000000000040 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				Q10000000000000000000021 /* EchoPage.swift */,
+				Q10000000000000000000022 /* EchoScreenHeader.swift */,
+				Q10000000000000000000023 /* EchoSurface.swift */,
+				Q10000000000000000000024 /* EchoContentState.swift */,
+				Q10000000000000000000025 /* EchoEntryPresentation.swift */,
+			);
+			path = Components;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -537,6 +560,11 @@
 				M10000000000000000000004 /* SwiftDataEchoOrganizedJournalRepository.swift in Sources */,
 				N10000000000000000000001 /* DayOrganizationViewModel.swift in Sources */,
 				P10000000000000000000001 /* EchoPresentationFoundation.swift in Sources */,
+				Q10000000000000000000001 /* EchoPage.swift in Sources */,
+				Q10000000000000000000002 /* EchoScreenHeader.swift in Sources */,
+				Q10000000000000000000003 /* EchoSurface.swift in Sources */,
+				Q10000000000000000000004 /* EchoContentState.swift in Sources */,
+				Q10000000000000000000005 /* EchoEntryPresentation.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

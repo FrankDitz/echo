@@ -118,27 +118,26 @@ struct EntryEditorView: View {
       .font(EchoTypography.status)
       .foregroundStyle(.secondary)
     } else if let assistedText {
-      VStack(alignment: .leading, spacing: EchoLayout.inlineSpacing) {
-        Label("Assisted Draft", systemImage: "wand.and.stars")
-          .font(.headline)
-        Text(assistedText)
-          .font(EchoTypography.body)
-          .lineSpacing(4)
-          .textSelection(.enabled)
-        Text("Your original writing is preserved above.")
-          .font(.caption)
-          .foregroundStyle(.secondary)
+      EchoSurface(
+        style: .accent(opacity: EchoMaterialMetrics.assistedWritingFillOpacity),
+        padding: EchoLayout.focusedContentInset,
+        cornerRadius: EchoShape.embeddedRadius
+      ) {
+        VStack(alignment: .leading, spacing: EchoLayout.inlineSpacing) {
+          Label("Assisted Draft", systemImage: "wand.and.stars")
+            .font(.headline)
+          Text(assistedText)
+            .font(EchoTypography.body)
+            .lineSpacing(4)
+            .textSelection(.enabled)
+          Text("Your original writing is preserved above.")
+            .font(.caption)
+            .foregroundStyle(.secondary)
+        }
       }
-      .padding(EchoLayout.focusedContentInset)
       .frame(maxWidth: .infinity, alignment: .leading)
-      .background(
-        Color.accentColor.opacity(EchoMaterialMetrics.assistedWritingFillOpacity),
-        in: RoundedRectangle(cornerRadius: EchoShape.embeddedRadius)
-      )
     } else if assistanceFailed {
-      Label("Writing assistance could not be generated or saved.", systemImage: "exclamationmark.triangle")
-        .font(EchoTypography.status)
-        .foregroundStyle(.red)
+      EchoErrorState(message: "Writing assistance could not be generated or saved.")
     }
   }
 
