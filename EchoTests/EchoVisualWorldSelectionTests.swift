@@ -18,10 +18,23 @@ struct EchoVisualWorldSelectionTests {
 
   @Test("A stable identifier is restored from application preferences")
   func restoringSelection() {
+    let store = InMemoryVisualWorldPreferenceStore(selectedID: .crimsonStatic)
+    let selection = EchoVisualWorldSelection(preferenceStore: store)
+
+    #expect(selection.selectedID == .crimsonStatic)
+    #expect(selection.selectedWorld.id == .crimsonStatic)
+  }
+
+  @Test("Selecting a world updates presentation and persists its stable identifier")
+  func selectingWorld() {
     let store = InMemoryVisualWorldPreferenceStore(selectedID: .tealImmersion)
     let selection = EchoVisualWorldSelection(preferenceStore: store)
 
-    #expect(selection.selectedID == .tealImmersion)
+    selection.select(.crimsonStatic)
+
+    #expect(selection.selectedID == .crimsonStatic)
+    #expect(selection.selectedWorld.id == .crimsonStatic)
+    #expect(store.savedIDs == [.crimsonStatic])
   }
 
   @Test("UserDefaults stores only the selected world's stable identifier")
@@ -31,12 +44,12 @@ struct EchoVisualWorldSelectionTests {
     defer { defaults.removePersistentDomain(forName: suiteName) }
     let store = UserDefaultsEchoVisualWorldPreferenceStore(userDefaults: defaults)
 
-    store.saveSelectedWorldID(.tealImmersion)
+    store.saveSelectedWorldID(.crimsonStatic)
 
     #expect(
       defaults.string(
         forKey: UserDefaultsEchoVisualWorldPreferenceStore.selectedWorldKey
-      ) == EchoVisualWorldID.tealImmersion.rawValue
+      ) == EchoVisualWorldID.crimsonStatic.rawValue
     )
     let persistedValues = try #require(
       defaults.persistentDomain(forName: suiteName)
