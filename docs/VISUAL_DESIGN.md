@@ -88,6 +88,13 @@ Feature screens consume semantic values. They must not switch on individual worl
 - Wider iPad windows retain the top focal anchor and allow the outer city edges to crop. Mac uses a dedicated 16:10 composition to preserve detail and reflections across large windows. Semantic surface fills and the world overlay protect readability where either background becomes more detailed.
 - The asset-generation prompt and provenance are recorded in `ARTWORK_PROVENANCE.md` so future variants can be reviewed against the same privacy and originality boundary.
 
+### Crimson Static production treatment
+
+- `CrimsonStaticBackground.imageset` contains separate portrait and native 16:10 Mac compositions. Both use an original fictional city and contain no people, text, logos, personal media, or embedded location details.
+- Oxblood and ember-red city light stays concentrated around the upper third and outer edges. A calmer black-cherry center and lower region supports journal controls and reading surfaces.
+- Primary text uses a warm near-white while secondary text shifts toward pale dusty silver-red. The brighter ember accent is reserved for selection and action; saved and error colors remain visually distinct from it.
+- The background uses no teal, cyan, purple, or magenta, so the world reads as a deliberate environmental change rather than a recolored Teal Immersion screen.
+
 ## Accessibility and platform rules
 
 - Text contrast is validated against the rendered artwork, not only against palette swatches.
