@@ -7,6 +7,7 @@ struct EntryEditorView: View {
   let onSaveAssistedText: (String) async -> Bool
 
   @Environment(\.dismiss) private var dismiss
+  @Environment(\.echoVisualWorld) private var world
   @FocusState private var isEditorFocused: Bool
   @State private var draft: String
   @State private var savedText: String
@@ -35,28 +36,35 @@ struct EntryEditorView: View {
 
   var body: some View {
     NavigationStack {
-      VStack(alignment: .leading, spacing: EchoLayout.rowSpacing) {
-        TextEditor(text: $draft)
-          .focused($isEditorFocused)
-          .font(EchoTypography.body)
-          .lineSpacing(5)
-          .scrollContentBackground(.hidden)
-          .frame(maxWidth: .infinity, maxHeight: .infinity)
-          .accessibilityLabel("Journal entry")
+      EchoWorldCanvas {
+        EchoSurface(padding: EchoLayout.editorPadding) {
+          VStack(alignment: .leading, spacing: EchoLayout.rowSpacing) {
+            TextEditor(text: $draft)
+              .focused($isEditorFocused)
+              .font(EchoTypography.body)
+              .foregroundStyle(world.primaryText)
+              .lineSpacing(5)
+              .scrollContentBackground(.hidden)
+              .frame(maxWidth: .infinity, maxHeight: .infinity)
+              .accessibilityLabel("Journal entry")
 
-        assistanceSection
+            assistanceSection
 
-        Divider()
+            Divider()
 
-        HStack {
-          Text(entry.createdAt, format: .dateTime.month().day().hour().minute())
-            .foregroundStyle(.secondary)
-          Spacer()
-          saveStatus
+            HStack {
+              Text(entry.createdAt, format: .dateTime.month().day().hour().minute())
+                .foregroundStyle(.secondary)
+              Spacer()
+              saveStatus
+            }
+            .font(.footnote)
+          }
         }
-        .font(.footnote)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(.horizontal, EchoLayout.pageHorizontalPadding)
+        .padding(.vertical, EchoLayout.pageVerticalPadding)
       }
-      .padding(EchoLayout.editorPadding)
       .navigationTitle("Entry")
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
@@ -149,10 +157,10 @@ struct EntryEditorView: View {
         .accessibilityLabel("Saving")
     } else if saveFailed {
       Label("Not saved", systemImage: "exclamationmark.circle")
-        .foregroundStyle(.red)
+        .foregroundStyle(world.error)
     } else if didSave {
       Label("Saved", systemImage: "checkmark.circle.fill")
-        .foregroundStyle(.secondary)
+        .foregroundStyle(world.saved)
     } else if isDirty {
       Text("Unsaved changes")
         .foregroundStyle(.secondary)

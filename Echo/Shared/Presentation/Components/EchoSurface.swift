@@ -6,6 +6,8 @@ enum EchoSurfaceStyle {
 }
 
 struct EchoSurface<Content: View>: View {
+  @Environment(\.echoVisualWorld) private var world
+
   let style: EchoSurfaceStyle
   let padding: CGFloat
   let cornerRadius: CGFloat
@@ -26,12 +28,19 @@ struct EchoSurface<Content: View>: View {
   var body: some View {
     content
       .padding(padding)
-      .background(fill, in: RoundedRectangle(cornerRadius: cornerRadius))
+      .foregroundStyle(world.primaryText, world.secondaryText)
+      .background {
+        RoundedRectangle(cornerRadius: cornerRadius)
+          .fill(.ultraThinMaterial)
+        RoundedRectangle(cornerRadius: cornerRadius)
+          .fill(fill)
+      }
+      .shadow(color: world.contentShadow.opacity(0.24), radius: 18, y: 8)
       .overlay {
         if case .standard = style {
           RoundedRectangle(cornerRadius: cornerRadius)
             .stroke(
-              Color.secondary.opacity(EchoMaterialMetrics.subtleBorderOpacity),
+              world.separator,
               lineWidth: EchoShape.hairlineWidth
             )
         }
@@ -41,9 +50,9 @@ struct EchoSurface<Content: View>: View {
   private var fill: AnyShapeStyle {
     switch style {
     case .standard:
-      AnyShapeStyle(.background)
+      AnyShapeStyle(world.surfaceFill)
     case .accent(let opacity):
-      AnyShapeStyle(Color.accentColor.opacity(opacity))
+      AnyShapeStyle(world.accent.opacity(max(opacity, 0.12)))
     }
   }
 }

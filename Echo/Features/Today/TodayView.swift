@@ -60,38 +60,40 @@ struct TodayView: View {
   }
 
   private var entrySection: some View {
-    VStack(alignment: .leading, spacing: EchoLayout.contentSpacing) {
-      Text("Today’s Entries")
-        .font(EchoTypography.sectionTitle)
+    EchoSurface {
+      VStack(alignment: .leading, spacing: EchoLayout.contentSpacing) {
+        Text("Today’s Entries")
+          .font(EchoTypography.sectionTitle)
 
-      if viewModel.isLoading && viewModel.entries.isEmpty {
-        EchoLoadingState(
-          title: "Loading today’s entries…",
-          minHeight: EchoLayout.compactStateHeight
-        )
-      } else if viewModel.entries.isEmpty {
-        EchoEmptyState(
-          title: "A quiet day so far",
-          systemImage: "text.page",
-          description: "Write whenever there is something you want to remember.",
-          minHeight: EchoLayout.mediumStateHeight
-        )
-      } else {
-        ForEach(viewModel.entries) { entry in
-          TodayEntryRow(
-            entry: entry,
-            highlightViewModel: highlightViewModel,
-            onOpen: { selectedEntry = entry },
-            onDelete: { confirmDeletion(of: entry) }
+        if viewModel.isLoading && viewModel.entries.isEmpty {
+          EchoLoadingState(
+            title: "Loading today’s entries…",
+            minHeight: EchoLayout.compactStateHeight
           )
-          if entry.id != viewModel.entries.last?.id {
-            Divider()
+        } else if viewModel.entries.isEmpty {
+          EchoEmptyState(
+            title: "A quiet day so far",
+            systemImage: "text.page",
+            description: "Write whenever there is something you want to remember.",
+            minHeight: EchoLayout.mediumStateHeight
+          )
+        } else {
+          ForEach(viewModel.entries) { entry in
+            TodayEntryRow(
+              entry: entry,
+              highlightViewModel: highlightViewModel,
+              onOpen: { selectedEntry = entry },
+              onDelete: { confirmDeletion(of: entry) }
+            )
+            if entry.id != viewModel.entries.last?.id {
+              Divider()
+            }
           }
         }
-      }
 
-      if let failureMessage {
-        EchoErrorState(message: failureMessage)
+        if let failureMessage {
+          EchoErrorState(message: failureMessage)
+        }
       }
     }
   }
@@ -139,6 +141,8 @@ struct TodayView: View {
 }
 
 private struct TodayCaptureControl: View {
+  @Environment(\.echoVisualWorld) private var world
+
   @Binding var draft: String
   let isFocused: FocusState<Bool>.Binding
   let saveState: TodayEntrySaveState
@@ -185,10 +189,10 @@ private struct TodayCaptureControl: View {
         .accessibilityLabel("Saving")
     case .saved:
       Label("Saved", systemImage: "checkmark.circle.fill")
-        .foregroundStyle(.secondary)
+        .foregroundStyle(world.saved)
     case .failed:
       Label("Not saved", systemImage: "exclamationmark.circle")
-        .foregroundStyle(.red)
+        .foregroundStyle(world.error)
     }
   }
 

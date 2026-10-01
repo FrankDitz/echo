@@ -13,25 +13,16 @@ struct EchoPage<Content: View>: View {
   }
 
   var body: some View {
-    ScrollView {
-      LazyVStack(alignment: .leading, spacing: spacing) {
-        content
+    EchoWorldCanvas {
+      ScrollView {
+        LazyVStack(alignment: .leading, spacing: spacing) {
+          content
+        }
+        .frame(maxWidth: EchoLayout.contentMaxWidth, alignment: .leading)
+        .padding(.horizontal, EchoLayout.pageHorizontalPadding)
+        .padding(.vertical, EchoLayout.pageVerticalPadding)
+        .frame(maxWidth: .infinity)
       }
-      .frame(maxWidth: EchoLayout.contentMaxWidth, alignment: .leading)
-      .padding(.horizontal, EchoLayout.pageHorizontalPadding)
-      .padding(.vertical, EchoLayout.pageVerticalPadding)
-      .frame(maxWidth: .infinity)
     }
-    .background(EchoPlatformColor.groupedBackground)
-  }
-}
-
-enum EchoPlatformColor {
-  static var groupedBackground: Color {
-    #if os(iOS)
-      Color(uiColor: .systemGroupedBackground)
-    #else
-      Color(nsColor: .windowBackgroundColor)
-    #endif
   }
 }
