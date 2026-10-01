@@ -16,6 +16,10 @@ final class TimelineViewModel {
   private(set) var isLoading = false
   private(set) var failure: TimelineFailure?
 
+  var mostRecentTimelineDate: Date {
+    calendar.date(byAdding: .day, value: -1, to: now()) ?? now()
+  }
+
   init(
     repository: any EchoEntryRepository,
     calendar: Calendar = .autoupdatingCurrent,

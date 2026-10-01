@@ -7,6 +7,7 @@ struct TimelineView: View {
   let journalRepository: any EchoOrganizedJournalRepository
 
   @Environment(\.timeZone) private var timeZone
+  @Environment(\.calendar) private var calendar
   @Environment(\.echoVisualWorld) private var world
 
   var body: some View {
@@ -45,18 +46,21 @@ struct TimelineView: View {
   private var timelineContent: some View {
     if viewModel.isLoading && viewModel.days.isEmpty {
       EchoLoadingState(title: "Loading your timeline…")
-    } else if viewModel.days.isEmpty {
-      EchoSurface {
-        EchoEmptyState(
-          title: "Your story starts here",
-          systemImage: "clock.arrow.circlepath",
-          description: "Days with journal entries will gather here over time.",
-          minHeight: EchoLayout.mediumStateHeight
-        )
-      }
     } else {
       recentDateStrip
-      timelineRail
+
+      if viewModel.days.isEmpty {
+        EchoSurface {
+          EchoEmptyState(
+            title: "Your story starts here",
+            systemImage: "clock.arrow.circlepath",
+            description: "Days with journal entries will gather here over time.",
+            minHeight: EchoLayout.compactStateHeight
+          )
+        }
+      } else {
+        timelineRail
+      }
 
       if viewModel.failure != nil {
         EchoErrorState(
@@ -70,7 +74,7 @@ struct TimelineView: View {
     EchoSurface(padding: 0) {
       VStack(alignment: .leading, spacing: EchoLayout.rowSpacing) {
         Label(
-          latestDisplayDate.formatted(.dateTime.month(.wide).year()),
+          stripAnchorDate.formatted(.dateTime.month(.wide).year()),
           systemImage: "calendar"
         )
         .font(EchoTypography.metadata)
@@ -80,17 +84,26 @@ struct TimelineView: View {
 
         ScrollView(.horizontal) {
           LazyHStack(spacing: EchoLayout.inlineSpacing) {
-            ForEach(recentDays) { day in
-              NavigationLink {
-                destination(for: day)
-              } label: {
+            ForEach(dateStripDates, id: \.self) { date in
+              if let day = day(for: date) {
+                NavigationLink {
+                  destination(for: day)
+                } label: {
+                  TimelineDateTile(
+                    date: date,
+                    isLatest: day.id == viewModel.days.first?.id,
+                    hasEntries: true
+                  )
+                }
+                .buttonStyle(.plain)
+                .accessibilityHint("Opens this day’s entries")
+              } else {
                 TimelineDateTile(
-                  date: displayDate(for: day),
-                  isLatest: day.id == viewModel.days.first?.id
+                  date: date,
+                  isLatest: false,
+                  hasEntries: false
                 )
               }
-              .buttonStyle(.plain)
-              .accessibilityHint("Opens this day’s entries")
             }
           }
           .padding(.horizontal, EchoLayout.surfacePadding)
@@ -137,12 +150,19 @@ struct TimelineView: View {
     }
   }
 
-  private var recentDays: [EchoDay] {
-    Array(viewModel.days.prefix(7).reversed())
+  private var stripAnchorDate: Date {
+    viewModel.days.first.map(displayDate(for:)) ?? viewModel.mostRecentTimelineDate
   }
 
-  private var latestDisplayDate: Date {
-    displayDate(for: viewModel.days[0])
+  private var dateStripDates: [Date] {
+    (-6...0).compactMap { offset in
+      calendar.date(byAdding: .day, value: offset, to: stripAnchorDate)
+    }
+  }
+
+  private func day(for date: Date) -> EchoDay? {
+    let identifier = EchoDayIdentifier(containing: date, calendar: calendar)
+    return viewModel.days.first(where: { $0.id == identifier })
   }
 
   private func displayDate(for day: EchoDay) -> Date {
@@ -162,6 +182,7 @@ struct TimelineView: View {
 private struct TimelineDateTile: View {
   let date: Date
   let isLatest: Bool
+  let hasEntries: Bool
 
   @Environment(\.echoVisualWorld) private var world
 
@@ -173,7 +194,7 @@ private struct TimelineDateTile: View {
       Text(date, format: .dateTime.day())
         .font(.title2.weight(.semibold))
     }
-    .foregroundStyle(isLatest ? world.canvas : world.primaryText)
+    .foregroundStyle(tileForeground)
     .frame(width: 54)
     .frame(minHeight: 62)
     .background(isLatest ? world.accent : world.selectedFill, in: RoundedRectangle(cornerRadius: 14))
@@ -185,8 +206,13 @@ private struct TimelineDateTile: View {
     }
     .accessibilityElement(children: .ignore)
     .accessibilityLabel(
-      "\(isLatest ? "Latest, " : "")\(date.formatted(.dateTime.weekday(.wide).month(.wide).day().year()))"
+      "\(isLatest ? "Latest entry, " : "")\(date.formatted(.dateTime.weekday(.wide).month(.wide).day().year())), \(hasEntries ? "has entries" : "no entries")"
     )
+  }
+
+  private var tileForeground: Color {
+    if isLatest { return world.canvas }
+    return hasEntries ? world.primaryText : world.secondaryText.opacity(0.75)
   }
 }
 
