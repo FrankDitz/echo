@@ -29,9 +29,11 @@ struct EchoEmptyState: View {
 struct EchoErrorState: View {
   let message: String
 
+  @Environment(\.echoVisualWorld) private var world
+
   var body: some View {
     Label(message, systemImage: "exclamationmark.triangle")
       .font(EchoTypography.status)
-      .foregroundStyle(.red)
+      .foregroundStyle(world.error)
   }
 }

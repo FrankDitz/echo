@@ -46,6 +46,9 @@ struct EchoApp: App {
         aiService: aiService,
         journalRepository: journalRepository
       )
+      .environment(\.echoVisualWorld, .tealImmersion)
+      .tint(EchoVisualWorld.tealImmersion.accent)
+      .preferredColorScheme(.dark)
     }
     .modelContainer(modelContainer)
   }

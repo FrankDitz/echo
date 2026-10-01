@@ -63,6 +63,8 @@
 		Q10000000000000000000003 /* EchoSurface.swift in Sources */ = {isa = PBXBuildFile; fileRef = Q10000000000000000000023 /* EchoSurface.swift */; };
 		Q10000000000000000000004 /* EchoContentState.swift in Sources */ = {isa = PBXBuildFile; fileRef = Q10000000000000000000024 /* EchoContentState.swift */; };
 		Q10000000000000000000005 /* EchoEntryPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = Q10000000000000000000025 /* EchoEntryPresentation.swift */; };
+		R10000000000000000000001 /* EchoVisualWorld.swift in Sources */ = {isa = PBXBuildFile; fileRef = R10000000000000000000021 /* EchoVisualWorld.swift */; };
+		R10000000000000000000002 /* EchoWorldCanvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = R10000000000000000000022 /* EchoWorldCanvas.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -134,6 +136,8 @@
 		Q10000000000000000000023 /* EchoSurface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoSurface.swift; sourceTree = "<group>"; };
 		Q10000000000000000000024 /* EchoContentState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoContentState.swift; sourceTree = "<group>"; };
 		Q10000000000000000000025 /* EchoEntryPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoEntryPresentation.swift; sourceTree = "<group>"; };
+		R10000000000000000000021 /* EchoVisualWorld.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoVisualWorld.swift; sourceTree = "<group>"; };
+		R10000000000000000000022 /* EchoWorldCanvas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoWorldCanvas.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -402,6 +406,7 @@
 			children = (
 				P10000000000000000000041 /* Foundation */,
 				Q10000000000000000000040 /* Components */,
+				R10000000000000000000040 /* Theming */,
 			);
 			path = Presentation;
 			sourceTree = "<group>";
@@ -424,6 +429,15 @@
 				Q10000000000000000000025 /* EchoEntryPresentation.swift */,
 			);
 			path = Components;
+			sourceTree = "<group>";
+		};
+		R10000000000000000000040 /* Theming */ = {
+			isa = PBXGroup;
+			children = (
+				R10000000000000000000021 /* EchoVisualWorld.swift */,
+				R10000000000000000000022 /* EchoWorldCanvas.swift */,
+			);
+			path = Theming;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -565,6 +579,8 @@
 				Q10000000000000000000003 /* EchoSurface.swift in Sources */,
 				Q10000000000000000000004 /* EchoContentState.swift in Sources */,
 				Q10000000000000000000005 /* EchoEntryPresentation.swift in Sources */,
+				R10000000000000000000001 /* EchoVisualWorld.swift in Sources */,
+				R10000000000000000000002 /* EchoWorldCanvas.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

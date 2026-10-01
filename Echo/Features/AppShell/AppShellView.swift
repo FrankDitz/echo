@@ -73,12 +73,14 @@ private struct SettingsPlaceholderView: View {
 
   var body: some View {
     NavigationStack {
-      EchoEmptyState(
-        title: "Settings",
-        systemImage: "gearshape",
-        description: "Preferences will be added as Echo grows.",
-        minHeight: 0
-      )
+      EchoWorldCanvas {
+        EchoEmptyState(
+          title: "Settings",
+          systemImage: "gearshape",
+          description: "Preferences will be added as Echo grows.",
+          minHeight: 0
+        )
+      }
       .navigationTitle("Settings")
       .toolbar {
         ToolbarItem(placement: .confirmationAction) {

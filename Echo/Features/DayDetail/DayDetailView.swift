@@ -150,6 +150,8 @@ private struct DayReflectionSection: View {
 }
 
 private struct DayDetailEntry: View {
+  @Environment(\.echoVisualWorld) private var world
+
   let entry: EchoEntry
   let highlightViewModel: EntryHighlightViewModel
   let isFocusedSource: Bool
@@ -170,7 +172,7 @@ private struct DayDetailEntry: View {
     .padding(isFocusedSource ? EchoLayout.focusedContentInset : 0)
     .background(
       isFocusedSource
-        ? Color.accentColor.opacity(EchoMaterialMetrics.focusedSourceFillOpacity)
+        ? world.selectedFill
         : Color.clear,
       in: RoundedRectangle(cornerRadius: EchoShape.embeddedRadius)
     )
@@ -178,7 +180,7 @@ private struct DayDetailEntry: View {
       if isFocusedSource {
         RoundedRectangle(cornerRadius: EchoShape.embeddedRadius)
           .stroke(
-            Color.accentColor.opacity(EchoMaterialMetrics.focusedSourceBorderOpacity),
+            world.accent.opacity(EchoMaterialMetrics.focusedSourceBorderOpacity),
             lineWidth: EchoShape.emphasizedBorderWidth
           )
       }
