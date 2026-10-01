@@ -31,14 +31,14 @@ struct DayDetailView: View {
   var body: some View {
     ScrollViewReader { proxy in
       ScrollView {
-        LazyVStack(alignment: .leading, spacing: 28) {
+        LazyVStack(alignment: .leading, spacing: EchoLayout.sectionSpacing) {
           header
           organizedJournal
           entries
         }
-        .frame(maxWidth: 720, alignment: .leading)
-        .padding(.horizontal, 20)
-        .padding(.vertical, 24)
+        .frame(maxWidth: EchoLayout.contentMaxWidth, alignment: .leading)
+        .padding(.horizontal, EchoLayout.pageHorizontalPadding)
+        .padding(.vertical, EchoLayout.pageVerticalPadding)
         .frame(maxWidth: .infinity)
       }
       .background(groupedBackground)
@@ -54,10 +54,10 @@ struct DayDetailView: View {
   }
 
   private var organizedJournal: some View {
-    VStack(alignment: .leading, spacing: 14) {
+    VStack(alignment: .leading, spacing: EchoLayout.contentSpacing) {
       HStack {
         Label("Organized Journal", systemImage: "wand.and.stars")
-          .font(.title3.weight(.semibold))
+          .font(EchoTypography.contentTitle)
         Spacer()
         Button(
           organizationViewModel.journal == nil ? "Organize Day" : "Regenerate",
@@ -77,7 +77,7 @@ struct DayDetailView: View {
         ProgressView("Organizing this day…")
       } else if let journal = organizationViewModel.journal {
         Text(journal.body)
-          .font(.body)
+          .font(EchoTypography.body)
           .lineSpacing(5)
           .textSelection(.enabled)
         Text("Created locally from \(journal.sourceEntryIDs.count) raw \(journal.sourceEntryIDs.count == 1 ? "entry" : "entries").")
@@ -85,7 +85,7 @@ struct DayDetailView: View {
           .foregroundStyle(.secondary)
       } else {
         Text("Create a readable daily narrative while keeping every original entry unchanged.")
-          .font(.subheadline)
+          .font(EchoTypography.supporting)
           .foregroundStyle(.secondary)
       }
 
@@ -94,23 +94,26 @@ struct DayDetailView: View {
           "The organized journal could not be loaded or saved.",
           systemImage: "exclamationmark.triangle"
         )
-        .font(.footnote)
+        .font(EchoTypography.status)
         .foregroundStyle(.red)
       }
     }
-    .padding(18)
-    .background(Color.accentColor.opacity(0.06), in: RoundedRectangle(cornerRadius: 18))
+    .padding(EchoLayout.surfacePadding)
+    .background(
+      Color.accentColor.opacity(EchoMaterialMetrics.organizedJournalFillOpacity),
+      in: RoundedRectangle(cornerRadius: EchoShape.surfaceRadius)
+    )
   }
 
   private var header: some View {
-    VStack(alignment: .leading, spacing: 8) {
+    VStack(alignment: .leading, spacing: EchoLayout.inlineSpacing) {
       Text(displayDate, format: .dateTime.weekday(.wide))
         .font(.title3.weight(.medium))
         .foregroundStyle(.secondary)
       Text(displayDate, format: .dateTime.month(.wide).day().year())
-        .font(.largeTitle.weight(.bold))
+        .font(EchoTypography.screenTitle)
       Text(entryCountLabel)
-        .font(.subheadline)
+        .font(EchoTypography.supporting)
         .foregroundStyle(.secondary)
     }
     .accessibilityElement(children: .combine)
@@ -127,15 +130,18 @@ struct DayDetailView: View {
         .id(entry.id)
         if entry.id != day.entries.last?.id {
           Divider()
-            .padding(.vertical, 20)
+            .padding(.vertical, EchoLayout.editorPadding)
         }
       }
     }
-    .padding(20)
-    .background(.background, in: RoundedRectangle(cornerRadius: 18))
+    .padding(EchoLayout.editorPadding)
+    .background(.background, in: RoundedRectangle(cornerRadius: EchoShape.surfaceRadius))
     .overlay {
-      RoundedRectangle(cornerRadius: 18)
-        .stroke(Color.secondary.opacity(0.2), lineWidth: 0.5)
+      RoundedRectangle(cornerRadius: EchoShape.surfaceRadius)
+        .stroke(
+          Color.secondary.opacity(EchoMaterialMetrics.subtleBorderOpacity),
+          lineWidth: EchoShape.hairlineWidth
+        )
     }
   }
 
@@ -162,12 +168,12 @@ private struct DayDetailEntry: View {
   let isFocusedSource: Bool
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 10) {
+    VStack(alignment: .leading, spacing: EchoLayout.inlineSpacing) {
       Text(entry.createdAt, format: .dateTime.hour().minute())
-        .font(.caption.weight(.semibold))
+        .font(EchoTypography.metadata)
         .foregroundStyle(.secondary)
       Text(entry.rawText)
-        .font(.body)
+        .font(EchoTypography.body)
         .lineSpacing(5)
         .frame(maxWidth: .infinity, alignment: .leading)
         .textSelection(.enabled)
@@ -175,15 +181,20 @@ private struct DayDetailEntry: View {
         .buttonStyle(.borderless)
         .font(.subheadline)
     }
-    .padding(isFocusedSource ? 14 : 0)
+    .padding(isFocusedSource ? EchoLayout.focusedContentInset : 0)
     .background(
-      isFocusedSource ? Color.accentColor.opacity(0.1) : Color.clear,
-      in: RoundedRectangle(cornerRadius: 12)
+      isFocusedSource
+        ? Color.accentColor.opacity(EchoMaterialMetrics.focusedSourceFillOpacity)
+        : Color.clear,
+      in: RoundedRectangle(cornerRadius: EchoShape.embeddedRadius)
     )
     .overlay {
       if isFocusedSource {
-        RoundedRectangle(cornerRadius: 12)
-          .stroke(Color.accentColor.opacity(0.35), lineWidth: 1)
+        RoundedRectangle(cornerRadius: EchoShape.embeddedRadius)
+          .stroke(
+            Color.accentColor.opacity(EchoMaterialMetrics.focusedSourceBorderOpacity),
+            lineWidth: EchoShape.emphasizedBorderWidth
+          )
       }
     }
     .accessibilityElement(children: .combine)
