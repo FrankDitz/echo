@@ -31,7 +31,9 @@ Echo/
   Services/
     AI/                Provider-neutral contracts and deterministic local stand-in
   Hub/                 Future integration contracts only
-  Shared/              Focused reusable UI and resources
+  Shared/
+    Presentation/      Theme-neutral foundations, reusable UI, and visual-world definitions
+    Resources/         Bundled assets that contain no personal runtime data
 ```
 
 Only directories with real implementation files exist today. Future directories are created when their first implementation arrives, avoiding empty abstractions and placeholder production types.
@@ -51,6 +53,25 @@ SwiftUI features -> application/domain contracts <- data and service adapters
 - Hub integration consumes stable, explicit contracts; Echo does not depend on Ambition.
 
 These are boundaries, not a requirement to create one type per layer. A protocol is introduced when there is a real replacement or testing seam.
+
+## Presentation architecture
+
+Feature ownership remains vertical: Today, Timeline, Day Detail, Entry Editor, Highlights, and App Shell own their screens and feature-specific presentation state. A view stays in its feature when another feature has no concrete reason to reuse it.
+
+Shared presentation code is introduced only with a real consumer and belongs under `Shared/Presentation`:
+
+```text
+Shared/Presentation/
+  Foundation/          Semantic typography, spacing, shape, material, and motion values
+  Components/          Reusable controls and content presentation with multiple consumers
+  Theming/             Visual-world definitions, selection, environment, and rendering
+```
+
+Feature views may depend on Shared presentation code. Shared presentation code must not depend on a feature, repository implementation, SwiftData record, or concrete AI adapter. Visual worlds provide semantic presentation values and background artwork; they do not branch domain behavior or own journal state.
+
+The project does not create empty folders or placeholder types to imitate this target tree. Each directory arrives with its first implementation. Existing feature files move only when ownership changes, keeping organizational work reviewable and avoiding project-file churn.
+
+See [Visual design](VISUAL_DESIGN.md) for the approved Phase 7 direction, visual-world contract, and screen-level constraints.
 
 ## Data and identity decisions
 
