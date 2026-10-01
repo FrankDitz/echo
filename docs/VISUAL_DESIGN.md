@@ -95,6 +95,13 @@ Feature screens consume semantic values. They must not switch on individual worl
 - Primary text uses a warm near-white while secondary text shifts toward pale dusty silver-red. The brighter ember accent is reserved for selection and action; saved and error colors remain visually distinct from it.
 - The background uses no teal, cyan, purple, or magenta, so the world reads as a deliberate environmental change rather than a recolored Teal Immersion screen.
 
+### Sodium Fog production treatment
+
+- `SodiumFogBackground.imageset` contains separate portrait and native 16:10 Mac compositions. Both depict an original fictional concrete waterfront with no people, text, logos, personal media, or embedded location details.
+- Monumental concrete, viaducts, and diffused fog stay concentrated around the skyline and outer edges. A calmer charcoal-olive water region supports journal controls and reading surfaces.
+- Primary text uses warm ivory, secondary text uses muted khaki, and sodium amber is reserved for selection and action. A restrained red signal remains available for errors without becoming the world's dominant color.
+- The world avoids teal, cyan, saturated blue, purple, and broad red washes, separating it from both Teal Immersion and Crimson Static rather than recoloring their artwork.
+
 ## Accessibility and platform rules
 
 - Text contrast is validated against the rendered artwork, not only against palette swatches.
