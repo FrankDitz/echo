@@ -24,9 +24,15 @@ Each deliverable uses its own short-lived branch and pull request. A deliverable
 4. **Teal Immersion default world (complete):** create production background artwork, define its presentation values, and apply the approved Mirror City composition across Today, Timeline, Day Detail, Highlights, Entry Editor, and assisted-writing states.
 5. **Theme selection (complete):** add an accessible visual-world selector and persist only the stable selected-world identifier in application preferences. Selection must not touch SwiftData journal records.
 6. **Additional visual worlds (complete):** add Crimson Static, Sodium Fog, and Electric Blue Hour independently, validating each background crop, contrast, and component treatment before the next world is introduced.
-7. **Motion and icon polish:** add purposeful transitions, feedback, and an Echo icon vocabulary while honoring Reduce Motion and avoiding ornamental animation.
-8. **Platform and accessibility review:** validate supported iPhone, iPad, and Mac layouts; Dynamic Type; VoiceOver labels and order; contrast; keyboard behavior; reduced transparency; and light-sensitive presentation.
-9. **Phase closeout:** run full builds and tests, simulator review, repository-safety scans, documentation refresh, and a final comparison against the approved visual specification.
+7. **Editorial app shell (complete):** replace generic system tab and toolbar presentation with an Echo wordmark, custom theme-aware primary navigation, responsive iPhone, iPad, and Mac chrome, and reusable navigation styling. Preserve the existing Today, Timeline, Highlights, and Settings behavior.
+8. **Today product UI:** realize the approved prompt-led capture composition, a clear text-entry action, and a compact timestamped raw-entry list while preserving loading, empty, error, edit, and deletion behavior. Do not show microphone or media controls before those capabilities exist.
+9. **Timeline product UI:** realize the approved date-browsing composition and vertical entry rail while preserving previous-day filtering, refresh states, and native Day Detail navigation.
+10. **Day Detail and Reflection product UI:** realize the editorial reflection hierarchy, provenance, original-source rows, and organize/regenerate actions. Show titles, themes, or other generated structure only when the domain model actually provides it.
+11. **Highlights product UI:** realize the compact saved-writing and bookmark composition with source navigation and removal behavior. Add filters only for content types the product supports.
+12. **Entry Editor and assisted-writing product UI:** realize a focused writing surface, explicit save feedback, and a clear visual separation between original and assisted text without changing persistence behavior.
+13. **Motion and icon polish:** add purposeful transitions, feedback, and an Echo icon vocabulary while honoring Reduce Motion and avoiding ornamental animation.
+14. **Platform and accessibility review:** validate supported iPhone, iPad, and Mac layouts; Dynamic Type; VoiceOver labels and order; contrast; keyboard behavior; reduced transparency; and light-sensitive presentation.
+15. **Phase closeout:** run full builds and tests, simulator review, repository-safety scans, documentation refresh, and a final comparison against the approved visual specification.
 
 ## Near-term improvements
 
