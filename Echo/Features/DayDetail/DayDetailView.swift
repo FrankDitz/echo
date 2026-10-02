@@ -92,24 +92,57 @@ struct DayDetailView: View {
   @Environment(\.timeZone) private var timeZone
 
   var body: some View {
-    ScrollViewReader { proxy in
-      EchoPage(spacing: EchoLayout.sectionSpacing) {
-        DayDateHeader(
-          date: displayDate,
-          entryCountLabel: entryCountLabel
-        )
-        DayReflectionSection(viewModel: organizationViewModel)
-        entries
-        ReflectionActionBar(viewModel: organizationViewModel)
-      }
-      .task {
-        await highlightViewModel.load()
-        await organizationViewModel.load()
-        if let focusedEntryID {
-          proxy.scrollTo(focusedEntryID, anchor: .center)
+    EchoWorldCanvas {
+      GeometryReader { geometry in
+        ScrollViewReader { proxy in
+          ScrollView {
+            if geometry.size.width >= EchoLayout.wideLayoutBreakpoint {
+              HStack(alignment: .top, spacing: 42) {
+                VStack(alignment: .leading, spacing: EchoLayout.sectionSpacing) {
+                  dayHeader
+                  DayReflectionSection(viewModel: organizationViewModel)
+                  ReflectionActionBar(viewModel: organizationViewModel)
+                }
+                .frame(maxWidth: 610, alignment: .leading)
+
+                entries
+                  .frame(maxWidth: 440, alignment: .topLeading)
+              }
+              .frame(maxWidth: EchoLayout.wideContentMaxWidth, alignment: .topLeading)
+              .padding(.horizontal, 40)
+              .padding(.vertical, 44)
+              .frame(maxWidth: .infinity, alignment: .top)
+            } else {
+              LazyVStack(alignment: .leading, spacing: EchoLayout.sectionSpacing) {
+                dayHeader
+                DayReflectionSection(viewModel: organizationViewModel)
+                entries
+                ReflectionActionBar(viewModel: organizationViewModel)
+              }
+              .frame(maxWidth: EchoLayout.contentMaxWidth, alignment: .leading)
+              .padding(.horizontal, EchoLayout.pageHorizontalPadding)
+              .padding(.vertical, EchoLayout.pageVerticalPadding)
+              .frame(maxWidth: .infinity)
+            }
+          }
+          .scrollIndicators(.hidden)
+          .task {
+            await highlightViewModel.load()
+            await organizationViewModel.load()
+            if let focusedEntryID {
+              proxy.scrollTo(focusedEntryID, anchor: .center)
+            }
+          }
         }
       }
     }
+  }
+
+  private var dayHeader: some View {
+    DayDateHeader(
+      date: displayDate,
+      entryCountLabel: entryCountLabel
+    )
   }
 
   private var entries: some View {
