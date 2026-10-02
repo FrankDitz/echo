@@ -8,6 +8,7 @@ struct TimelineView: View {
 
   @State private var selectedDayID: EchoDayIdentifier?
   @State private var searchQuery = ""
+  @State private var isShowingCalendar = false
   @FocusState private var isSearchFocused: Bool
 
   @Environment(\.timeZone) private var timeZone
@@ -45,6 +46,13 @@ struct TimelineView: View {
     }
     .task {
       await viewModel.load()
+    }
+    .sheet(isPresented: $isShowingCalendar) {
+      TimelineCalendarBrowser(
+        days: viewModel.days,
+        selectedDayID: $selectedDayID,
+        initialDate: stripAnchorDate
+      )
     }
   }
 
@@ -246,9 +254,14 @@ struct TimelineView: View {
 
         Spacer()
 
-        Label("7-day view", systemImage: "calendar")
-          .labelStyle(.titleAndIcon)
-          .accessibilityLabel("Seven-day date browser")
+        Button {
+          isShowingCalendar = true
+        } label: {
+          Label("Browse month", systemImage: "calendar")
+            .labelStyle(.titleAndIcon)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Open calendar browser")
       }
       .font(EchoTypography.metadata)
       .foregroundStyle(world.secondaryText)
@@ -366,7 +379,9 @@ struct TimelineView: View {
   }
 
   private var stripAnchorDate: Date {
-    viewModel.days.first.map(displayDate(for:)) ?? viewModel.mostRecentTimelineDate
+    selectedTimelineDay.map(displayDate(for:))
+      ?? viewModel.days.first.map(displayDate(for:))
+      ?? viewModel.mostRecentTimelineDate
   }
 
   private var selectedTimelineDay: EchoDay? {
@@ -416,6 +431,170 @@ struct TimelineView: View {
       journalRepository: journalRepository,
       focusedEntryID: focusedEntryID
     )
+  }
+}
+
+private struct TimelineCalendarBrowser: View {
+  let days: [EchoDay]
+  @Binding var selectedDayID: EchoDayIdentifier?
+
+  @Environment(\.dismiss) private var dismiss
+  @Environment(\.calendar) private var calendar
+  @Environment(\.echoVisualWorld) private var world
+
+  @State private var displayedMonth: Date
+
+  init(
+    days: [EchoDay],
+    selectedDayID: Binding<EchoDayIdentifier?>,
+    initialDate: Date
+  ) {
+    self.days = days
+    _selectedDayID = selectedDayID
+    _displayedMonth = State(initialValue: initialDate)
+  }
+
+  var body: some View {
+    EchoWorldCanvas {
+      VStack(spacing: EchoLayout.contentSpacing) {
+        HStack {
+          VStack(alignment: .leading, spacing: EchoLayout.microSpacing) {
+            Text("JOURNAL CALENDAR")
+              .font(EchoTypography.editorialEyebrow)
+              .tracking(1.4)
+              .foregroundStyle(world.accent)
+            Text(monthStart, format: .dateTime.month(.wide).year())
+              .font(EchoTypography.sectionTitle)
+          }
+
+          Spacer()
+
+          monthButton(systemImage: "chevron.left", offset: -1)
+          monthButton(systemImage: "chevron.right", offset: 1)
+
+          Button("Done") { dismiss() }
+            .buttonStyle(.borderedProminent)
+            .tint(world.accent)
+            .foregroundStyle(world.canvas)
+        }
+
+        EchoReadabilityPanel {
+          VStack(spacing: EchoLayout.rowSpacing) {
+            LazyVGrid(columns: calendarColumns, spacing: EchoLayout.inlineSpacing) {
+              ForEach(rotatedWeekdaySymbols, id: \.self) { symbol in
+                Text(symbol.uppercased())
+                  .font(EchoTypography.editorialEyebrow)
+                  .foregroundStyle(world.secondaryText)
+                  .frame(maxWidth: .infinity)
+              }
+
+              ForEach(Array(monthCells.enumerated()), id: \.offset) { _, date in
+                if let date {
+                  calendarDay(date)
+                } else {
+                  Color.clear
+                    .frame(minHeight: 48)
+                    .accessibilityHidden(true)
+                }
+              }
+            }
+          }
+        }
+
+        Text("Only days containing journal entries can be opened.")
+          .font(EchoTypography.supporting)
+          .foregroundStyle(world.secondaryText)
+          .frame(maxWidth: .infinity, alignment: .leading)
+      }
+      .frame(maxWidth: 620, alignment: .topLeading)
+      .padding(EchoLayout.pageHorizontalPadding)
+      .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+    }
+    .frame(minWidth: 360, minHeight: 520)
+  }
+
+  private var monthStart: Date {
+    calendar.dateInterval(of: .month, for: displayedMonth)?.start ?? displayedMonth
+  }
+
+  private var calendarColumns: [GridItem] {
+    Array(repeating: GridItem(.flexible(), spacing: EchoLayout.tightSpacing), count: 7)
+  }
+
+  private var rotatedWeekdaySymbols: [String] {
+    let symbols = calendar.veryShortStandaloneWeekdaySymbols
+    let startIndex = max(calendar.firstWeekday - 1, 0)
+    return Array(symbols[startIndex...]) + Array(symbols[..<startIndex])
+  }
+
+  private var monthCells: [Date?] {
+    guard let dayRange = calendar.range(of: .day, in: .month, for: monthStart),
+      let firstDay = calendar.date(bySetting: .day, value: dayRange.lowerBound, of: monthStart)
+    else {
+      return []
+    }
+
+    let weekday = calendar.component(.weekday, from: firstDay)
+    let leadingCount = (weekday - calendar.firstWeekday + 7) % 7
+    let leading = Array<Date?>(repeating: nil, count: leadingCount)
+    let dates = dayRange.compactMap { day in
+      calendar.date(bySetting: .day, value: day, of: monthStart)
+    }
+    return leading + dates.map(Optional.some)
+  }
+
+  private func calendarDay(_ date: Date) -> some View {
+    let identifier = EchoDayIdentifier(containing: date, calendar: calendar)
+    let day = days.first(where: { $0.id == identifier })
+    let isSelected = selectedDayID == identifier
+
+    return Button {
+      selectedDayID = identifier
+      dismiss()
+    } label: {
+      VStack(spacing: EchoLayout.microSpacing) {
+        Text(date, format: .dateTime.day())
+          .font(.body.weight(isSelected ? .bold : .medium))
+          .frame(width: 36, height: 36)
+          .foregroundStyle(isSelected ? world.canvas : world.primaryText)
+          .background {
+            if isSelected {
+              Circle().fill(world.accent)
+            }
+          }
+
+        Circle()
+          .fill(day == nil ? Color.clear : world.accent)
+          .frame(width: 4, height: 4)
+      }
+      .frame(maxWidth: .infinity, minHeight: 48)
+      .contentShape(Rectangle())
+    }
+    .buttonStyle(.plain)
+    .disabled(day == nil)
+    .opacity(day == nil ? 0.38 : 1)
+    .accessibilityLabel(
+      "\(date.formatted(.dateTime.weekday(.wide).month(.wide).day().year())), \(day == nil ? "no entries" : "\(day?.entryCount ?? 0) entries")"
+    )
+    .accessibilityHint(day == nil ? "" : "Shows this day in Timeline")
+  }
+
+  private func monthButton(systemImage: String, offset: Int) -> some View {
+    Button {
+      if let newMonth = calendar.date(byAdding: .month, value: offset, to: monthStart) {
+        displayedMonth = newMonth
+      }
+    } label: {
+      Image(systemName: systemImage)
+        .font(.subheadline.weight(.bold))
+        .frame(width: 36, height: 36)
+        .background(.ultraThinMaterial, in: Circle())
+        .overlay {
+          Circle().stroke(world.separator, lineWidth: EchoShape.hairlineWidth)
+        }
+    }
+    .buttonStyle(.plain)
+    .accessibilityLabel(offset < 0 ? "Previous month" : "Next month")
   }
 }
 
