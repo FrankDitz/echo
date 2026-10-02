@@ -11,7 +11,7 @@ Each phase is implemented, built, tested where behavior exists, reviewed, commit
 - **Phase 4 — Timeline (complete):** previous-day filtering and newest-first summaries, entry counts and previews, captured-date presentation, refresh states, native Day Detail navigation, and readable chronological entries.
 - **Phase 5 — Highlights (complete):** highlight and unhighlight entries, browse a newest-highlighted-first curated collection, remove highlights, and navigate to the emphasized source entry within its complete day context.
 - **Phase 6 — AI architecture (complete):** provider-neutral cleanup, polish, and day-organization contracts; a deterministic offline implementation; separately persisted assisted text; versioned organized-journal storage; Day Detail generation and regeneration; and provenance, durability, failure, and immutability tests. No provider credential, network call, or real journal content enters the app bundle, fixtures, logs, or Git.
-- **Phase 7 — Visual worlds and presentation system (in progress):** build a mature, reusable presentation architecture around the approved Mirror City direction, with Teal Immersion as the default visual world and optional Crimson Static, Sodium Fog, and Electric Blue Hour worlds. Theme choice changes presentation only; journal data and application behavior remain unchanged.
+- **Phase 7 — Visual worlds and presentation system (complete):** build a mature, reusable presentation architecture around the approved Mirror City direction, with Teal Immersion as the default visual world and optional Crimson Static, Sodium Fog, and Electric Blue Hour worlds. Theme choice changes presentation only; journal data and application behavior remain unchanged.
 - **Phase 8 — Memory, reflection, and continuity:** turn the functional journal into a product worth returning to through honest retrieval, richer private reflection, memory resurfacing, faster capture, and explicit personal-data controls. Each capability remains local-first, optional where appropriate, and independently reviewable.
 - **Phase 9 — MVP review:** full builds and tests, architecture and privacy review, naming cleanup, documentation refresh, staged-data scan, and full reachable-history scan.
 
@@ -39,7 +39,7 @@ Each deliverable uses its own short-lived branch and pull request. A deliverable
 18. **Motion and icon language (complete):** add purposeful capture, selection, navigation, and theme transitions plus a consistent Echo icon vocabulary while honoring Reduce Motion and avoiding ornamental animation.
 19. **Mac workspace composition (complete):** make productive use of wide windows, add appropriate keyboard commands and focus behavior, and avoid presenting a stretched phone composition on macOS.
 20. **Platform and accessibility review (complete):** validate supported iPhone, iPad, and Mac layouts; Dynamic Type; VoiceOver labels and order; contrast; keyboard behavior; reduced transparency; and light-sensitive presentation.
-21. **Phase closeout:** run full builds and tests, simulator review, repository-safety scans, documentation refresh, and a final comparison against the approved visual specification.
+21. **Phase closeout (complete):** run full builds and tests, simulator review, repository-safety scans, documentation refresh, and a final comparison against the approved visual specification.
 
 ## Phase 8 deliverables
 

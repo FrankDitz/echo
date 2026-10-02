@@ -2,12 +2,12 @@
 
 Echo is a private, low-friction journal and life archive for iPhone and Mac. It is designed to feel like a quiet conversation with yourself: write once at the end of a day, capture several small moments, or simply leave the day alone.
 
-> **Status:** Phase 6 — the functional MVP is complete. Echo supports local writing, historical browsing, highlights, deterministic assisted drafts, and organized daily journals without contacting an external AI provider.
+> **Status:** Phase 7 — the functional MVP and approved Mirror City presentation system are complete. Echo supports local writing, historical browsing, highlights, deterministic assisted drafts, organized daily journals, four selectable visual worlds, and responsive iPhone, iPad, and Mac presentation without contacting an external AI provider.
 
 ## Foundation
 
 - One native SwiftUI target shared by iPhone, iPad, and Mac
-- Native `TabView` navigation for Today, Timeline, and Highlights
+- Custom editorial navigation for Today, Timeline, Day Reflection, and Highlights
 - Settings kept outside the primary navigation
 - No accounts, network services, analytics, or third-party dependencies
 - Local-only SwiftData persistence with CloudKit explicitly disabled
@@ -23,6 +23,9 @@ Echo is a private, low-friction journal and life archive for iPhone and Mac. It 
 - A newest-highlighted-first collection with navigation back to the source day and entry
 - Offline deterministic cleanup and polish drafts that never replace raw writing
 - Persisted organized daily journals with complete source-entry provenance
+- Teal Immersion, Crimson Static, Sodium Fog, and Electric Blue Hour visual worlds
+- Responsive wide-window journal and reflection workspaces on Mac
+- Reduce Motion, Reduce Transparency, Dynamic Type, keyboard, and VoiceOver-aware presentation
 - Fictional-data domain and persistence tests using Swift Testing
 
 The shared target keeps the product and domain code consistent across Apple platforms. Platform-specific behavior will be isolated only when the platforms genuinely differ.

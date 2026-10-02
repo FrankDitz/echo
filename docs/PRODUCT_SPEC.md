@@ -18,13 +18,14 @@ The first usable version focuses on text. Media, voice, imported events, richer 
 
 ## Primary navigation
 
-Echo has three primary areas:
+Echo has four primary areas:
 
 1. **Today** — the fastest path to writing and reviewing the current day.
 2. **Timeline** — chronological access to previous days and day details.
-3. **Highlights** — a curated collection of meaningful moments.
+3. **Day Reflection** — the most recent day’s organized narrative and its unchanged source entries.
+4. **Highlights** — a curated collection of meaningful moments.
 
-Settings belongs in a toolbar or platform-appropriate settings surface, not a fourth primary tab.
+Settings belongs in a toolbar or platform-appropriate settings surface, not a primary tab.
 
 ## Today
 
