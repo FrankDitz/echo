@@ -48,7 +48,7 @@ Phase 8 begins only after the completed Phase 7 application has been reviewed to
 1. **Search contracts and indexing (complete):** add testable repository queries for private full-text retrieval without copying journal content into logs, fixtures, Spotlight, or a second unprotected store.
 2. **Search experience (complete):** add a responsive search surface with useful snippets, dates, keyboard focus, empty states, and navigation back to the complete source day.
 3. **Calendar browsing (complete):** replace decorative calendar affordances with a real month browser, day indicators, date selection, and direct navigation to days containing entries.
-4. **Reflection structure domain:** extend organized journals with optional generated title, themes, key moments, and reflection questions through a versioned migration that preserves existing journals and raw entries.
+4. **Reflection structure domain (complete):** extend organized journals with optional generated title, themes, key moments, and reflection questions through a versioned migration that preserves existing journals and raw entries.
 5. **Richer reflection generation and UI:** produce and present the new reflection structure with the deterministic local provider first, keeping regeneration explicit and original-source provenance visible.
 6. **Memory resurfacing:** add private “On This Day,” recent unfinished thoughts, and saved-memory resurfacing with neutral empty states and no streaks, guilt, or engagement pressure.
 7. **Weekly Echo foundation:** define, persist, and test a weekly reflection containing source provenance, recurring themes, notable entries, and an optional question for the coming week.

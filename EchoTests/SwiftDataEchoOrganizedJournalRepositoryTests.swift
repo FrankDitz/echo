@@ -1,4 +1,5 @@
 import Foundation
+import SwiftData
 import Testing
 
 @testable import Echo
@@ -99,6 +100,10 @@ struct SwiftDataEchoOrganizedJournalRepositoryTests {
       ),
       createdAt: try makeDate("2026-10-06T20:00:00Z"),
       body: "A fictional durable organized journal.",
+      title: "A durable fictional title",
+      themes: ["Clarity", "Momentum"],
+      keyMoments: ["A fictional moment survived the restart."],
+      reflectionQuestions: ["What should the fictional next step be?"],
       sourceEntryIDs: [],
       generator: .deterministicLocal
     )
@@ -114,5 +119,75 @@ struct SwiftDataEchoOrganizedJournalRepositoryTests {
       modelContainer: try EchoModelContainerFactory.makePersistent(at: location.store)
     )
     #expect(try await reopenedRepository.journal(for: journal.day) == journal)
+  }
+
+  @Test("Version 2 journals and entries migrate without content loss")
+  func versionTwoMigration() async throws {
+    let location = try makeDisposableStoreLocation()
+    defer { try? FileManager.default.removeItem(at: location.directory) }
+    let calendar = try makeGregorianCalendar(timeZone: "UTC")
+    let day = EchoDayIdentifier(
+      containing: try makeDate("2026-10-06T12:00:00Z"),
+      calendar: calendar
+    )
+    let entry = EchoEntry(
+      id: try makeUUID("00000000-0000-0000-0000-000000000917"),
+      createdAt: try makeDate("2026-10-06T18:00:00Z"),
+      calendar: calendar,
+      rawText: "A fictional entry kept through migration.",
+      source: .user
+    )
+    let journalID = try makeUUID("00000000-0000-0000-0000-000000000918")
+
+    do {
+      let schema = Schema(versionedSchema: EchoSchemaV2.self)
+      let configuration = ModelConfiguration(
+        "EchoVersionTwoMigrationTest",
+        schema: schema,
+        url: location.store,
+        cloudKitDatabase: .none
+      )
+      let container = try ModelContainer(for: schema, configurations: [configuration])
+      let context = ModelContext(container)
+      let dayEncoder = JSONEncoder()
+      dayEncoder.outputFormatting = [.sortedKeys]
+      let dayPayload = try dayEncoder.encode(day)
+      context.insert(try EchoPersistenceMapper.makeEntryRecord(from: entry))
+      context.insert(
+        PersistentEchoOrganizedJournal(
+          id: journalID,
+          dayKey: dayPayload.base64EncodedString(),
+          dayPayload: dayPayload,
+          createdAt: try makeDate("2026-10-06T20:00:00Z"),
+          modifiedAt: try makeDate("2026-10-06T20:00:00Z"),
+          body: "A fictional version two journal.",
+          sourceEntryIDsPayload: try JSONEncoder().encode([entry.id]),
+          generatorRawValue: EchoJournalGenerator.deterministicLocal.rawValue
+        )
+      )
+      try context.save()
+    }
+
+    let migratedContainer = try EchoModelContainerFactory.makePersistent(at: location.store)
+    let journalRepository = SwiftDataEchoOrganizedJournalRepository(
+      modelContainer: migratedContainer
+    )
+    let entryRepository = SwiftDataEchoEntryRepository(modelContainer: migratedContainer)
+    let migratedContext = ModelContext(migratedContainer)
+    let legacyRecords = try migratedContext.fetch(
+      FetchDescriptor<PersistentEchoOrganizedJournal>()
+    )
+    let currentRecords = try migratedContext.fetch(
+      FetchDescriptor<PersistentEchoOrganizedJournalV3>()
+    )
+    #expect(legacyRecords.isEmpty, "The migration should retire version 2 journal rows.")
+    #expect(currentRecords.count == 1, "The migration should create one version 3 row.")
+    let migratedJournal = try #require(await journalRepository.journal(for: day))
+
+    #expect(migratedJournal.id == journalID)
+    #expect(migratedJournal.body == "A fictional version two journal.")
+    #expect(migratedJournal.title == nil)
+    #expect(migratedJournal.themes.isEmpty)
+    #expect(try await entryRepository.entry(id: entry.id) == entry)
   }
 }

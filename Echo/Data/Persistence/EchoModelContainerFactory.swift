@@ -3,13 +3,13 @@ import SwiftData
 
 enum EchoModelContainerFactory {
   static func makePersistent() throws -> ModelContainer {
-    let schema = Schema(versionedSchema: EchoSchemaV2.self)
+    let schema = Schema(versionedSchema: EchoSchemaV3.self)
     let configuration = productionConfiguration(schema: schema)
     return try makeContainer(schema: schema, configuration: configuration)
   }
 
   static func makeInMemory() throws -> ModelContainer {
-    let schema = Schema(versionedSchema: EchoSchemaV2.self)
+    let schema = Schema(versionedSchema: EchoSchemaV3.self)
     let configuration = ModelConfiguration(
       "EchoInMemory",
       schema: schema,
@@ -23,7 +23,7 @@ enum EchoModelContainerFactory {
   static func makePersistent(at storeURL: URL) throws -> ModelContainer {
     precondition(storeURL.isFileURL, "A SwiftData store must use a file URL.")
 
-    let schema = Schema(versionedSchema: EchoSchemaV2.self)
+    let schema = Schema(versionedSchema: EchoSchemaV3.self)
     let configuration = ModelConfiguration(
       "EchoDisposable",
       schema: schema,
@@ -34,7 +34,7 @@ enum EchoModelContainerFactory {
   }
 
   static func productionConfiguration() -> ModelConfiguration {
-    productionConfiguration(schema: Schema(versionedSchema: EchoSchemaV2.self))
+    productionConfiguration(schema: Schema(versionedSchema: EchoSchemaV3.self))
   }
 
   private static func productionConfiguration(schema: Schema) -> ModelConfiguration {
