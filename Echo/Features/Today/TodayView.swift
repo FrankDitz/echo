@@ -78,8 +78,6 @@ struct TodayView: View {
   private func wideContent(availableSize: CGSize) -> some View {
     HStack(alignment: .bottom, spacing: 56) {
       VStack(alignment: .leading, spacing: EchoLayout.contentSpacing) {
-        Spacer(minLength: 220)
-
         Text(
           viewModel.displayedDate.formatted(
             .dateTime.weekday(.wide).month(.wide).day().year()
@@ -92,16 +90,16 @@ struct TodayView: View {
         promptHeader(isWide: true)
         captureControl
       }
-      .frame(maxWidth: 560, minHeight: max(availableSize.height - 128, 520), alignment: .bottom)
+      .frame(maxWidth: 560, alignment: .leading)
 
       entrySection(isWide: true)
         .frame(width: min(max(availableSize.width * 0.36, 380), 500))
-        .padding(.bottom, 10)
     }
     .frame(maxWidth: EchoLayout.wideContentMaxWidth, alignment: .center)
     .padding(.horizontal, 40)
-    .padding(.bottom, 36)
-    .frame(maxWidth: .infinity, minHeight: availableSize.height, alignment: .bottom)
+    .padding(.top, 104)
+    .padding(.bottom, 56)
+    .frame(maxWidth: .infinity, minHeight: availableSize.height, alignment: .center)
   }
 
   private func promptHeader(isWide: Bool) -> some View {
