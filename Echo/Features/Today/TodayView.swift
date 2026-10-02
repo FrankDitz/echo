@@ -76,8 +76,12 @@ struct TodayView: View {
   }
 
   private func wideContent(availableSize: CGSize) -> some View {
-    HStack(alignment: .bottom, spacing: 56) {
-      VStack(alignment: .leading, spacing: EchoLayout.contentSpacing) {
+    VStack(alignment: .leading, spacing: 30) {
+      HStack(spacing: EchoLayout.rowSpacing) {
+        Capsule()
+          .fill(world.accent)
+          .frame(width: 30, height: 3)
+
         Text(
           viewModel.displayedDate.formatted(
             .dateTime.weekday(.wide).month(.wide).day().year()
@@ -87,19 +91,30 @@ struct TodayView: View {
         .tracking(1.8)
         .foregroundStyle(world.secondaryText)
 
-        promptHeader(isWide: true)
-        captureControl
-      }
-      .frame(maxWidth: 560, alignment: .leading)
+        Spacer()
 
-      entrySection(isWide: true)
-        .frame(width: min(max(availableSize.width * 0.36, 380), 500))
+        Label("PRIVATE · ON DEVICE", systemImage: "lock.fill")
+          .font(EchoTypography.metadata)
+          .tracking(1.1)
+          .foregroundStyle(world.secondaryText)
+      }
+
+      HStack(alignment: .top, spacing: 72) {
+        VStack(alignment: .leading, spacing: EchoLayout.contentSpacing) {
+          promptHeader(isWide: true)
+          captureControl
+        }
+        .frame(maxWidth: 610, alignment: .leading)
+
+        entrySection(isWide: true)
+          .frame(width: min(max(availableSize.width * 0.34, 390), 470))
+      }
     }
-    .frame(maxWidth: EchoLayout.wideContentMaxWidth, alignment: .center)
+    .frame(maxWidth: EchoLayout.wideContentMaxWidth, alignment: .leading)
     .padding(.horizontal, 40)
-    .padding(.top, 104)
-    .padding(.bottom, 56)
-    .frame(maxWidth: .infinity, minHeight: availableSize.height, alignment: .center)
+    .padding(.top, 92)
+    .padding(.bottom, 64)
+    .frame(maxWidth: .infinity, minHeight: availableSize.height, alignment: .top)
   }
 
   private func promptHeader(isWide: Bool) -> some View {
@@ -182,7 +197,7 @@ struct TodayView: View {
         RoundedRectangle(cornerRadius: 14)
           .fill(.ultraThinMaterial)
         RoundedRectangle(cornerRadius: 14)
-          .fill(world.canvas.opacity(0.48))
+          .fill(world.canvas.opacity(0.12))
       } else {
         Rectangle()
           .fill(world.canvas.opacity(0.18))
@@ -205,9 +220,9 @@ struct TodayView: View {
       }
     }
     .shadow(
-      color: world.contentShadow.opacity(isWide ? 0.28 : 0.12),
-      radius: isWide ? 18 : 8,
-      y: isWide ? 8 : 3
+      color: world.contentShadow.opacity(isWide ? 0.16 : 0.12),
+      radius: isWide ? 16 : 8,
+      y: isWide ? 6 : 3
     )
   }
 
