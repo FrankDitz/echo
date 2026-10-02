@@ -29,10 +29,14 @@ Each deliverable uses its own short-lived branch and pull request. A deliverable
 9. **Timeline product UI (complete):** realize the approved date-browsing composition and vertical entry rail while preserving previous-day filtering, refresh states, and native Day Detail navigation.
 10. **Day Detail and Reflection product UI (complete):** realize the editorial reflection hierarchy, provenance, original-source rows, and organize/regenerate actions. Show titles, themes, or other generated structure only when the domain model actually provides it.
 11. **Highlights product UI (complete):** realize the compact saved-writing and bookmark composition with source navigation and removal behavior. Add filters only for content types the product supports.
-12. **Entry Editor and assisted-writing product UI:** realize a focused writing surface, explicit save feedback, and a clear visual separation between original and assisted text without changing persistence behavior.
-13. **Motion and icon polish:** add purposeful transitions, feedback, and an Echo icon vocabulary while honoring Reduce Motion and avoiding ornamental animation.
-14. **Platform and accessibility review:** validate supported iPhone, iPad, and Mac layouts; Dynamic Type; VoiceOver labels and order; contrast; keyboard behavior; reduced transparency; and light-sensitive presentation.
-15. **Phase closeout:** run full builds and tests, simulator review, repository-safety scans, documentation refresh, and a final comparison against the approved visual specification.
+12. **Approved-composition fidelity — shared shell and Today (complete):** match the reference hierarchy, translucency, typography, prompt placement, capture silhouette, raw-entry density, and mobile proportions while keeping text capture honest and fully functional.
+13. **Approved-composition fidelity — Timeline:** match the reference calendar ribbon, month treatment, chronology rail, timestamps, spacing, and transparent layering without introducing unsupported media controls.
+14. **Approved-composition fidelity — Day Reflection:** match the reference editorial scale, narrative flow, source-entry density, action placement, and transparent layering using only generated fields the domain model actually provides.
+15. **Approved-composition fidelity — Highlights:** match the reference saved-writing rhythm, filtering silhouette, bookmark placement, row density, and transparent layering while exposing only supported text content.
+16. **Entry Editor and assisted-writing product UI:** realize a focused writing surface, explicit save feedback, and a clear visual separation between original and assisted text without changing persistence behavior.
+17. **Motion and icon polish:** add purposeful transitions, feedback, and an Echo icon vocabulary while honoring Reduce Motion and avoiding ornamental animation.
+18. **Platform and accessibility review:** validate supported iPhone, iPad, and Mac layouts; Dynamic Type; VoiceOver labels and order; contrast; keyboard behavior; reduced transparency; and light-sensitive presentation.
+19. **Phase closeout:** run full builds and tests, simulator review, repository-safety scans, documentation refresh, and a final comparison against the approved visual specification.
 
 ## Near-term improvements
 

@@ -14,15 +14,26 @@ struct AppShellView: View {
 
   var body: some View {
     NavigationStack {
-      selectedContent
-        .safeAreaInset(edge: .top, spacing: 0) {
-          EchoPrimaryNavigation(selection: $selection) {
-            isShowingSettings = true
+      if selection == .today {
+        selectedContent
+          .overlay(alignment: .top) {
+            primaryNavigation
           }
-        }
+      } else {
+        selectedContent
+          .safeAreaInset(edge: .top, spacing: 0) {
+            primaryNavigation
+          }
+      }
     }
     .sheet(isPresented: $isShowingSettings) {
       SettingsView(visualWorldSelection: visualWorldSelection)
+    }
+  }
+
+  private var primaryNavigation: some View {
+    EchoPrimaryNavigation(selection: $selection) {
+      isShowingSettings = true
     }
   }
 

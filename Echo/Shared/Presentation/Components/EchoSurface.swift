@@ -35,7 +35,7 @@ struct EchoSurface<Content: View>: View {
         RoundedRectangle(cornerRadius: cornerRadius)
           .fill(fill)
       }
-      .shadow(color: world.contentShadow.opacity(0.24), radius: 18, y: 8)
+      .shadow(color: world.contentShadow.opacity(0.18), radius: 16, y: 7)
       .overlay {
         if case .standard = style {
           RoundedRectangle(cornerRadius: cornerRadius)
@@ -50,7 +50,7 @@ struct EchoSurface<Content: View>: View {
   private var fill: AnyShapeStyle {
     switch style {
     case .standard:
-      AnyShapeStyle(world.surfaceFill)
+      AnyShapeStyle(world.canvas.opacity(0.18))
     case .accent(let opacity):
       AnyShapeStyle(world.accent.opacity(max(opacity, 0.12)))
     }

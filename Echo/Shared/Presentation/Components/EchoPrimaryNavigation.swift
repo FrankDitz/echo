@@ -26,10 +26,11 @@ struct EchoPrimaryNavigation: View {
     .padding(.vertical, EchoLayout.inlineSpacing)
     .frame(maxWidth: .infinity)
     .background {
-      ZStack {
-        Rectangle().fill(.ultraThinMaterial)
-        Rectangle().fill(world.canvas.opacity(0.72))
-      }
+      LinearGradient(
+        colors: [world.canvas.opacity(0.32), world.canvas.opacity(0.08)],
+        startPoint: .top,
+        endPoint: .bottom
+      )
     }
     .overlay(alignment: .bottom) {
       Rectangle()
@@ -47,14 +48,14 @@ struct EchoPrimaryNavigation: View {
   }
 
   private var compactChrome: some View {
-    VStack(alignment: .leading, spacing: EchoLayout.tightSpacing) {
+    VStack(alignment: .leading, spacing: EchoLayout.microSpacing) {
       HStack {
         wordmark
         Spacer(minLength: EchoLayout.contentSpacing)
-        settingsButton
+        compactSettingsButton
       }
 
-      navigationItems
+      compactNavigationItems
         .frame(maxWidth: .infinity, alignment: .leading)
     }
   }
@@ -78,7 +79,7 @@ struct EchoPrimaryNavigation: View {
               .lineLimit(1)
             Capsule()
               .fill(selection == section ? world.accent : Color.clear)
-              .frame(height: 3)
+              .frame(width: 36, height: 2)
           }
           .font(EchoTypography.primaryNavigation)
           .foregroundStyle(selection == section ? world.accent : world.secondaryText)
@@ -95,17 +96,53 @@ struct EchoPrimaryNavigation: View {
     .accessibilityLabel("Primary navigation")
   }
 
+  private var compactNavigationItems: some View {
+    HStack(spacing: EchoLayout.microSpacing) {
+      ForEach(EchoPrimarySection.allCases) { section in
+        Button {
+          selection = section
+        } label: {
+          VStack(spacing: EchoLayout.microSpacing) {
+            Text(section.rawValue)
+              .lineLimit(1)
+              .minimumScaleFactor(0.78)
+            Capsule()
+              .fill(selection == section ? world.accent : Color.clear)
+              .frame(width: 30, height: 2)
+          }
+          .font(.caption.weight(selection == section ? .semibold : .regular))
+          .foregroundStyle(selection == section ? world.accent : world.secondaryText)
+          .padding(.horizontal, EchoLayout.tightSpacing)
+          .padding(.top, EchoLayout.tightSpacing)
+          .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .frame(maxWidth: .infinity)
+        .accessibilityLabel(section.rawValue)
+        .accessibilityValue(selection == section ? "Selected" : "")
+      }
+    }
+    .accessibilityElement(children: .contain)
+    .accessibilityLabel("Primary navigation")
+  }
+
   private var settingsButton: some View {
     Button(action: showSettings) {
       Image(systemName: "gearshape")
-        .font(.body.weight(.semibold))
-        .foregroundStyle(world.primaryText)
-        .frame(width: 44, height: 44)
-        .background(world.surfaceFill, in: Circle())
-        .overlay {
-          Circle()
-            .stroke(world.separator, lineWidth: EchoShape.hairlineWidth)
-        }
+        .font(.body.weight(.medium))
+        .foregroundStyle(world.secondaryText)
+        .frame(width: 40, height: 40)
+    }
+    .buttonStyle(.plain)
+    .accessibilityLabel("Settings")
+  }
+
+  private var compactSettingsButton: some View {
+    Button(action: showSettings) {
+      Image(systemName: "gearshape")
+        .font(.subheadline.weight(.medium))
+        .foregroundStyle(world.secondaryText)
+        .frame(width: 36, height: 36)
     }
     .buttonStyle(.plain)
     .accessibilityLabel("Settings")
