@@ -7,6 +7,8 @@ struct TimelineView: View {
   let journalRepository: any EchoOrganizedJournalRepository
 
   @State private var selectedDayID: EchoDayIdentifier?
+  @State private var searchQuery = ""
+  @FocusState private var isSearchFocused: Bool
 
   @Environment(\.timeZone) private var timeZone
   @Environment(\.calendar) private var calendar
@@ -23,6 +25,7 @@ struct TimelineView: View {
             if isWide {
               timelineHeader
             }
+            searchControl
             timelineContent(isWide: isWide)
           }
           .frame(
@@ -66,7 +69,9 @@ struct TimelineView: View {
 
   @ViewBuilder
   private func timelineContent(isWide: Bool) -> some View {
-    if viewModel.isLoading && viewModel.days.isEmpty {
+    if containsSearchQuery {
+      searchContent
+    } else if viewModel.isLoading && viewModel.days.isEmpty {
       EchoLoadingState(title: "Loading your timeline…")
     } else {
       recentDateStrip(isWide: isWide)
@@ -90,6 +95,147 @@ struct TimelineView: View {
         )
       }
     }
+  }
+
+  private var searchControl: some View {
+    HStack(spacing: EchoLayout.rowSpacing) {
+      Button {
+        isSearchFocused = true
+      } label: {
+        Image(systemName: "magnifyingglass")
+          .font(.body.weight(.semibold))
+          .foregroundStyle(world.accent)
+          .frame(width: 30, height: 30)
+      }
+      .buttonStyle(.plain)
+      .keyboardShortcut("f", modifiers: [.command])
+      .accessibilityLabel("Focus journal search")
+
+      TextField("Search your writing", text: $searchQuery)
+        .focused($isSearchFocused)
+        .textFieldStyle(.plain)
+        .submitLabel(.search)
+        .onSubmit {
+          Task { await viewModel.search(searchQuery) }
+        }
+
+      if viewModel.isSearching {
+        ProgressView()
+          .controlSize(.small)
+          .accessibilityLabel("Searching")
+      } else if containsSearchQuery {
+        Button {
+          searchQuery = ""
+          Task { await viewModel.search("") }
+        } label: {
+          Image(systemName: "xmark.circle.fill")
+            .foregroundStyle(world.secondaryText)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Clear search")
+      }
+    }
+    .padding(.horizontal, EchoLayout.contentSpacing)
+    .frame(minHeight: 48)
+    .background {
+      Capsule().fill(.ultraThinMaterial)
+      Capsule().fill(world.surfaceFill.opacity(0.58))
+    }
+    .overlay {
+      Capsule().stroke(world.separator, lineWidth: EchoShape.hairlineWidth)
+    }
+    .task(id: searchQuery) {
+      guard containsSearchQuery else {
+        await viewModel.search("")
+        return
+      }
+      try? await Task.sleep(for: .milliseconds(250))
+      guard !Task.isCancelled else { return }
+      await viewModel.search(searchQuery)
+    }
+  }
+
+  @ViewBuilder
+  private var searchContent: some View {
+    if viewModel.isSearching && viewModel.searchResults.isEmpty {
+      EchoLoadingState(title: "Searching your writing…", minHeight: EchoLayout.compactStateHeight)
+    } else if viewModel.searchFailed {
+      EchoErrorState(message: "Search could not be completed. Your journal remains on this device.")
+    } else if viewModel.searchResults.isEmpty {
+      EchoSurface {
+        EchoEmptyState(
+          title: "No matching entries",
+          systemImage: "text.magnifyingglass",
+          description: "Try a different word or phrase. Search includes original and assisted writing.",
+          minHeight: EchoLayout.compactStateHeight
+        )
+      }
+    } else {
+      VStack(alignment: .leading, spacing: EchoLayout.rowSpacing) {
+        HStack {
+          Text("SEARCH RESULTS")
+            .font(EchoTypography.editorialEyebrow)
+            .tracking(1.4)
+            .foregroundStyle(world.secondaryText)
+          Spacer()
+          Text(viewModel.searchResults.count, format: .number)
+            .font(EchoTypography.metadata)
+            .foregroundStyle(.secondary)
+        }
+
+        EchoReadabilityPanel(padding: 0) {
+          VStack(spacing: 0) {
+            ForEach(viewModel.searchResults) { result in
+              NavigationLink {
+                destination(for: result.sourceDay, focusedEntryID: result.entry.id)
+              } label: {
+                searchResultRow(result)
+              }
+              .buttonStyle(.plain)
+              .accessibilityHint("Opens the complete source day")
+
+              if result.id != viewModel.searchResults.last?.id {
+                Divider()
+                  .overlay(world.separator.opacity(0.7))
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  private func searchResultRow(_ result: TimelineSearchResult) -> some View {
+    HStack(alignment: .top, spacing: EchoLayout.contentSpacing) {
+      VStack(alignment: .leading, spacing: EchoLayout.inlineSpacing) {
+        Text(
+          result.entry.createdAt.formatted(
+            .dateTime.weekday(.abbreviated).month(.abbreviated).day().year().hour().minute()
+          ).uppercased()
+        )
+        .font(EchoTypography.editorialEyebrow)
+        .tracking(1.1)
+        .foregroundStyle(world.secondaryText)
+
+        Text(result.entry.rawText)
+          .font(EchoTypography.body)
+          .lineSpacing(4)
+          .lineLimit(4)
+          .multilineTextAlignment(.leading)
+          .frame(maxWidth: .infinity, alignment: .leading)
+      }
+
+      Image(systemName: "chevron.right")
+        .font(.caption.weight(.bold))
+        .foregroundStyle(world.accent)
+        .padding(.top, EchoLayout.inlineSpacing)
+    }
+    .padding(EchoLayout.surfacePadding)
+    .contentShape(Rectangle())
+  }
+
+  private var containsSearchQuery: Bool {
+    searchQuery.contains(where: { !$0.isWhitespace })
   }
 
   private func recentDateStrip(isWide: Bool) -> some View {

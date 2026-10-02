@@ -118,6 +118,55 @@ struct TimelineViewModelTests {
     #expect(viewModel.failure == .loadDays)
   }
 
+  @Test("Search returns dated entries with their complete source days")
+  func searching() async throws {
+    let calendar = try makeGregorianCalendar(timeZone: "UTC")
+    let matching = try makeEntry(
+      id: "00000000-0000-0000-0000-000000000608",
+      date: "2026-10-01T08:00:00Z",
+      text: "A fictional bridge appeared through the fog.",
+      calendar: calendar
+    )
+    let sameDay = try makeEntry(
+      id: "00000000-0000-0000-0000-000000000609",
+      date: "2026-10-01T18:00:00Z",
+      text: "A fictional train arrived later.",
+      calendar: calendar
+    )
+    let currentDate = try makeDate("2026-10-03T12:00:00Z")
+    let viewModel = TimelineViewModel(
+      repository: TimelineEntryRepositoryStub(entries: [sameDay, matching]),
+      calendar: calendar,
+      now: { currentDate }
+    )
+
+    await viewModel.search("BRIDGE fog")
+
+    #expect(viewModel.searchResults.map(\.entry) == [matching])
+    #expect(viewModel.searchResults.first?.sourceDay.entries == [matching, sameDay])
+    #expect(!viewModel.searchFailed)
+  }
+
+  @Test("Blank search clears results and a failed search retains privacy-safe state")
+  func searchStates() async throws {
+    let calendar = try makeGregorianCalendar(timeZone: "UTC")
+    let entry = try makeEntry(
+      id: "00000000-0000-0000-0000-000000000610",
+      date: "2026-10-01T08:00:00Z",
+      text: "A fictional search result.",
+      calendar: calendar
+    )
+    let repository = TimelineEntryRepositoryStub(entries: [entry])
+    let viewModel = TimelineViewModel(repository: repository, calendar: calendar)
+    await viewModel.search("fictional")
+    await viewModel.search("   ")
+    #expect(viewModel.searchResults.isEmpty)
+
+    await repository.setShouldFail(true)
+    await viewModel.search("fictional")
+    #expect(viewModel.searchFailed)
+  }
+
   private func makeEntry(
     id: String,
     date: String,
