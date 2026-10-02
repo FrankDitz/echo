@@ -289,7 +289,7 @@ private struct TodayCaptureControl: View {
   var body: some View {
     VStack(alignment: .leading, spacing: EchoLayout.inlineSpacing) {
       HStack(spacing: EchoLayout.rowSpacing) {
-        Image(systemName: "square.and.pencil")
+        Image(systemName: EchoIcon.write)
           .font(.body.weight(.medium))
           .foregroundStyle(world.accent)
           .frame(width: 26, height: 28)
@@ -354,6 +354,7 @@ private struct TodayCaptureControl: View {
     case .saved:
       Label("Saved", systemImage: "checkmark.circle.fill")
         .foregroundStyle(world.saved)
+        .symbolEffect(.bounce, value: saveState)
     case .failed:
       Label("Not saved", systemImage: "exclamationmark.circle")
         .foregroundStyle(world.error)

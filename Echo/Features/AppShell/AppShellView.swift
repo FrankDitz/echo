@@ -11,21 +11,27 @@ struct AppShellView: View {
 
   @State private var selection: EchoPrimarySection = .today
   @State private var isShowingSettings = false
+  @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
   var body: some View {
     NavigationStack {
       if selection == .today {
         selectedContent
+          .id(selection)
+          .transition(.opacity)
           .overlay(alignment: .top) {
             primaryNavigation
           }
       } else {
         selectedContent
+          .id(selection)
+          .transition(.opacity)
           .safeAreaInset(edge: .top, spacing: 0) {
             primaryNavigation
           }
       }
     }
+    .animation(EchoMotion.animation(reduceMotion: reduceMotion), value: selection)
     .sheet(isPresented: $isShowingSettings) {
       SettingsView(visualWorldSelection: visualWorldSelection)
     }

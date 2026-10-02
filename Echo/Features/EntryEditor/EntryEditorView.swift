@@ -254,14 +254,14 @@ struct EntryEditorView: View {
       EchoReadabilityPanel {
         VStack(alignment: .leading, spacing: EchoLayout.inlineSpacing) {
           HStack {
-            Label("ASSISTED DRAFT", systemImage: "wand.and.stars")
+            Label("ASSISTED DRAFT", systemImage: EchoIcon.assistedWriting)
               .font(EchoTypography.editorialEyebrow)
               .tracking(1.3)
               .foregroundStyle(world.accent)
 
             Spacer()
 
-            Label("Original preserved", systemImage: "lock.fill")
+            Label("Original preserved", systemImage: EchoIcon.privateEntry)
               .font(EchoTypography.metadata)
               .foregroundStyle(world.secondaryText)
           }

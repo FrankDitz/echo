@@ -2,6 +2,7 @@ import SwiftUI
 
 struct EchoWorldCanvas<Content: View>: View {
   @Environment(\.echoVisualWorld) private var world
+  @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
   private let content: Content
 
@@ -18,6 +19,8 @@ struct EchoWorldCanvas<Content: View>: View {
             .scaledToFill()
             .frame(width: proxy.size.width, height: proxy.size.height, alignment: .top)
             .clipped()
+            .id(world.id)
+            .transition(.opacity)
 
           if proxy.size.width >= EchoLayout.wideLayoutBreakpoint {
             LinearGradient(
@@ -52,6 +55,10 @@ struct EchoWorldCanvas<Content: View>: View {
           }
         }
         .ignoresSafeArea()
+        .animation(
+          EchoMotion.animation(EchoMotion.ambient, reduceMotion: reduceMotion),
+          value: world.id
+        )
       }
       .accessibilityHidden(true)
 

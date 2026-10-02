@@ -58,4 +58,24 @@ enum EchoMaterialMetrics {
 
 enum EchoMotion {
   static let editorFocusDelay = Duration.milliseconds(300)
+  static let quick = Animation.easeOut(duration: 0.18)
+  static let standard = Animation.easeInOut(duration: 0.28)
+  static let ambient = Animation.easeInOut(duration: 0.42)
+
+  static func animation(
+    _ animation: Animation = standard,
+    reduceMotion: Bool
+  ) -> Animation? {
+    reduceMotion ? nil : animation
+  }
+}
+
+enum EchoIcon {
+  static let write = "square.and.pencil"
+  static let timeline = "point.bottomleft.forward.to.point.topright.scurvepath"
+  static let reflection = "sparkles.rectangle.stack"
+  static let highlight = "bookmark.fill"
+  static let settings = "gearshape"
+  static let privateEntry = "lock.fill"
+  static let assistedWriting = "wand.and.stars"
 }
