@@ -7,6 +7,7 @@ struct HighlightsView: View {
   let journalRepository: any EchoOrganizedJournalRepository
 
   @State private var selectedItem: HighlightedEntry?
+  @State private var selectedFilter: HighlightFilter = .saved
 
   var body: some View {
     EchoPage(spacing: EchoLayout.compactSectionSpacing) {
@@ -63,12 +64,10 @@ struct HighlightsView: View {
         )
       }
     } else {
-      EchoSurface(padding: 0) {
+      VStack(alignment: .leading, spacing: EchoLayout.contentSpacing) {
+        filterRibbon
+
         VStack(alignment: .leading, spacing: 0) {
-          savedHeader
-
-          Divider()
-
           ForEach(viewModel.items) { item in
             HighlightedEntryRow(
               item: item,
@@ -82,9 +81,14 @@ struct HighlightsView: View {
 
             if item.id != viewModel.items.last?.id {
               Divider()
-                .padding(.leading, EchoLayout.surfacePadding)
+                .overlay(world.separator.opacity(0.7))
             }
           }
+        }
+        .overlay(alignment: .top) {
+          Rectangle()
+            .fill(world.separator.opacity(0.7))
+            .frame(height: EchoShape.hairlineWidth)
         }
       }
     }
@@ -94,26 +98,49 @@ struct HighlightsView: View {
     }
   }
 
-  private var savedHeader: some View {
-    HStack(spacing: EchoLayout.rowSpacing) {
-      Label("Saved", systemImage: "bookmark.fill")
-        .font(EchoTypography.primaryNavigation)
-        .foregroundStyle(world.canvas)
-        .padding(.horizontal, EchoLayout.contentSpacing)
-        .padding(.vertical, EchoLayout.tightSpacing)
-        .background(world.accent, in: Capsule())
+  private var filterRibbon: some View {
+    ScrollView(.horizontal) {
+      HStack(spacing: EchoLayout.inlineSpacing) {
+        ForEach(HighlightFilter.allCases) { filter in
+          Button {
+            selectedFilter = filter
+          } label: {
+            Text(filter.title)
+              .font(EchoTypography.metadata.weight(.semibold))
+              .foregroundStyle(selectedFilter == filter ? world.canvas : world.primaryText)
+              .padding(.horizontal, EchoLayout.contentSpacing)
+              .frame(minHeight: 32)
+              .background {
+                Capsule()
+                  .fill(selectedFilter == filter ? world.accent : world.canvas.opacity(0.1))
+                if selectedFilter != filter {
+                  Capsule().fill(.ultraThinMaterial)
+                }
+              }
+              .overlay {
+                Capsule()
+                  .stroke(
+                    selectedFilter == filter ? world.accent : world.separator,
+                    lineWidth: EchoShape.hairlineWidth
+                  )
+              }
+          }
+          .buttonStyle(.plain)
+          .disabled(!filter.isAvailable)
+          .opacity(filter.isAvailable ? 1 : 0.48)
+          .accessibilityHint(filter.isAvailable ? "Filters saved highlights" : "Not available yet")
+        }
 
-      Spacer()
-
-      Text(viewModel.items.count, format: .number)
-        .font(EchoTypography.metadata)
-        .foregroundStyle(.secondary)
-        .accessibilityLabel(
-          "\(viewModel.items.count) saved \(viewModel.items.count == 1 ? "entry" : "entries")"
-        )
+        Text(viewModel.items.count, format: .number)
+          .font(EchoTypography.metadata)
+          .foregroundStyle(.secondary)
+          .padding(.leading, EchoLayout.tightSpacing)
+          .accessibilityLabel(
+            "\(viewModel.items.count) saved \(viewModel.items.count == 1 ? "entry" : "entries")"
+          )
+      }
     }
-    .padding(.horizontal, EchoLayout.surfacePadding)
-    .padding(.vertical, EchoLayout.contentSpacing)
+    .scrollIndicators(.hidden)
   }
 
   @Environment(\.echoVisualWorld) private var world
@@ -128,6 +155,18 @@ struct HighlightsView: View {
       nil
     }
   }
+}
+
+private enum HighlightFilter: String, CaseIterable, Identifiable {
+  case saved
+  case all
+  case text
+  case voice
+  case photo
+
+  var id: String { rawValue }
+  var title: String { rawValue.capitalized }
+  var isAvailable: Bool { self != .voice && self != .photo }
 }
 
 private struct HighlightedEntryRow: View {
