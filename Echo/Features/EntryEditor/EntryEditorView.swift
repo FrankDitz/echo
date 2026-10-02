@@ -35,75 +35,42 @@ struct EntryEditorView: View {
   }
 
   var body: some View {
-    NavigationStack {
-      EchoWorldCanvas {
-        EchoSurface(padding: EchoLayout.editorPadding) {
-          VStack(alignment: .leading, spacing: EchoLayout.rowSpacing) {
-            TextEditor(text: $draft)
-              .focused($isEditorFocused)
-              .font(EchoTypography.body)
-              .foregroundStyle(world.primaryText)
-              .lineSpacing(5)
-              .scrollContentBackground(.hidden)
-              .frame(maxWidth: .infinity, maxHeight: .infinity)
-              .accessibilityLabel("Journal entry")
+    EchoWorldCanvas {
+      GeometryReader { proxy in
+        let isWide = proxy.size.width >= 760
 
-            assistanceSection
+        VStack(spacing: 0) {
+          editorHeader(isWide: isWide)
 
-            Divider()
-
-            HStack {
-              Text(entry.createdAt, format: .dateTime.month().day().hour().minute())
-                .foregroundStyle(.secondary)
-              Spacer()
-              saveStatus
+          ScrollView {
+            VStack(alignment: .leading, spacing: EchoLayout.contentSpacing) {
+              writingCanvas(isWide: isWide)
+              assistanceSection
             }
-            .font(.footnote)
+            .frame(maxWidth: isWide ? 860 : EchoLayout.contentMaxWidth, alignment: .leading)
+            .padding(.horizontal, isWide ? 36 : EchoLayout.pageHorizontalPadding)
+            .padding(.top, isWide ? 28 : EchoLayout.contentSpacing)
+            .padding(.bottom, EchoLayout.sectionSpacing)
+            .frame(maxWidth: .infinity)
           }
+          .scrollIndicators(.hidden)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .padding(.horizontal, EchoLayout.pageHorizontalPadding)
-        .padding(.vertical, EchoLayout.pageVerticalPadding)
-      }
-      .navigationTitle("Entry")
-      .toolbar {
-        ToolbarItem(placement: .cancellationAction) {
-          Button("Close") {
-            closeEditor()
-          }
-        }
-        ToolbarItem(placement: .confirmationAction) {
-          Button("Save") {
-            save()
-          }
-          .disabled(!canSave)
-          .keyboardShortcut("s", modifiers: [.command])
-        }
-        ToolbarItem(placement: .secondaryAction) {
-          Menu("Writing Assistance", systemImage: "wand.and.stars") {
-            Button("Clean Up", systemImage: "text.alignleft") {
-              generateAssistance(using: .cleanup)
-            }
-            Button("Polish", systemImage: "sparkles") {
-              generateAssistance(using: .polish)
-            }
-          }
-          .disabled(isDirty || isSaving || isGeneratingAssistance)
-        }
-      }
-      .confirmationDialog(
-        "Discard unsaved changes?",
-        isPresented: $isConfirmingDiscard,
-        titleVisibility: .visible
-      ) {
-        Button("Discard Changes", role: .destructive) {
-          dismiss()
-        }
-        Button("Keep Editing", role: .cancel) {}
       }
     }
-    .frame(minWidth: 360, minHeight: 420)
+    .frame(minWidth: 360, minHeight: 520)
     .interactiveDismissDisabled(isDirty)
+    .confirmationDialog(
+      "Discard unsaved changes?",
+      isPresented: $isConfirmingDiscard,
+      titleVisibility: .visible
+    ) {
+      Button("Discard Changes", role: .destructive) {
+        dismiss()
+      }
+      Button("Keep Editing", role: .cancel) {}
+    } message: {
+      Text("Your last saved version will remain in Echo.")
+    }
     .task {
       // Wait for the presented sheet to become the active focus scope.
       try? await Task.sleep(for: EchoMotion.editorFocusDelay)
@@ -113,6 +80,164 @@ struct EntryEditorView: View {
       didSave = false
       saveFailed = false
     }
+  }
+
+  private func editorHeader(isWide: Bool) -> some View {
+    HStack(spacing: EchoLayout.contentSpacing) {
+      Button(action: closeEditor) {
+        Image(systemName: "xmark")
+          .font(.subheadline.weight(.bold))
+          .frame(width: 38, height: 38)
+          .background(.ultraThinMaterial, in: Circle())
+          .overlay {
+            Circle()
+              .stroke(world.separator, lineWidth: EchoShape.hairlineWidth)
+          }
+      }
+      .buttonStyle(.plain)
+      .keyboardShortcut(.cancelAction)
+      .accessibilityLabel("Close entry editor")
+
+      VStack(alignment: .leading, spacing: EchoLayout.microSpacing) {
+        Text("PRIVATE ENTRY")
+          .font(EchoTypography.editorialEyebrow)
+          .tracking(1.5)
+          .foregroundStyle(world.accent)
+
+        Text(
+          entry.createdAt.formatted(
+            isWide
+              ? .dateTime.weekday(.wide).month(.wide).day().year().hour().minute()
+              : .dateTime.month(.abbreviated).day().hour().minute()
+          )
+        )
+        .font(isWide ? EchoTypography.contentTitle : EchoTypography.supporting.weight(.semibold))
+        .lineLimit(1)
+      }
+
+      Spacer(minLength: EchoLayout.inlineSpacing)
+
+      saveStatus
+        .font(EchoTypography.status)
+
+      Button(action: save) {
+        Label("Save", systemImage: "checkmark")
+          .font(.subheadline.weight(.bold))
+          .foregroundStyle(world.canvas)
+          .padding(.horizontal, isWide ? 20 : 14)
+          .frame(minHeight: 40)
+          .background(world.accent, in: Capsule())
+      }
+      .buttonStyle(.plain)
+      .disabled(!canSave)
+      .opacity(canSave ? 1 : 0.5)
+      .keyboardShortcut("s", modifiers: [.command])
+    }
+    .foregroundStyle(world.primaryText)
+    .padding(.horizontal, isWide ? 28 : EchoLayout.pageHorizontalPadding)
+    .padding(.vertical, EchoLayout.rowSpacing)
+    .background {
+      Rectangle()
+        .fill(.ultraThinMaterial)
+      Rectangle()
+        .fill(world.surfaceFill.opacity(0.76))
+    }
+    .overlay(alignment: .bottom) {
+      Rectangle()
+        .fill(world.separator)
+        .frame(height: EchoShape.hairlineWidth)
+    }
+  }
+
+  private func writingCanvas(isWide: Bool) -> some View {
+    EchoReadabilityPanel(padding: 0) {
+      VStack(alignment: .leading, spacing: 0) {
+        HStack {
+          Label("Original writing", systemImage: "text.cursor")
+            .font(EchoTypography.metadata)
+            .foregroundStyle(world.secondaryText)
+
+          Spacer()
+
+          Text(wordCountLabel)
+            .font(EchoTypography.metadata)
+            .foregroundStyle(.secondary)
+        }
+        .padding(.horizontal, EchoLayout.editorPadding)
+        .padding(.vertical, EchoLayout.rowSpacing)
+
+        Divider()
+
+        TextEditor(text: $draft)
+          .focused($isEditorFocused)
+          .font(isWide ? .system(.title3, design: .serif) : EchoTypography.body)
+          .foregroundStyle(world.primaryText)
+          .lineSpacing(isWide ? 7 : 5)
+          .scrollContentBackground(.hidden)
+          .padding(EchoLayout.editorPadding)
+          .frame(minHeight: isWide ? 330 : 250)
+          .accessibilityLabel("Original journal entry")
+
+        Divider()
+
+        assistanceControls
+          .padding(EchoLayout.contentSpacing)
+      }
+    }
+  }
+
+  private var assistanceControls: some View {
+    ViewThatFits(in: .horizontal) {
+      HStack(spacing: EchoLayout.rowSpacing) {
+        assistanceLabel
+        Spacer(minLength: EchoLayout.contentSpacing)
+        assistanceButtons
+      }
+
+      VStack(alignment: .leading, spacing: EchoLayout.rowSpacing) {
+        assistanceLabel
+        assistanceButtons
+      }
+    }
+  }
+
+  private var assistanceLabel: some View {
+    VStack(alignment: .leading, spacing: EchoLayout.microSpacing) {
+      Text("Writing assistance")
+        .font(EchoTypography.supporting.weight(.semibold))
+      Text(isDirty ? "Save changes before creating a new assisted draft." : "Creates a separate draft. Your original stays intact.")
+        .font(EchoTypography.status)
+        .foregroundStyle(.secondary)
+    }
+  }
+
+  private var assistanceButtons: some View {
+    HStack(spacing: EchoLayout.inlineSpacing) {
+      assistanceButton(title: "Clean Up", systemImage: "text.alignleft", operation: .cleanup)
+      assistanceButton(title: "Polish", systemImage: "sparkles", operation: .polish)
+    }
+  }
+
+  private func assistanceButton(
+    title: String,
+    systemImage: String,
+    operation: AssistanceOperation
+  ) -> some View {
+    Button {
+      generateAssistance(using: operation)
+    } label: {
+      Label(title, systemImage: systemImage)
+        .font(EchoTypography.status.weight(.semibold))
+        .padding(.horizontal, EchoLayout.rowSpacing)
+        .frame(minHeight: 36)
+        .background(world.canvas.opacity(0.16), in: Capsule())
+        .overlay {
+          Capsule()
+            .stroke(world.separator, lineWidth: EchoShape.hairlineWidth)
+        }
+    }
+    .buttonStyle(.plain)
+    .disabled(isDirty || isSaving || isGeneratingAssistance)
   }
 
   @ViewBuilder
@@ -126,21 +251,27 @@ struct EntryEditorView: View {
       .font(EchoTypography.status)
       .foregroundStyle(.secondary)
     } else if let assistedText {
-      EchoSurface(
-        style: .accent(opacity: EchoMaterialMetrics.assistedWritingFillOpacity),
-        padding: EchoLayout.focusedContentInset,
-        cornerRadius: EchoShape.embeddedRadius
-      ) {
+      EchoReadabilityPanel {
         VStack(alignment: .leading, spacing: EchoLayout.inlineSpacing) {
-          Label("Assisted Draft", systemImage: "wand.and.stars")
-            .font(.headline)
+          HStack {
+            Label("ASSISTED DRAFT", systemImage: "wand.and.stars")
+              .font(EchoTypography.editorialEyebrow)
+              .tracking(1.3)
+              .foregroundStyle(world.accent)
+
+            Spacer()
+
+            Label("Original preserved", systemImage: "lock.fill")
+              .font(EchoTypography.metadata)
+              .foregroundStyle(world.secondaryText)
+          }
+
+          Divider()
+
           Text(assistedText)
-            .font(EchoTypography.body)
-            .lineSpacing(4)
+            .font(EchoTypography.editorialNarrative)
+            .lineSpacing(6)
             .textSelection(.enabled)
-          Text("Your original writing is preserved above.")
-            .font(.caption)
-            .foregroundStyle(.secondary)
         }
       }
       .frame(maxWidth: .infinity, alignment: .leading)
@@ -176,6 +307,11 @@ struct EntryEditorView: View {
 
   private var containsWriting: Bool {
     draft.contains(where: { !$0.isWhitespace })
+  }
+
+  private var wordCountLabel: String {
+    let count = draft.split(whereSeparator: \.isWhitespace).count
+    return count == 1 ? "1 word" : "\(count) words"
   }
 
   private var canSave: Bool {
