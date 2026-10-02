@@ -69,22 +69,26 @@ enum EchoPersistenceMapper {
 
   static func makeOrganizedJournalRecord(
     from journal: EchoOrganizedJournal
-  ) throws -> PersistentEchoOrganizedJournal {
+  ) throws -> PersistentEchoOrganizedJournalV3 {
     let dayPayload = try encodeDay(journal.day)
-    return PersistentEchoOrganizedJournal(
+    return PersistentEchoOrganizedJournalV3(
       id: journal.id,
       dayKey: dayPayload.base64EncodedString(),
       dayPayload: dayPayload,
       createdAt: journal.createdAt,
       modifiedAt: journal.modifiedAt,
       body: journal.body,
+      title: journal.title,
+      themesPayload: try encodeStrings(journal.themes),
+      keyMomentsPayload: try encodeStrings(journal.keyMoments),
+      reflectionQuestionsPayload: try encodeStrings(journal.reflectionQuestions),
       sourceEntryIDsPayload: try encodeEntryIDs(journal.sourceEntryIDs),
       generatorRawValue: journal.generator.rawValue
     )
   }
 
   static func update(
-    _ record: PersistentEchoOrganizedJournal,
+    _ record: PersistentEchoOrganizedJournalV3,
     from journal: EchoOrganizedJournal
   ) throws {
     let dayPayload = try encodeDay(journal.day)
@@ -93,12 +97,16 @@ enum EchoPersistenceMapper {
     record.createdAt = journal.createdAt
     record.modifiedAt = journal.modifiedAt
     record.body = journal.body
+    record.title = journal.title
+    record.themesPayload = try encodeStrings(journal.themes)
+    record.keyMomentsPayload = try encodeStrings(journal.keyMoments)
+    record.reflectionQuestionsPayload = try encodeStrings(journal.reflectionQuestions)
     record.sourceEntryIDsPayload = try encodeEntryIDs(journal.sourceEntryIDs)
     record.generatorRawValue = journal.generator.rawValue
   }
 
   static func makeOrganizedJournal(
-    from record: PersistentEchoOrganizedJournal
+    from record: PersistentEchoOrganizedJournalV3
   ) throws -> EchoOrganizedJournal {
     EchoOrganizedJournal(
       id: record.id,
@@ -106,6 +114,10 @@ enum EchoPersistenceMapper {
       createdAt: record.createdAt,
       modifiedAt: record.modifiedAt,
       body: record.body,
+      title: record.title,
+      themes: try decodeStrings(record.themesPayload),
+      keyMoments: try decodeStrings(record.keyMomentsPayload),
+      reflectionQuestions: try decodeStrings(record.reflectionQuestionsPayload),
       sourceEntryIDs: try decodeEntryIDs(record.sourceEntryIDsPayload),
       generator: EchoJournalGenerator(rawValue: record.generatorRawValue)
     )
@@ -127,5 +139,14 @@ enum EchoPersistenceMapper {
 
   private static func decodeEntryIDs(_ data: Data) throws -> [UUID] {
     try JSONDecoder().decode([UUID].self, from: data)
+  }
+
+  private static func encodeStrings(_ values: [String]) throws -> Data {
+    try JSONEncoder().encode(values)
+  }
+
+  private static func decodeStrings(_ data: Data?) throws -> [String] {
+    guard let data else { return [] }
+    return try JSONDecoder().decode([String].self, from: data)
   }
 }

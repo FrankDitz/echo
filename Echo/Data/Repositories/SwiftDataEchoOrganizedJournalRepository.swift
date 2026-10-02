@@ -20,7 +20,7 @@ actor SwiftDataEchoOrganizedJournalRepository: EchoOrganizedJournalRepository {
   }
 
   func allJournals() async throws -> [EchoOrganizedJournal] {
-    try modelContext.fetch(FetchDescriptor<PersistentEchoOrganizedJournal>())
+    try modelContext.fetch(FetchDescriptor<PersistentEchoOrganizedJournalV3>())
       .map(EchoPersistenceMapper.makeOrganizedJournal)
       .sorted { lhs, rhs in
         if lhs.day != rhs.day { return lhs.day < rhs.day }
@@ -45,17 +45,17 @@ actor SwiftDataEchoOrganizedJournalRepository: EchoOrganizedJournalRepository {
     try modelContext.save()
   }
 
-  private func record(id: UUID) throws -> PersistentEchoOrganizedJournal? {
-    var descriptor = FetchDescriptor<PersistentEchoOrganizedJournal>(
+  private func record(id: UUID) throws -> PersistentEchoOrganizedJournalV3? {
+    var descriptor = FetchDescriptor<PersistentEchoOrganizedJournalV3>(
       predicate: #Predicate { $0.id == id }
     )
     descriptor.fetchLimit = 1
     return try modelContext.fetch(descriptor).first
   }
 
-  private func record(day: EchoDayIdentifier) throws -> PersistentEchoOrganizedJournal? {
+  private func record(day: EchoDayIdentifier) throws -> PersistentEchoOrganizedJournalV3? {
     let dayKey = try EchoPersistenceMapper.dayKey(for: day)
-    var descriptor = FetchDescriptor<PersistentEchoOrganizedJournal>(
+    var descriptor = FetchDescriptor<PersistentEchoOrganizedJournalV3>(
       predicate: #Predicate { $0.dayKey == dayKey }
     )
     descriptor.fetchLimit = 1
