@@ -88,6 +88,60 @@ struct SwiftDataEchoEntryRepositoryTests {
     }
   }
 
+  @Test("Search is private, normalized, multi-term, and newest first")
+  func search() async throws {
+    let container = try EchoModelContainerFactory.makeInMemory()
+    let repository = SwiftDataEchoEntryRepository(modelContainer: container)
+    let calendar = try makeGregorianCalendar(timeZone: "UTC")
+    let older = EchoEntry(
+      id: try makeUUID("00000000-0000-0000-0000-000000000408"),
+      createdAt: try makeDate("2026-10-01T09:00:00Z"),
+      calendar: calendar,
+      rawText: "A fictional café visit beside the quiet river."
+    )
+    var newer = EchoEntry(
+      id: try makeUUID("00000000-0000-0000-0000-000000000409"),
+      createdAt: try makeDate("2026-10-02T09:00:00Z"),
+      calendar: calendar,
+      rawText: "A fictional morning beside the river."
+    )
+    newer.setPolishedText(
+      "A calm fictional morning beside the river.",
+      at: try makeDate("2026-10-02T09:05:00Z")
+    )
+    let unrelated = EchoEntry(
+      id: try makeUUID("00000000-0000-0000-0000-000000000410"),
+      createdAt: try makeDate("2026-10-03T09:00:00Z"),
+      calendar: calendar,
+      rawText: "A fictional train crossed the city."
+    )
+
+    try await repository.create(older)
+    try await repository.create(newer)
+    try await repository.create(unrelated)
+
+    #expect(
+      try await repository.searchEntries(
+        matching: EchoEntrySearchQuery("FICTIONAL river")
+      ) == [newer, older]
+    )
+    #expect(
+      try await repository.searchEntries(
+        matching: EchoEntrySearchQuery("CAFE")
+      ) == [older]
+    )
+    #expect(
+      try await repository.searchEntries(
+        matching: EchoEntrySearchQuery("calm morning")
+      ) == [newer]
+    )
+    #expect(
+      try await repository.searchEntries(
+        matching: EchoEntrySearchQuery("   ")
+      ).isEmpty
+    )
+  }
+
   @Test("An entry survives recreating the persistent container")
   func persistsAcrossContainerRecreation() async throws {
     let location = try makeDisposableStoreLocation()

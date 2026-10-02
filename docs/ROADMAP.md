@@ -12,7 +12,7 @@ Each phase is implemented, built, tested where behavior exists, reviewed, commit
 - **Phase 5 — Highlights (complete):** highlight and unhighlight entries, browse a newest-highlighted-first curated collection, remove highlights, and navigate to the emphasized source entry within its complete day context.
 - **Phase 6 — AI architecture (complete):** provider-neutral cleanup, polish, and day-organization contracts; a deterministic offline implementation; separately persisted assisted text; versioned organized-journal storage; Day Detail generation and regeneration; and provenance, durability, failure, and immutability tests. No provider credential, network call, or real journal content enters the app bundle, fixtures, logs, or Git.
 - **Phase 7 — Visual worlds and presentation system (complete):** build a mature, reusable presentation architecture around the approved Mirror City direction, with Teal Immersion as the default visual world and optional Crimson Static, Sodium Fog, and Electric Blue Hour worlds. Theme choice changes presentation only; journal data and application behavior remain unchanged.
-- **Phase 8 — Memory, reflection, and continuity:** turn the functional journal into a product worth returning to through honest retrieval, richer private reflection, memory resurfacing, faster capture, and explicit personal-data controls. Each capability remains local-first, optional where appropriate, and independently reviewable.
+- **Phase 8 — Memory, reflection, and continuity (in progress):** turn the functional journal into a product worth returning to through honest retrieval, richer private reflection, memory resurfacing, faster capture, and explicit personal-data controls. Each capability remains local-first, optional where appropriate, and independently reviewable.
 - **Phase 9 — MVP review:** full builds and tests, architecture and privacy review, naming cleanup, documentation refresh, staged-data scan, and full reachable-history scan.
 
 ## Phase 7 deliverables
@@ -45,7 +45,7 @@ Each deliverable uses its own short-lived branch and pull request. A deliverable
 
 Phase 8 begins only after the completed Phase 7 application has been reviewed together. Every deliverable uses its own short-lived branch and pull request and must preserve the public-source/private-journal boundary.
 
-1. **Search contracts and indexing:** add testable repository queries for private full-text retrieval without copying journal content into logs, fixtures, Spotlight, or a second unprotected store.
+1. **Search contracts and indexing (complete):** add testable repository queries for private full-text retrieval without copying journal content into logs, fixtures, Spotlight, or a second unprotected store.
 2. **Search experience:** add a responsive search surface with useful snippets, dates, keyboard focus, empty states, and navigation back to the complete source day.
 3. **Calendar browsing:** replace decorative calendar affordances with a real month browser, day indicators, date selection, and direct navigation to days containing entries.
 4. **Reflection structure domain:** extend organized journals with optional generated title, themes, key moments, and reflection questions through a versioned migration that preserves existing journals and raw entries.

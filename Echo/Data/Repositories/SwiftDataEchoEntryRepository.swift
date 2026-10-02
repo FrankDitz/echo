@@ -31,6 +31,23 @@ actor SwiftDataEchoEntryRepository: EchoEntryRepository {
     return EchoEntryOrdering.chronological(entries)
   }
 
+  func searchEntries(matching query: EchoEntrySearchQuery) async throws -> [EchoEntry] {
+    guard !query.isEmpty else { return [] }
+
+    // Search remains inside the existing app-container store. Echo does not create
+    // a second index, export journal text, or expose content to system search.
+    let entries = try modelContext.fetch(FetchDescriptor<PersistentEchoEntry>())
+      .map(EchoPersistenceMapper.makeEntry)
+      .filter(query.matches)
+
+    return entries.sorted { lhs, rhs in
+      if lhs.createdAt != rhs.createdAt {
+        return lhs.createdAt > rhs.createdAt
+      }
+      return lhs.id.uuidString < rhs.id.uuidString
+    }
+  }
+
   func update(_ entry: EchoEntry) async throws {
     guard let record = try record(id: entry.id) else {
       throw EchoRepositoryError.entryNotFound(entry.id)
