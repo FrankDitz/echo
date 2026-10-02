@@ -11,6 +11,7 @@ struct TimelineView: View {
   @Environment(\.timeZone) private var timeZone
   @Environment(\.calendar) private var calendar
   @Environment(\.echoVisualWorld) private var world
+  @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
   var body: some View {
     EchoWorldCanvas {
@@ -108,39 +109,16 @@ struct TimelineView: View {
       .padding(.horizontal, isWide ? 22 : 14)
       .padding(.top, isWide ? 18 : 12)
 
-      HStack(spacing: 0) {
-        ForEach(Array(dateStripDates.enumerated()), id: \.element) { index, date in
-          if index > 0 {
-            Rectangle()
-              .fill(world.separator.opacity(0.72))
-              .frame(width: EchoShape.hairlineWidth, height: isWide ? 52 : 44)
-              .accessibilityHidden(true)
+      Group {
+        if dynamicTypeSize.isAccessibilitySize {
+          ScrollView(.horizontal) {
+            dateTiles(isWide: isWide, usesFixedWidth: true)
           }
-
-          if let day = day(for: date) {
-            Button {
-              selectedDayID = day.id
-            } label: {
-              TimelineDateTile(
-                date: date,
-                isSelected: day.id == selectedTimelineDay?.id,
-                hasEntries: true,
-                isWide: isWide
-              )
-            }
-            .buttonStyle(.plain)
-            .accessibilityHint("Shows this day’s entries in the timeline")
-          } else {
-            TimelineDateTile(
-              date: date,
-              isSelected: false,
-              hasEntries: false,
-              isWide: isWide
-            )
-          }
+          .scrollIndicators(.hidden)
+        } else {
+          dateTiles(isWide: isWide, usesFixedWidth: false)
         }
       }
-      .padding(.horizontal, isWide ? 8 : 2)
       .padding(.bottom, isWide ? 16 : 10)
     }
     .background {
@@ -160,6 +138,44 @@ struct TimelineView: View {
           .frame(height: EchoShape.hairlineWidth)
       }
     }
+  }
+
+  private func dateTiles(isWide: Bool, usesFixedWidth: Bool) -> some View {
+    HStack(spacing: 0) {
+      ForEach(Array(dateStripDates.enumerated()), id: \.element) { index, date in
+        if index > 0 {
+          Rectangle()
+            .fill(world.separator.opacity(0.72))
+            .frame(width: EchoShape.hairlineWidth, height: isWide ? 52 : 44)
+            .accessibilityHidden(true)
+        }
+
+        if let day = day(for: date) {
+          Button {
+            selectedDayID = day.id
+          } label: {
+            TimelineDateTile(
+              date: date,
+              isSelected: day.id == selectedTimelineDay?.id,
+              hasEntries: true,
+              isWide: isWide,
+              usesFixedWidth: usesFixedWidth
+            )
+          }
+          .buttonStyle(.plain)
+          .accessibilityHint("Shows this day’s entries in the timeline")
+        } else {
+          TimelineDateTile(
+            date: date,
+            isSelected: false,
+            hasEntries: false,
+            isWide: isWide,
+            usesFixedWidth: usesFixedWidth
+          )
+        }
+      }
+    }
+    .padding(.horizontal, isWide ? 8 : 2)
   }
 
   private var timelineRail: some View {
@@ -262,6 +278,7 @@ private struct TimelineDateTile: View {
   let isSelected: Bool
   let hasEntries: Bool
   let isWide: Bool
+  let usesFixedWidth: Bool
 
   @Environment(\.echoVisualWorld) private var world
 
@@ -285,7 +302,10 @@ private struct TimelineDateTile: View {
         .frame(width: 3, height: 3)
     }
     .foregroundStyle(tileForeground)
-    .frame(maxWidth: .infinity)
+    .frame(
+      minWidth: usesFixedWidth ? 78 : nil,
+      maxWidth: usesFixedWidth ? 78 : .infinity
+    )
     .frame(minHeight: isWide ? 72 : 64)
     .contentShape(Rectangle())
     .accessibilityElement(children: .ignore)

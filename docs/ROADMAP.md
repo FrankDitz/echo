@@ -38,7 +38,7 @@ Each deliverable uses its own short-lived branch and pull request. A deliverable
 17. **Interaction honesty and control polish (complete):** remove or restyle affordances that imply unavailable voice, media, filtering, or calendar behavior; every enabled control must perform the action it communicates.
 18. **Motion and icon language (complete):** add purposeful capture, selection, navigation, and theme transitions plus a consistent Echo icon vocabulary while honoring Reduce Motion and avoiding ornamental animation.
 19. **Mac workspace composition (complete):** make productive use of wide windows, add appropriate keyboard commands and focus behavior, and avoid presenting a stretched phone composition on macOS.
-20. **Platform and accessibility review:** validate supported iPhone, iPad, and Mac layouts; Dynamic Type; VoiceOver labels and order; contrast; keyboard behavior; reduced transparency; and light-sensitive presentation.
+20. **Platform and accessibility review (complete):** validate supported iPhone, iPad, and Mac layouts; Dynamic Type; VoiceOver labels and order; contrast; keyboard behavior; reduced transparency; and light-sensitive presentation.
 21. **Phase closeout:** run full builds and tests, simulator review, repository-safety scans, documentation refresh, and a final comparison against the approved visual specification.
 
 ## Phase 8 deliverables
