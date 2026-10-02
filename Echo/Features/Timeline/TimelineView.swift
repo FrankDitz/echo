@@ -6,6 +6,8 @@ struct TimelineView: View {
   let aiService: any EchoAIService
   let journalRepository: any EchoOrganizedJournalRepository
 
+  @State private var selectedDayID: EchoDayIdentifier?
+
   @Environment(\.timeZone) private var timeZone
   @Environment(\.calendar) private var calendar
   @Environment(\.echoVisualWorld) private var world
@@ -106,99 +108,105 @@ struct TimelineView: View {
       .padding(.top, isWide ? 18 : 12)
 
       HStack(spacing: 0) {
-        ForEach(dateStripDates, id: \.self) { date in
+        ForEach(Array(dateStripDates.enumerated()), id: \.element) { index, date in
+          if index > 0 {
+            Rectangle()
+              .fill(world.separator.opacity(0.72))
+              .frame(width: EchoShape.hairlineWidth, height: isWide ? 52 : 44)
+              .accessibilityHidden(true)
+          }
+
           if let day = day(for: date) {
-            NavigationLink {
-              destination(for: day)
+            Button {
+              selectedDayID = day.id
             } label: {
               TimelineDateTile(
                 date: date,
-                isLatest: day.id == viewModel.days.first?.id,
+                isSelected: day.id == selectedTimelineDay?.id,
                 hasEntries: true,
                 isWide: isWide
               )
             }
             .buttonStyle(.plain)
-            .accessibilityHint("Opens this day’s entries")
+            .accessibilityHint("Shows this day’s entries in the timeline")
           } else {
             TimelineDateTile(
               date: date,
-              isLatest: false,
+              isSelected: false,
               hasEntries: false,
               isWide: isWide
             )
           }
         }
       }
-      .padding(.horizontal, isWide ? 12 : 4)
+      .padding(.horizontal, isWide ? 8 : 2)
       .padding(.bottom, isWide ? 16 : 10)
     }
     .background {
-      RoundedRectangle(cornerRadius: isWide ? 18 : 14)
+      Rectangle()
         .fill(.ultraThinMaterial)
-      RoundedRectangle(cornerRadius: isWide ? 18 : 14)
-        .fill(world.canvas.opacity(0.1))
+      Rectangle()
+        .fill(world.canvas.opacity(0.06))
     }
     .overlay {
-      RoundedRectangle(cornerRadius: isWide ? 18 : 14)
-        .stroke(world.separator.opacity(0.75), lineWidth: EchoShape.hairlineWidth)
+      VStack(spacing: 0) {
+        Rectangle()
+          .fill(world.separator.opacity(0.7))
+          .frame(height: EchoShape.hairlineWidth)
+        Spacer()
+        Rectangle()
+          .fill(world.separator.opacity(0.7))
+          .frame(height: EchoShape.hairlineWidth)
+      }
     }
-    .shadow(color: world.contentShadow.opacity(0.15), radius: 14, y: 6)
   }
 
   private var timelineRail: some View {
-    VStack(alignment: .leading, spacing: 0) {
+    VStack(alignment: .leading, spacing: EchoLayout.rowSpacing) {
       HStack {
-        Text("JOURNAL DAYS")
+        Text(selectedTimelineDay.map(displayDate(for:)) ?? stripAnchorDate, format: .dateTime.weekday(.abbreviated).month(.abbreviated).day().year())
           .font(EchoTypography.metadata)
           .tracking(1.4)
+          .textCase(.uppercase)
           .foregroundStyle(world.secondaryText)
 
         Spacer()
 
-        Text(viewModel.days.count, format: .number)
+        Text(selectedTimelineDay?.entryCount ?? 0, format: .number)
           .font(EchoTypography.metadata)
           .foregroundStyle(.secondary)
           .accessibilityLabel(
-            "\(viewModel.days.count) \(viewModel.days.count == 1 ? "day" : "days")"
+            "\(selectedTimelineDay?.entryCount ?? 0) \((selectedTimelineDay?.entryCount ?? 0) == 1 ? "entry" : "entries")"
           )
       }
-      .padding(.horizontal, EchoLayout.surfacePadding)
-      .padding(.vertical, EchoLayout.contentSpacing)
+      .padding(.horizontal, EchoLayout.tightSpacing)
 
-      Rectangle()
-        .fill(world.separator.opacity(0.7))
-        .frame(height: EchoShape.hairlineWidth)
+      if let selectedTimelineDay {
+        let entries = Array(selectedTimelineDay.entries.reversed())
 
-      ForEach(Array(viewModel.days.enumerated()), id: \.element.id) { index, day in
-        NavigationLink {
-          destination(for: day)
-        } label: {
-          TimelineDayRailRow(
-            day: day,
-            displayDate: displayDate(for: day),
-            showsContinuation: index < viewModel.days.count - 1
-          )
+        ForEach(Array(entries.enumerated()), id: \.element.id) { index, entry in
+          NavigationLink {
+            destination(for: selectedTimelineDay, focusedEntryID: entry.id)
+          } label: {
+            TimelineEntryRailRow(
+              entry: entry,
+              showsContinuation: index < entries.count - 1
+            )
+          }
+          .buttonStyle(.plain)
+          .accessibilityHint("Opens this entry in its day reflection")
         }
-        .buttonStyle(.plain)
-        .accessibilityHint("Opens this day’s entries")
       }
     }
-    .background {
-      RoundedRectangle(cornerRadius: 16)
-        .fill(.ultraThinMaterial)
-      RoundedRectangle(cornerRadius: 16)
-        .fill(world.canvas.opacity(0.08))
-    }
-    .overlay {
-      RoundedRectangle(cornerRadius: 16)
-        .stroke(world.separator.opacity(0.65), lineWidth: EchoShape.hairlineWidth)
-    }
-    .shadow(color: world.contentShadow.opacity(0.13), radius: 14, y: 6)
   }
 
   private var stripAnchorDate: Date {
     viewModel.days.first.map(displayDate(for:)) ?? viewModel.mostRecentTimelineDate
+  }
+
+  private var selectedTimelineDay: EchoDay? {
+    guard let selectedDayID else { return viewModel.days.first }
+    return viewModel.days.first(where: { $0.id == selectedDayID }) ?? viewModel.days.first
   }
 
   private var dateStripDates: [Date] {
@@ -235,19 +243,20 @@ struct TimelineView: View {
     day.id.date(in: timeZone) ?? day.entries[0].createdAt
   }
 
-  private func destination(for day: EchoDay) -> some View {
+  private func destination(for day: EchoDay, focusedEntryID: UUID? = nil) -> some View {
     DayDetailView(
       day: day,
       highlightViewModel: highlightViewModel,
       aiService: aiService,
-      journalRepository: journalRepository
+      journalRepository: journalRepository,
+      focusedEntryID: focusedEntryID
     )
   }
 }
 
 private struct TimelineDateTile: View {
   let date: Date
-  let isLatest: Bool
+  let isSelected: Bool
   let hasEntries: Bool
   let isWide: Bool
 
@@ -259,13 +268,13 @@ private struct TimelineDateTile: View {
         .font(isWide ? .title3.weight(.medium) : .body.weight(.medium))
         .frame(width: isWide ? 38 : 34, height: isWide ? 38 : 34)
         .background {
-          if isLatest {
+          if isSelected {
             Circle().fill(world.accent)
           }
         }
 
       Text(date, format: .dateTime.weekday(.abbreviated))
-        .font(.caption2.weight(isLatest ? .bold : .medium))
+        .font(.caption2.weight(isSelected ? .bold : .medium))
         .textCase(.uppercase)
 
       Circle()
@@ -278,19 +287,18 @@ private struct TimelineDateTile: View {
     .contentShape(Rectangle())
     .accessibilityElement(children: .ignore)
     .accessibilityLabel(
-      "\(isLatest ? "Latest entry, " : "")\(date.formatted(.dateTime.weekday(.wide).month(.wide).day().year())), \(hasEntries ? "has entries" : "no entries")"
+      "\(isSelected ? "Selected, " : "")\(date.formatted(.dateTime.weekday(.wide).month(.wide).day().year())), \(hasEntries ? "has entries" : "no entries")"
     )
   }
 
   private var tileForeground: Color {
-    if isLatest { return world.canvas }
+    if isSelected { return world.canvas }
     return hasEntries ? world.primaryText : world.secondaryText.opacity(0.75)
   }
 }
 
-private struct TimelineDayRailRow: View {
-  let day: EchoDay
-  let displayDate: Date
+private struct TimelineEntryRailRow: View {
+  let entry: EchoEntry
   let showsContinuation: Bool
 
   @Environment(\.echoVisualWorld) private var world
@@ -300,53 +308,44 @@ private struct TimelineDayRailRow: View {
       VStack(spacing: 0) {
         Circle()
           .fill(world.accent)
-          .frame(width: 10, height: 10)
+          .frame(width: 13, height: 13)
           .overlay {
-            Circle().stroke(world.primaryText.opacity(0.5), lineWidth: 1.5)
+            Circle().stroke(world.primaryText.opacity(0.65), lineWidth: 1.5)
           }
 
         if showsContinuation {
           Rectangle()
-            .fill(world.separator)
-            .frame(width: 1)
+            .fill(world.accent.opacity(0.8))
+            .frame(width: 1.5)
             .frame(maxHeight: .infinity)
         }
       }
-      .frame(width: 16)
+      .frame(width: 18)
 
       VStack(alignment: .leading, spacing: EchoLayout.inlineSpacing) {
-        Text(displayDate, format: .dateTime.weekday(.abbreviated).month(.abbreviated).day().year())
+        Text(entry.createdAt, format: .dateTime.hour().minute())
           .font(EchoTypography.metadata)
           .tracking(0.7)
-          .textCase(.uppercase)
           .foregroundStyle(world.secondaryText)
 
         HStack(alignment: .top, spacing: EchoLayout.inlineSpacing) {
-          Text(day.entries.last?.rawText ?? "")
+          Text(entry.rawText)
             .font(EchoTypography.body)
             .foregroundStyle(world.primaryText)
             .lineLimit(3)
             .lineSpacing(3)
             .frame(maxWidth: .infinity, alignment: .leading)
 
-          VStack(alignment: .trailing, spacing: EchoLayout.tightSpacing) {
-            Text(entryCountLabel)
-              .font(EchoTypography.metadata)
-              .foregroundStyle(.secondary)
-            Image(systemName: "chevron.right")
-              .font(.caption.weight(.semibold))
-              .foregroundStyle(world.accent)
-          }
+          Image(systemName: "chevron.right")
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(world.accent)
         }
       }
-      .padding(.bottom, showsContinuation ? EchoLayout.sectionSpacing : EchoLayout.surfacePadding)
+      .padding(.bottom, showsContinuation ? EchoLayout.sectionSpacing : EchoLayout.tightSpacing)
     }
-    .padding(.horizontal, EchoLayout.surfacePadding)
-    .padding(.top, EchoLayout.surfacePadding)
+    .padding(.horizontal, EchoLayout.tightSpacing)
+    .padding(.top, EchoLayout.rowSpacing)
     .accessibilityElement(children: .combine)
   }
 
-  private var entryCountLabel: String {
-    day.entryCount == 1 ? "1 entry" : "\(day.entryCount) entries"
-  }
 }
