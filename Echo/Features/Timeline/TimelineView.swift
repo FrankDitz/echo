@@ -99,8 +99,9 @@ struct TimelineView: View {
 
         Spacer()
 
-        Image(systemName: "calendar")
-          .accessibilityHidden(true)
+        Label("7-day view", systemImage: "calendar")
+          .labelStyle(.titleAndIcon)
+          .accessibilityLabel("Seven-day date browser")
       }
       .font(EchoTypography.metadata)
       .foregroundStyle(world.secondaryText)

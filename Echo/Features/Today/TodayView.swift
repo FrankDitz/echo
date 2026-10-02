@@ -289,7 +289,7 @@ private struct TodayCaptureControl: View {
   var body: some View {
     VStack(alignment: .leading, spacing: EchoLayout.inlineSpacing) {
       HStack(spacing: EchoLayout.rowSpacing) {
-        Image(systemName: "waveform")
+        Image(systemName: "square.and.pencil")
           .font(.body.weight(.medium))
           .foregroundStyle(world.accent)
           .frame(width: 26, height: 28)
