@@ -67,28 +67,25 @@ struct HighlightsView: View {
       VStack(alignment: .leading, spacing: EchoLayout.contentSpacing) {
         filterRibbon
 
-        VStack(alignment: .leading, spacing: 0) {
-          ForEach(viewModel.items) { item in
-            HighlightedEntryRow(
-              item: item,
-              onOpen: { selectedItem = item },
-              onRemove: {
-                Task {
-                  await viewModel.remove(entryID: item.entry.id)
+        EchoReadabilityPanel(padding: 0) {
+          VStack(alignment: .leading, spacing: 0) {
+            ForEach(viewModel.items) { item in
+              HighlightedEntryRow(
+                item: item,
+                onOpen: { selectedItem = item },
+                onRemove: {
+                  Task {
+                    await viewModel.remove(entryID: item.entry.id)
+                  }
                 }
-              }
-            )
+              )
 
-            if item.id != viewModel.items.last?.id {
-              Divider()
-                .overlay(world.separator.opacity(0.7))
+              if item.id != viewModel.items.last?.id {
+                Divider()
+                  .overlay(world.separator.opacity(0.7))
+              }
             }
           }
-        }
-        .overlay(alignment: .top) {
-          Rectangle()
-            .fill(world.separator.opacity(0.7))
-            .frame(height: EchoShape.hairlineWidth)
         }
       }
     }

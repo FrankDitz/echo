@@ -162,39 +162,41 @@ struct TimelineView: View {
   }
 
   private var timelineRail: some View {
-    VStack(alignment: .leading, spacing: EchoLayout.rowSpacing) {
-      HStack {
-        Text(selectedTimelineDay.map(displayDate(for:)) ?? stripAnchorDate, format: .dateTime.weekday(.abbreviated).month(.abbreviated).day().year())
-          .font(EchoTypography.metadata)
-          .tracking(1.4)
-          .textCase(.uppercase)
-          .foregroundStyle(world.secondaryText)
+    EchoReadabilityPanel(padding: EchoLayout.contentSpacing) {
+      VStack(alignment: .leading, spacing: EchoLayout.rowSpacing) {
+        HStack {
+          Text(selectedTimelineDay.map(displayDate(for:)) ?? stripAnchorDate, format: .dateTime.weekday(.abbreviated).month(.abbreviated).day().year())
+            .font(EchoTypography.metadata)
+            .tracking(1.4)
+            .textCase(.uppercase)
+            .foregroundStyle(world.secondaryText)
 
-        Spacer()
+          Spacer()
 
-        Text(selectedTimelineDay?.entryCount ?? 0, format: .number)
-          .font(EchoTypography.metadata)
-          .foregroundStyle(.secondary)
-          .accessibilityLabel(
-            "\(selectedTimelineDay?.entryCount ?? 0) \((selectedTimelineDay?.entryCount ?? 0) == 1 ? "entry" : "entries")"
-          )
-      }
-      .padding(.horizontal, EchoLayout.tightSpacing)
-
-      if let selectedTimelineDay {
-        let entries = Array(selectedTimelineDay.entries.reversed())
-
-        ForEach(Array(entries.enumerated()), id: \.element.id) { index, entry in
-          NavigationLink {
-            destination(for: selectedTimelineDay, focusedEntryID: entry.id)
-          } label: {
-            TimelineEntryRailRow(
-              entry: entry,
-              showsContinuation: index < entries.count - 1
+          Text(selectedTimelineDay?.entryCount ?? 0, format: .number)
+            .font(EchoTypography.metadata)
+            .foregroundStyle(.secondary)
+            .accessibilityLabel(
+              "\(selectedTimelineDay?.entryCount ?? 0) \((selectedTimelineDay?.entryCount ?? 0) == 1 ? "entry" : "entries")"
             )
+        }
+        .padding(.horizontal, EchoLayout.tightSpacing)
+
+        if let selectedTimelineDay {
+          let entries = Array(selectedTimelineDay.entries.reversed())
+
+          ForEach(Array(entries.enumerated()), id: \.element.id) { index, entry in
+            NavigationLink {
+              destination(for: selectedTimelineDay, focusedEntryID: entry.id)
+            } label: {
+              TimelineEntryRailRow(
+                entry: entry,
+                showsContinuation: index < entries.count - 1
+              )
+            }
+            .buttonStyle(.plain)
+            .accessibilityHint("Opens this entry in its day reflection")
           }
-          .buttonStyle(.plain)
-          .accessibilityHint("Opens this entry in its day reflection")
         }
       }
     }
