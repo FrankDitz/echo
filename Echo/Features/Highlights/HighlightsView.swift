@@ -7,7 +7,6 @@ struct HighlightsView: View {
   let journalRepository: any EchoOrganizedJournalRepository
 
   @State private var selectedItem: HighlightedEntry?
-  @State private var selectedFilter: HighlightFilter = .saved
 
   var body: some View {
     EchoPage(spacing: EchoLayout.compactSectionSpacing) {
@@ -96,48 +95,34 @@ struct HighlightsView: View {
   }
 
   private var filterRibbon: some View {
-    ScrollView(.horizontal) {
-      HStack(spacing: EchoLayout.inlineSpacing) {
-        ForEach(HighlightFilter.allCases) { filter in
-          Button {
-            selectedFilter = filter
-          } label: {
-            Text(filter.title)
-              .font(EchoTypography.metadata.weight(.semibold))
-              .foregroundStyle(selectedFilter == filter ? world.canvas : world.primaryText)
-              .padding(.horizontal, EchoLayout.contentSpacing)
-              .frame(minHeight: 32)
-              .background {
-                Capsule()
-                  .fill(selectedFilter == filter ? world.accent : world.canvas.opacity(0.1))
-                if selectedFilter != filter {
-                  Capsule().fill(.ultraThinMaterial)
-                }
-              }
-              .overlay {
-                Capsule()
-                  .stroke(
-                    selectedFilter == filter ? world.accent : world.separator,
-                    lineWidth: EchoShape.hairlineWidth
-                  )
-              }
-          }
-          .buttonStyle(.plain)
-          .disabled(!filter.isAvailable)
-          .opacity(filter.isAvailable ? 1 : 0.48)
-          .accessibilityHint(filter.isAvailable ? "Filters saved highlights" : "Not available yet")
+    HStack(spacing: EchoLayout.inlineSpacing) {
+      Label("Saved entries", systemImage: "bookmark.fill")
+        .font(EchoTypography.metadata.weight(.semibold))
+        .foregroundStyle(world.canvas)
+        .padding(.horizontal, EchoLayout.contentSpacing)
+        .frame(minHeight: 32)
+        .background(world.accent, in: Capsule())
+
+      Text("Text")
+        .font(EchoTypography.metadata.weight(.semibold))
+        .foregroundStyle(world.secondaryText)
+        .padding(.horizontal, EchoLayout.contentSpacing)
+        .frame(minHeight: 32)
+        .background(.ultraThinMaterial, in: Capsule())
+        .overlay {
+          Capsule()
+            .stroke(world.separator, lineWidth: EchoShape.hairlineWidth)
         }
 
-        Text(viewModel.items.count, format: .number)
-          .font(EchoTypography.metadata)
-          .foregroundStyle(.secondary)
-          .padding(.leading, EchoLayout.tightSpacing)
-          .accessibilityLabel(
-            "\(viewModel.items.count) saved \(viewModel.items.count == 1 ? "entry" : "entries")"
-          )
-      }
+      Spacer()
+
+      Text(viewModel.items.count, format: .number)
+        .font(EchoTypography.metadata)
+        .foregroundStyle(.secondary)
+        .accessibilityLabel(
+          "\(viewModel.items.count) saved \(viewModel.items.count == 1 ? "entry" : "entries")"
+        )
     }
-    .scrollIndicators(.hidden)
   }
 
   @Environment(\.echoVisualWorld) private var world
@@ -152,18 +137,6 @@ struct HighlightsView: View {
       nil
     }
   }
-}
-
-private enum HighlightFilter: String, CaseIterable, Identifiable {
-  case saved
-  case all
-  case text
-  case voice
-  case photo
-
-  var id: String { rawValue }
-  var title: String { rawValue.capitalized }
-  var isAvailable: Bool { self != .voice && self != .photo }
 }
 
 private struct HighlightedEntryRow: View {
