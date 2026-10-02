@@ -56,3 +56,38 @@ struct EchoSurface<Content: View>: View {
     }
   }
 }
+
+struct EchoReadabilityPanel<Content: View>: View {
+  @Environment(\.echoVisualWorld) private var world
+
+  let padding: CGFloat
+  let cornerRadius: CGFloat
+  private let content: Content
+
+  init(
+    padding: CGFloat = EchoLayout.surfacePadding,
+    cornerRadius: CGFloat = 16,
+    @ViewBuilder content: () -> Content
+  ) {
+    self.padding = padding
+    self.cornerRadius = cornerRadius
+    self.content = content()
+  }
+
+  var body: some View {
+    content
+      .padding(padding)
+      .foregroundStyle(world.primaryText, world.secondaryText)
+      .background {
+        RoundedRectangle(cornerRadius: cornerRadius)
+          .fill(.ultraThinMaterial)
+        RoundedRectangle(cornerRadius: cornerRadius)
+          .fill(world.surfaceFill.opacity(0.76))
+      }
+      .overlay {
+        RoundedRectangle(cornerRadius: cornerRadius)
+          .stroke(world.separator.opacity(0.9), lineWidth: EchoShape.hairlineWidth)
+      }
+      .shadow(color: world.contentShadow.opacity(0.26), radius: 18, y: 8)
+  }
+}

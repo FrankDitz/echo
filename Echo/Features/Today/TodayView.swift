@@ -197,7 +197,7 @@ struct TodayView: View {
         RoundedRectangle(cornerRadius: 14)
           .fill(.ultraThinMaterial)
         RoundedRectangle(cornerRadius: 14)
-          .fill(world.canvas.opacity(0.12))
+          .fill(world.surfaceFill.opacity(0.72))
       } else {
         Rectangle()
           .fill(world.canvas.opacity(0.18))

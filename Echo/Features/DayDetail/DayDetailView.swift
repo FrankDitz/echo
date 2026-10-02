@@ -201,14 +201,15 @@ private struct DayReflectionSection: View {
   @Environment(\.echoVisualWorld) private var world
 
   var body: some View {
-    VStack(alignment: .leading, spacing: EchoLayout.sectionSpacing) {
-      reflectionContent
+    EchoReadabilityPanel {
+      VStack(alignment: .leading, spacing: EchoLayout.sectionSpacing) {
+        reflectionContent
 
-      if viewModel.failure != nil {
-        EchoErrorState(message: "The organized journal could not be loaded or saved.")
+        if viewModel.failure != nil {
+          EchoErrorState(message: "The organized journal could not be loaded or saved.")
+        }
       }
     }
-    .padding(.horizontal, EchoLayout.tightSpacing)
   }
 
   @ViewBuilder
