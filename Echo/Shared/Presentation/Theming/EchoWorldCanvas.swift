@@ -3,6 +3,7 @@ import SwiftUI
 struct EchoWorldCanvas<Content: View>: View {
   @Environment(\.echoVisualWorld) private var world
   @Environment(\.accessibilityReduceMotion) private var reduceMotion
+  @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
 
   private let content: Content
 
@@ -52,6 +53,10 @@ struct EchoWorldCanvas<Content: View>: View {
               startPoint: .top,
               endPoint: .bottom
             )
+          }
+
+          if reduceTransparency {
+            world.canvas.opacity(0.68)
           }
         }
         .ignoresSafeArea()

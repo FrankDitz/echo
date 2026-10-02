@@ -228,8 +228,12 @@ struct TodayView: View {
 
   @Environment(\.echoVisualWorld) private var world
   @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+  @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
   private func heroOffset(for availableHeight: CGFloat) -> CGFloat {
+    if dynamicTypeSize.isAccessibilitySize {
+      return 72
+    }
     if horizontalSizeClass == .compact {
       return min(max(availableHeight * 0.34, 140), 286)
     }

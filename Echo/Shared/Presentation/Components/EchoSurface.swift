@@ -7,6 +7,7 @@ enum EchoSurfaceStyle {
 
 struct EchoSurface<Content: View>: View {
   @Environment(\.echoVisualWorld) private var world
+  @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
 
   let style: EchoSurfaceStyle
   let padding: CGFloat
@@ -30,10 +31,12 @@ struct EchoSurface<Content: View>: View {
       .padding(padding)
       .foregroundStyle(world.primaryText, world.secondaryText)
       .background {
+        if !reduceTransparency {
+          RoundedRectangle(cornerRadius: cornerRadius)
+            .fill(.ultraThinMaterial)
+        }
         RoundedRectangle(cornerRadius: cornerRadius)
-          .fill(.ultraThinMaterial)
-        RoundedRectangle(cornerRadius: cornerRadius)
-          .fill(fill)
+          .fill(reduceTransparency ? AnyShapeStyle(world.surfaceFill) : fill)
       }
       .shadow(color: world.contentShadow.opacity(0.18), radius: 16, y: 7)
       .overlay {
@@ -59,6 +62,7 @@ struct EchoSurface<Content: View>: View {
 
 struct EchoReadabilityPanel<Content: View>: View {
   @Environment(\.echoVisualWorld) private var world
+  @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
 
   let padding: CGFloat
   let cornerRadius: CGFloat
@@ -79,10 +83,12 @@ struct EchoReadabilityPanel<Content: View>: View {
       .padding(padding)
       .foregroundStyle(world.primaryText, world.secondaryText)
       .background {
+        if !reduceTransparency {
+          RoundedRectangle(cornerRadius: cornerRadius)
+            .fill(.ultraThinMaterial)
+        }
         RoundedRectangle(cornerRadius: cornerRadius)
-          .fill(.ultraThinMaterial)
-        RoundedRectangle(cornerRadius: cornerRadius)
-          .fill(world.surfaceFill.opacity(0.76))
+          .fill(world.surfaceFill.opacity(reduceTransparency ? 1 : 0.76))
       }
       .overlay {
         RoundedRectangle(cornerRadius: cornerRadius)
