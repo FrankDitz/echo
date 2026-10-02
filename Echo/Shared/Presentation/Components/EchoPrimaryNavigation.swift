@@ -14,6 +14,7 @@ struct EchoPrimaryNavigation: View {
   let showSettings: () -> Void
 
   @Environment(\.echoVisualWorld) private var world
+  @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
   var body: some View {
     ViewThatFits(in: .horizontal) {
@@ -72,7 +73,9 @@ struct EchoPrimaryNavigation: View {
     HStack(spacing: EchoLayout.microSpacing) {
       ForEach(EchoPrimarySection.allCases) { section in
         Button {
-          selection = section
+          withAnimation(EchoMotion.animation(reduceMotion: reduceMotion)) {
+            selection = section
+          }
         } label: {
           VStack(spacing: EchoLayout.tightSpacing) {
             Text(section.rawValue)
@@ -100,7 +103,9 @@ struct EchoPrimaryNavigation: View {
     HStack(spacing: EchoLayout.microSpacing) {
       ForEach(EchoPrimarySection.allCases) { section in
         Button {
-          selection = section
+          withAnimation(EchoMotion.animation(reduceMotion: reduceMotion)) {
+            selection = section
+          }
         } label: {
           VStack(spacing: EchoLayout.microSpacing) {
             Text(section.rawValue)
@@ -128,7 +133,7 @@ struct EchoPrimaryNavigation: View {
 
   private var settingsButton: some View {
     Button(action: showSettings) {
-      Image(systemName: "gearshape")
+      Image(systemName: EchoIcon.settings)
         .font(.body.weight(.medium))
         .foregroundStyle(world.secondaryText)
         .frame(width: 40, height: 40)
@@ -139,7 +144,7 @@ struct EchoPrimaryNavigation: View {
 
   private var compactSettingsButton: some View {
     Button(action: showSettings) {
-      Image(systemName: "gearshape")
+      Image(systemName: EchoIcon.settings)
         .font(.subheadline.weight(.medium))
         .foregroundStyle(world.secondaryText)
         .frame(width: 36, height: 36)
