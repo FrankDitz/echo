@@ -100,6 +100,7 @@ struct DayDetailView: View {
         )
         DayReflectionSection(viewModel: organizationViewModel)
         entries
+        ReflectionActionBar(viewModel: organizationViewModel)
       }
       .task {
         await highlightViewModel.load()
@@ -112,38 +113,48 @@ struct DayDetailView: View {
   }
 
   private var entries: some View {
-    EchoSurface(padding: 0) {
-      VStack(alignment: .leading, spacing: 0) {
-        HStack(alignment: .firstTextBaseline) {
-          Text("Original entries")
-            .font(EchoTypography.contentTitle)
-          Spacer()
-          Text(day.entryCount, format: .number)
-            .font(EchoTypography.metadata)
-            .foregroundStyle(.secondary)
-            .accessibilityLabel(entryCountLabel)
-        }
-        .padding(.horizontal, EchoLayout.surfacePadding)
-        .padding(.vertical, EchoLayout.contentSpacing)
+    VStack(alignment: .leading, spacing: 0) {
+      HStack(alignment: .firstTextBaseline) {
+        Text("Original entries")
+          .font(EchoTypography.contentTitle)
+        Spacer()
+        Text(day.entryCount, format: .number)
+          .font(EchoTypography.metadata)
+          .foregroundStyle(.secondary)
+          .accessibilityLabel(entryCountLabel)
+      }
+      .padding(.horizontal, EchoLayout.contentSpacing)
+      .padding(.vertical, EchoLayout.rowSpacing)
 
-        Divider()
+      Divider()
 
-        ForEach(day.entries) { entry in
-          DayDetailEntry(
-            entry: entry,
-            highlightViewModel: highlightViewModel,
-            isFocusedSource: entry.id == focusedEntryID,
-            isReflectionSource: organizationViewModel.journal?.sourceEntryIDs.contains(entry.id) == true
-          )
-          .id(entry.id)
-          if entry.id != day.entries.last?.id {
-            Divider()
-              .padding(.leading, EchoLayout.surfacePadding + 38)
-          }
+      ForEach(day.entries) { entry in
+        DayDetailEntry(
+          entry: entry,
+          highlightViewModel: highlightViewModel,
+          isFocusedSource: entry.id == focusedEntryID,
+          isReflectionSource: organizationViewModel.journal?.sourceEntryIDs.contains(entry.id) == true
+        )
+        .id(entry.id)
+        if entry.id != day.entries.last?.id {
+          Divider()
+            .padding(.leading, EchoLayout.surfacePadding + 38)
         }
       }
     }
+    .background {
+      RoundedRectangle(cornerRadius: 14)
+        .fill(.ultraThinMaterial)
+      RoundedRectangle(cornerRadius: 14)
+        .fill(world.canvas.opacity(0.08))
+    }
+    .overlay {
+      RoundedRectangle(cornerRadius: 14)
+        .stroke(world.separator.opacity(0.7), lineWidth: EchoShape.hairlineWidth)
+    }
   }
+
+  @Environment(\.echoVisualWorld) private var world
 
   private var displayDate: Date {
     day.id.date(in: timeZone) ?? day.entries[0].createdAt
@@ -190,21 +201,14 @@ private struct DayReflectionSection: View {
   @Environment(\.echoVisualWorld) private var world
 
   var body: some View {
-    EchoSurface(
-      style: .accent(opacity: EchoMaterialMetrics.organizedJournalFillOpacity)
-    ) {
-      VStack(alignment: .leading, spacing: EchoLayout.sectionSpacing) {
-        reflectionContent
+    VStack(alignment: .leading, spacing: EchoLayout.sectionSpacing) {
+      reflectionContent
 
-        if !viewModel.isLoading {
-          reflectionAction
-        }
-
-        if viewModel.failure != nil {
-          EchoErrorState(message: "The organized journal could not be loaded or saved.")
-        }
+      if viewModel.failure != nil {
+        EchoErrorState(message: "The organized journal could not be loaded or saved.")
       }
     }
+    .padding(.horizontal, EchoLayout.tightSpacing)
   }
 
   @ViewBuilder
@@ -243,27 +247,65 @@ private struct DayReflectionSection: View {
     }
   }
 
-  private var reflectionAction: some View {
+}
+
+private struct ReflectionActionBar: View {
+  let viewModel: DayOrganizationViewModel
+
+  @Environment(\.echoVisualWorld) private var world
+
+  var body: some View {
+    HStack(spacing: EchoLayout.rowSpacing) {
+      actionButton(
+        title: "Organize",
+        systemImage: "square.stack.3d.up",
+        isPrimary: viewModel.journal == nil,
+        isDisabled: false
+      )
+
+      actionButton(
+        title: "Regenerate",
+        systemImage: "arrow.clockwise",
+        isPrimary: viewModel.journal != nil,
+        isDisabled: viewModel.journal == nil
+      )
+    }
+    .padding(.top, EchoLayout.tightSpacing)
+  }
+
+  private func actionButton(
+    title: String,
+    systemImage: String,
+    isPrimary: Bool,
+    isDisabled: Bool
+  ) -> some View {
     Button {
       Task { await viewModel.generate() }
     } label: {
-      HStack {
-        Spacer()
-        Label(
-          viewModel.journal == nil ? "Organize Day" : "Regenerate Reflection",
-          systemImage: viewModel.journal == nil ? "square.stack.3d.up" : "arrow.clockwise"
-        )
+      Label(title, systemImage: systemImage)
         .font(.body.weight(.semibold))
-        Spacer()
-      }
-      .frame(minHeight: 28)
-      .padding(.vertical, EchoLayout.tightSpacing)
-      .foregroundStyle(world.canvas)
-      .background(world.accent, in: RoundedRectangle(cornerRadius: EchoShape.embeddedRadius))
-      .contentShape(RoundedRectangle(cornerRadius: EchoShape.embeddedRadius))
+        .frame(maxWidth: .infinity, minHeight: 46)
+        .foregroundStyle(isPrimary ? world.canvas : world.primaryText)
+        .background {
+          RoundedRectangle(cornerRadius: EchoShape.embeddedRadius)
+            .fill(isPrimary ? world.accent : world.canvas.opacity(0.16))
+          if !isPrimary {
+            RoundedRectangle(cornerRadius: EchoShape.embeddedRadius)
+              .fill(.ultraThinMaterial)
+          }
+        }
+        .overlay {
+          RoundedRectangle(cornerRadius: EchoShape.embeddedRadius)
+            .stroke(
+              isPrimary ? world.accent : world.separator,
+              lineWidth: EchoShape.hairlineWidth
+            )
+        }
+        .contentShape(RoundedRectangle(cornerRadius: EchoShape.embeddedRadius))
     }
     .buttonStyle(.plain)
-    .disabled(viewModel.isGenerating)
+    .disabled(viewModel.isGenerating || isDisabled)
+    .opacity(isDisabled ? 0.48 : 1)
   }
 }
 
