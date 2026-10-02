@@ -15,26 +15,15 @@ struct TodayView: View {
     EchoWorldCanvas {
       GeometryReader { proxy in
         ScrollView {
-          LazyVStack(alignment: .leading, spacing: EchoLayout.compactSectionSpacing) {
-            Color.clear
-              .frame(height: heroOffset(for: proxy.size.height))
-              .accessibilityHidden(true)
-
-            promptHeader
-            TodayCaptureControl(
-              draft: $draft,
-              isFocused: $isComposerFocused,
-              saveState: viewModel.saveState,
-              onSubmit: submitDraft
-            )
-            entrySection
+          Group {
+            if proxy.size.width >= EchoLayout.wideLayoutBreakpoint {
+              wideContent(availableSize: proxy.size)
+            } else {
+              compactContent(availableHeight: proxy.size.height)
+            }
           }
-          .frame(maxWidth: EchoLayout.contentMaxWidth, alignment: .leading)
-          .padding(.horizontal, EchoLayout.pageHorizontalPadding)
-          .padding(.bottom, EchoLayout.pageVerticalPadding)
-          .frame(maxWidth: .infinity)
-          .frame(minHeight: proxy.size.height, alignment: .top)
         }
+        .scrollIndicators(.hidden)
       }
     }
     .task {
@@ -69,18 +58,73 @@ struct TodayView: View {
     }
   }
 
-  private var promptHeader: some View {
-    Text("What stayed with you?")
-      .font(EchoTypography.editorialPrompt)
-      .accessibilityAddTraits(.isHeader)
-    .shadow(color: world.contentShadow, radius: 10, y: 3)
+  private func compactContent(availableHeight: CGFloat) -> some View {
+    LazyVStack(alignment: .leading, spacing: 20) {
+      Color.clear
+        .frame(height: heroOffset(for: availableHeight))
+        .accessibilityHidden(true)
+
+      promptHeader(isWide: false)
+      captureControl
+      entrySection(isWide: false)
+    }
+    .frame(maxWidth: EchoLayout.contentMaxWidth, alignment: .leading)
+    .padding(.horizontal, EchoLayout.pageHorizontalPadding)
+    .padding(.bottom, EchoLayout.pageVerticalPadding)
+    .frame(maxWidth: .infinity)
+    .frame(minHeight: availableHeight, alignment: .top)
   }
 
-  private var entrySection: some View {
+  private func wideContent(availableSize: CGSize) -> some View {
+    HStack(alignment: .bottom, spacing: 56) {
+      VStack(alignment: .leading, spacing: EchoLayout.contentSpacing) {
+        Spacer(minLength: 220)
+
+        Text(
+          viewModel.displayedDate.formatted(
+            .dateTime.weekday(.wide).month(.wide).day().year()
+          ).uppercased()
+        )
+        .font(EchoTypography.editorialEyebrow)
+        .tracking(1.8)
+        .foregroundStyle(world.secondaryText)
+
+        promptHeader(isWide: true)
+        captureControl
+      }
+      .frame(maxWidth: 560, minHeight: max(availableSize.height - 128, 520), alignment: .bottom)
+
+      entrySection(isWide: true)
+        .frame(width: min(max(availableSize.width * 0.36, 380), 500))
+        .padding(.bottom, 10)
+    }
+    .frame(maxWidth: EchoLayout.wideContentMaxWidth, alignment: .center)
+    .padding(.horizontal, 40)
+    .padding(.bottom, 36)
+    .frame(maxWidth: .infinity, minHeight: availableSize.height, alignment: .bottom)
+  }
+
+  private func promptHeader(isWide: Bool) -> some View {
+    Text("What stayed with you?")
+      .font(isWide ? EchoTypography.wideEditorialPrompt : EchoTypography.editorialPrompt)
+      .accessibilityAddTraits(.isHeader)
+      .shadow(color: world.contentShadow, radius: 8, y: 2)
+  }
+
+  private var captureControl: some View {
+    TodayCaptureControl(
+      draft: $draft,
+      isFocused: $isComposerFocused,
+      saveState: viewModel.saveState,
+      onSubmit: submitDraft
+    )
+  }
+
+  private func entrySection(isWide: Bool) -> some View {
     VStack(alignment: .leading, spacing: 0) {
       HStack {
         Text("Raw entries")
-          .font(EchoTypography.contentTitle)
+          .font(.headline.weight(.semibold))
 
         Spacer()
 
@@ -136,16 +180,37 @@ struct TodayView: View {
       }
     }
     .background {
-      RoundedRectangle(cornerRadius: EchoShape.surfaceRadius)
-        .fill(.ultraThinMaterial)
-      RoundedRectangle(cornerRadius: EchoShape.surfaceRadius)
-        .fill(world.canvas.opacity(0.4))
+      if isWide {
+        RoundedRectangle(cornerRadius: 14)
+          .fill(.ultraThinMaterial)
+        RoundedRectangle(cornerRadius: 14)
+          .fill(world.canvas.opacity(0.48))
+      } else {
+        Rectangle()
+          .fill(world.canvas.opacity(0.18))
+      }
     }
     .overlay {
-      RoundedRectangle(cornerRadius: EchoShape.surfaceRadius)
-        .stroke(world.separator, lineWidth: EchoShape.hairlineWidth)
+      if isWide {
+        RoundedRectangle(cornerRadius: 14)
+          .stroke(world.separator, lineWidth: EchoShape.hairlineWidth)
+      } else {
+        VStack(spacing: 0) {
+          Rectangle()
+            .fill(world.separator)
+            .frame(height: EchoShape.hairlineWidth)
+          Spacer()
+          Rectangle()
+            .fill(world.separator.opacity(0.65))
+            .frame(height: EchoShape.hairlineWidth)
+        }
+      }
     }
-    .shadow(color: world.contentShadow.opacity(0.22), radius: 16, y: 7)
+    .shadow(
+      color: world.contentShadow.opacity(isWide ? 0.28 : 0.12),
+      radius: isWide ? 18 : 8,
+      y: isWide ? 8 : 3
+    )
   }
 
   @Environment(\.echoVisualWorld) private var world
@@ -153,7 +218,7 @@ struct TodayView: View {
 
   private func heroOffset(for availableHeight: CGFloat) -> CGFloat {
     if horizontalSizeClass == .compact {
-      return min(max(availableHeight * 0.36, 140), 300)
+      return min(max(availableHeight * 0.34, 140), 286)
     }
     return min(max(availableHeight * 0.27, 96), 230)
   }
@@ -212,9 +277,9 @@ private struct TodayCaptureControl: View {
     VStack(alignment: .leading, spacing: EchoLayout.inlineSpacing) {
       HStack(spacing: EchoLayout.rowSpacing) {
         Image(systemName: "waveform")
-          .font(.title3.weight(.medium))
+          .font(.body.weight(.medium))
           .foregroundStyle(world.accent)
-          .frame(width: 30, height: 30)
+          .frame(width: 26, height: 28)
           .accessibilityHidden(true)
 
         Rectangle()
@@ -230,9 +295,9 @@ private struct TodayCaptureControl: View {
 
         Button(action: onSubmit) {
           Image(systemName: "arrow.up")
-            .font(.body.weight(.bold))
+            .font(.subheadline.weight(.bold))
             .foregroundStyle(world.canvas)
-            .frame(width: 42, height: 42)
+            .frame(width: 38, height: 38)
             .background(world.accent, in: Circle())
         }
         .buttonStyle(.plain)
@@ -242,19 +307,19 @@ private struct TodayCaptureControl: View {
         .accessibilityLabel("Save entry")
       }
       .padding(.leading, EchoLayout.contentSpacing)
-      .padding(.trailing, EchoLayout.inlineSpacing)
-      .padding(.vertical, EchoLayout.inlineSpacing)
+      .padding(.trailing, EchoLayout.tightSpacing)
+      .padding(.vertical, EchoLayout.tightSpacing)
       .background {
         Capsule()
           .fill(.ultraThinMaterial)
         Capsule()
-          .fill(world.canvas.opacity(0.38))
+          .fill(world.canvas.opacity(0.3))
       }
       .overlay {
         Capsule()
           .stroke(world.separator, lineWidth: EchoShape.hairlineWidth)
       }
-      .shadow(color: world.contentShadow.opacity(0.24), radius: 14, y: 6)
+      .shadow(color: world.contentShadow.opacity(0.2), radius: 12, y: 5)
 
       if saveState != .idle {
         saveStatus

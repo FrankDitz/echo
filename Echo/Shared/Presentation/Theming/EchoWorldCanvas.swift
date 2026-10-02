@@ -12,24 +12,47 @@ struct EchoWorldCanvas<Content: View>: View {
   var body: some View {
     ZStack {
       GeometryReader { proxy in
-        Image(world.backgroundAssetName)
-          .resizable()
-          .scaledToFill()
-          .frame(width: proxy.size.width, height: proxy.size.height, alignment: .top)
-          .clipped()
-          .ignoresSafeArea()
-      }
-      .accessibilityHidden(true)
+        ZStack {
+          Image(world.backgroundAssetName)
+            .resizable()
+            .scaledToFill()
+            .frame(width: proxy.size.width, height: proxy.size.height, alignment: .top)
+            .clipped()
 
-      LinearGradient(
-        colors: [
-          world.canvas.opacity(0.2),
-          world.canvas.opacity(0.38),
-          world.canvas.opacity(0.72),
-        ],
-        startPoint: .top,
-        endPoint: .bottom
-      )
+          if proxy.size.width >= EchoLayout.wideLayoutBreakpoint {
+            LinearGradient(
+              colors: [
+                world.canvas.opacity(0.5),
+                world.canvas.opacity(0.08),
+                world.canvas.opacity(0.34),
+              ],
+              startPoint: .leading,
+              endPoint: .trailing
+            )
+
+            LinearGradient(
+              colors: [
+                world.canvas.opacity(0.08),
+                Color.clear,
+                world.canvas.opacity(0.38),
+              ],
+              startPoint: .top,
+              endPoint: .bottom
+            )
+          } else {
+            LinearGradient(
+              colors: [
+                world.canvas.opacity(0.12),
+                world.canvas.opacity(0.28),
+                world.canvas.opacity(0.66),
+              ],
+              startPoint: .top,
+              endPoint: .bottom
+            )
+          }
+        }
+        .ignoresSafeArea()
+      }
       .accessibilityHidden(true)
 
       content

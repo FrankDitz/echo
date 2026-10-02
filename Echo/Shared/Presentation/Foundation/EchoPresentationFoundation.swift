@@ -3,6 +3,8 @@ import SwiftUI
 enum EchoLayout {
   static let contentMaxWidth: CGFloat = 720
   static let chromeMaxWidth: CGFloat = 1_120
+  static let wideContentMaxWidth: CGFloat = 1_180
+  static let wideLayoutBreakpoint: CGFloat = 900
   static let pageHorizontalPadding: CGFloat = 20
   static let pageVerticalPadding: CGFloat = 24
   static let sectionSpacing: CGFloat = 28
@@ -30,9 +32,10 @@ enum EchoShape {
 
 enum EchoTypography {
   static let wordmark = Font.system(.largeTitle, design: .serif).weight(.bold)
-  static let primaryNavigation = Font.subheadline.weight(.semibold)
+  static let primaryNavigation = Font.subheadline.weight(.medium)
   static let editorialDisplay = Font.system(.largeTitle, design: .serif).weight(.medium)
-  static let editorialPrompt = Font.system(.title, design: .serif).weight(.regular)
+  static let editorialPrompt = Font.system(.title2, design: .serif).weight(.regular)
+  static let wideEditorialPrompt = Font.system(size: 42, weight: .regular, design: .serif)
   static let editorialNarrative = Font.system(.title2, design: .serif).weight(.regular)
   static let editorialEyebrow = Font.caption.weight(.semibold)
   static let screenTitle = Font.largeTitle.weight(.bold)

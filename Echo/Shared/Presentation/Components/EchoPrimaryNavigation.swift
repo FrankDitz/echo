@@ -26,7 +26,11 @@ struct EchoPrimaryNavigation: View {
     .padding(.vertical, EchoLayout.inlineSpacing)
     .frame(maxWidth: .infinity)
     .background {
-      Rectangle().fill(world.canvas.opacity(0.28))
+      LinearGradient(
+        colors: [world.canvas.opacity(0.32), world.canvas.opacity(0.08)],
+        startPoint: .top,
+        endPoint: .bottom
+      )
     }
     .overlay(alignment: .bottom) {
       Rectangle()
@@ -75,7 +79,7 @@ struct EchoPrimaryNavigation: View {
               .lineLimit(1)
             Capsule()
               .fill(selection == section ? world.accent : Color.clear)
-              .frame(height: 3)
+              .frame(width: 36, height: 2)
           }
           .font(EchoTypography.primaryNavigation)
           .foregroundStyle(selection == section ? world.accent : world.secondaryText)
@@ -104,9 +108,9 @@ struct EchoPrimaryNavigation: View {
               .minimumScaleFactor(0.78)
             Capsule()
               .fill(selection == section ? world.accent : Color.clear)
-              .frame(height: 3)
+              .frame(width: 30, height: 2)
           }
-          .font(.caption.weight(.semibold))
+          .font(.caption.weight(selection == section ? .semibold : .regular))
           .foregroundStyle(selection == section ? world.accent : world.secondaryText)
           .padding(.horizontal, EchoLayout.tightSpacing)
           .padding(.top, EchoLayout.tightSpacing)
@@ -125,14 +129,9 @@ struct EchoPrimaryNavigation: View {
   private var settingsButton: some View {
     Button(action: showSettings) {
       Image(systemName: "gearshape")
-        .font(.body.weight(.semibold))
-        .foregroundStyle(world.primaryText)
-        .frame(width: 44, height: 44)
-        .background(world.surfaceFill, in: Circle())
-        .overlay {
-          Circle()
-            .stroke(world.separator, lineWidth: EchoShape.hairlineWidth)
-        }
+        .font(.body.weight(.medium))
+        .foregroundStyle(world.secondaryText)
+        .frame(width: 40, height: 40)
     }
     .buttonStyle(.plain)
     .accessibilityLabel("Settings")
@@ -141,14 +140,9 @@ struct EchoPrimaryNavigation: View {
   private var compactSettingsButton: some View {
     Button(action: showSettings) {
       Image(systemName: "gearshape")
-        .font(.subheadline.weight(.semibold))
-        .foregroundStyle(world.primaryText)
-        .frame(width: 38, height: 38)
-        .background(world.surfaceFill, in: Circle())
-        .overlay {
-          Circle()
-            .stroke(world.separator, lineWidth: EchoShape.hairlineWidth)
-        }
+        .font(.subheadline.weight(.medium))
+        .foregroundStyle(world.secondaryText)
+        .frame(width: 36, height: 36)
     }
     .buttonStyle(.plain)
     .accessibilityLabel("Settings")
