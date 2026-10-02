@@ -37,7 +37,7 @@ Each deliverable uses its own short-lived branch and pull request. A deliverable
 16. **Entry Editor product UI (complete):** replace the generic editing sheet with a focused Echo writing surface, explicit save feedback, and a clear visual separation between original and assisted text without changing persistence behavior.
 17. **Interaction honesty and control polish (complete):** remove or restyle affordances that imply unavailable voice, media, filtering, or calendar behavior; every enabled control must perform the action it communicates.
 18. **Motion and icon language (complete):** add purposeful capture, selection, navigation, and theme transitions plus a consistent Echo icon vocabulary while honoring Reduce Motion and avoiding ornamental animation.
-19. **Mac workspace composition:** make productive use of wide windows, add appropriate keyboard commands and focus behavior, and avoid presenting a stretched phone composition on macOS.
+19. **Mac workspace composition (complete):** make productive use of wide windows, add appropriate keyboard commands and focus behavior, and avoid presenting a stretched phone composition on macOS.
 20. **Platform and accessibility review:** validate supported iPhone, iPad, and Mac layouts; Dynamic Type; VoiceOver labels and order; contrast; keyboard behavior; reduced transparency; and light-sensitive presentation.
 21. **Phase closeout:** run full builds and tests, simulator review, repository-safety scans, documentation refresh, and a final comparison against the approved visual specification.
 

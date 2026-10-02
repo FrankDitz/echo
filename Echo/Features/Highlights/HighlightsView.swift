@@ -9,9 +9,36 @@ struct HighlightsView: View {
   @State private var selectedItem: HighlightedEntry?
 
   var body: some View {
-    EchoPage(spacing: EchoLayout.compactSectionSpacing) {
-      highlightsHeader
-      content
+    EchoWorldCanvas {
+      GeometryReader { geometry in
+        ScrollView {
+          if geometry.size.width >= EchoLayout.wideLayoutBreakpoint {
+            HStack(alignment: .top, spacing: 64) {
+              highlightsHeader
+                .frame(width: 300, alignment: .leading)
+
+              VStack(alignment: .leading, spacing: EchoLayout.contentSpacing) {
+                content
+              }
+              .frame(maxWidth: 620, alignment: .leading)
+            }
+            .frame(maxWidth: EchoLayout.wideContentMaxWidth, alignment: .topLeading)
+            .padding(.horizontal, 40)
+            .padding(.vertical, 56)
+            .frame(maxWidth: .infinity, alignment: .top)
+          } else {
+            LazyVStack(alignment: .leading, spacing: EchoLayout.compactSectionSpacing) {
+              highlightsHeader
+              content
+            }
+            .frame(maxWidth: EchoLayout.contentMaxWidth, alignment: .leading)
+            .padding(.horizontal, EchoLayout.pageHorizontalPadding)
+            .padding(.vertical, EchoLayout.pageVerticalPadding)
+            .frame(maxWidth: .infinity)
+          }
+        }
+        .scrollIndicators(.hidden)
+      }
     }
     .task {
       await viewModel.load()

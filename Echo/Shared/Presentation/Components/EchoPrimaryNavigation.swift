@@ -7,6 +7,15 @@ enum EchoPrimarySection: String, CaseIterable, Identifiable {
   case highlights = "Highlights"
 
   var id: Self { self }
+
+  var keyboardShortcut: KeyEquivalent {
+    switch self {
+    case .today: "1"
+    case .timeline: "2"
+    case .reflection: "3"
+    case .highlights: "4"
+    }
+  }
 }
 
 struct EchoPrimaryNavigation: View {
@@ -91,6 +100,7 @@ struct EchoPrimaryNavigation: View {
           .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .keyboardShortcut(section.keyboardShortcut, modifiers: [.command])
         .accessibilityLabel(section.rawValue)
         .accessibilityValue(selection == section ? "Selected" : "")
       }
@@ -122,6 +132,7 @@ struct EchoPrimaryNavigation: View {
           .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .keyboardShortcut(section.keyboardShortcut, modifiers: [.command])
         .frame(maxWidth: .infinity)
         .accessibilityLabel(section.rawValue)
         .accessibilityValue(selection == section ? "Selected" : "")
@@ -139,6 +150,7 @@ struct EchoPrimaryNavigation: View {
         .frame(width: 40, height: 40)
     }
     .buttonStyle(.plain)
+    .keyboardShortcut(",", modifiers: [.command])
     .accessibilityLabel("Settings")
   }
 
@@ -150,6 +162,7 @@ struct EchoPrimaryNavigation: View {
         .frame(width: 36, height: 36)
     }
     .buttonStyle(.plain)
+    .keyboardShortcut(",", modifiers: [.command])
     .accessibilityLabel("Settings")
   }
 }
