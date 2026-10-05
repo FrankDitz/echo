@@ -77,3 +77,35 @@ enum EchoEntryOrdering {
     }
   }
 }
+
+struct EchoVoiceAttachment: Identifiable, Codable, Hashable, Sendable {
+  let id: UUID
+  let entryID: UUID
+  let createdAt: Date
+  let relativeFileName: String
+  let duration: TimeInterval
+  let format: String
+  private(set) var transcript: String?
+
+  init(
+    id: UUID = UUID(),
+    entryID: UUID,
+    createdAt: Date,
+    relativeFileName: String,
+    duration: TimeInterval,
+    format: String = "m4a",
+    transcript: String? = nil
+  ) {
+    self.id = id
+    self.entryID = entryID
+    self.createdAt = createdAt
+    self.relativeFileName = relativeFileName
+    self.duration = max(0, duration)
+    self.format = format
+    self.transcript = transcript
+  }
+
+  mutating func setTranscript(_ transcript: String?) {
+    self.transcript = transcript
+  }
+}

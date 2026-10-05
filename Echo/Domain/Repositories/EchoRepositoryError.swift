@@ -12,4 +12,7 @@ enum EchoRepositoryError: Error, Equatable, Sendable {
   case duplicateWeeklyReflection(UUID)
   case duplicateWeeklyReflectionWeek(EchoWeekIdentifier)
   case weeklyReflectionNotFound(UUID)
+  case duplicateVoiceAttachment(UUID)
+  case duplicateVoiceAttachmentEntry(UUID)
+  case voiceAttachmentNotFound(UUID)
 }

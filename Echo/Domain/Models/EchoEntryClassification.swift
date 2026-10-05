@@ -5,6 +5,7 @@ struct EchoEntryType: RawRepresentable, Codable, Hashable, Sendable {
   let rawValue: String
 
   static let text = EchoEntryType(rawValue: "text")
+  static let voice = EchoEntryType(rawValue: "voice")
 }
 
 /// Identifies where an entry originated without coupling Echo to another application.

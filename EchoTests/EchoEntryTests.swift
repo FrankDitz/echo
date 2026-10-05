@@ -105,3 +105,22 @@ struct EchoEntryTests {
     #expect(decoded == entry)
   }
 }
+
+@Suite("Voice attachment domain")
+struct EchoVoiceAttachmentTests {
+  @Test("Voice metadata is portable and transcript updates stay separate")
+  func metadata() throws {
+    var attachment = EchoVoiceAttachment(
+      id: try makeUUID("00000000-0000-0000-0000-000000000191"),
+      entryID: try makeUUID("00000000-0000-0000-0000-000000000192"),
+      createdAt: try makeDate("2026-10-05T12:00:00Z"),
+      relativeFileName: "00000000-0000-0000-0000-000000000191.m4a",
+      duration: -1
+    )
+
+    #expect(attachment.duration == 0)
+    #expect(!attachment.relativeFileName.hasPrefix("/"))
+    attachment.setTranscript("A fictional on-device transcript.")
+    #expect(attachment.transcript == "A fictional on-device transcript.")
+  }
+}

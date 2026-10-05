@@ -181,3 +181,56 @@ struct SwiftDataEchoEntryRepositoryTests {
     return try await repository.entry(id: id)
   }
 }
+
+@Suite("Voice attachment persistence and files")
+struct SwiftDataEchoVoiceAttachmentRepositoryTests {
+  @Test("Attachment lifecycle persists metadata and removes its private file")
+  func lifecycle() async throws {
+    let container = try EchoModelContainerFactory.makeInMemory()
+    let repository = SwiftDataEchoVoiceAttachmentRepository(modelContainer: container)
+    let directory = FileManager.default.temporaryDirectory
+      .appendingPathComponent("EchoVoiceTests-\(UUID().uuidString)", isDirectory: true)
+    defer { try? FileManager.default.removeItem(at: directory) }
+    let fileStore = EchoVoiceFileStore(rootDirectory: directory)
+    let attachmentID = try makeUUID("00000000-0000-0000-0000-000000000491")
+    let entryID = try makeUUID("00000000-0000-0000-0000-000000000492")
+    let fileURL = try fileStore.destinationURL(for: attachmentID)
+    try Data("fictional audio bytes".utf8).write(to: fileURL, options: .atomic)
+    var attachment = EchoVoiceAttachment(
+      id: attachmentID,
+      entryID: entryID,
+      createdAt: try makeDate("2026-10-05T12:00:00Z"),
+      relativeFileName: fileURL.lastPathComponent,
+      duration: 12.5
+    )
+
+    try await repository.create(attachment)
+    #expect(try await repository.attachment(for: entryID) == attachment)
+    attachment.setTranscript("A fictional local transcript.")
+    try await repository.update(attachment)
+    #expect(try await repository.attachment(for: entryID) == attachment)
+    #expect(FileManager.default.fileExists(atPath: fileURL.path))
+    #expect(!fileURL.standardizedFileURL.path.hasPrefix(repositoryRoot().path))
+
+    let lifecycle = EchoVoiceAttachmentLifecycle(repository: repository, fileStore: fileStore)
+    try await lifecycle.removeAttachment(for: entryID)
+
+    #expect(try await repository.attachment(for: entryID) == nil)
+    #expect(!FileManager.default.fileExists(atPath: fileURL.path))
+  }
+
+  @Test("File store rejects paths that escape its private directory")
+  func pathValidation() throws {
+    let store = EchoVoiceFileStore(rootDirectory: FileManager.default.temporaryDirectory)
+    let attachment = EchoVoiceAttachment(
+      entryID: UUID(),
+      createdAt: Date(timeIntervalSinceReferenceDate: 0),
+      relativeFileName: "../escaped.m4a",
+      duration: 1
+    )
+
+    #expect(throws: EchoVoiceFileStoreError.invalidFileName) {
+      try store.url(for: attachment)
+    }
+  }
+}

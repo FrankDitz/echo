@@ -35,3 +35,32 @@ final class PersistentEchoEntry {
     self.sourceRawValue = sourceRawValue
   }
 }
+
+@Model
+final class PersistentEchoVoiceAttachment {
+  @Attribute(.unique) var id: UUID
+  @Attribute(.unique) var entryID: UUID
+  var createdAt: Date
+  var relativeFileName: String
+  var duration: TimeInterval
+  var format: String
+  var transcript: String?
+
+  init(
+    id: UUID,
+    entryID: UUID,
+    createdAt: Date,
+    relativeFileName: String,
+    duration: TimeInterval,
+    format: String,
+    transcript: String?
+  ) {
+    self.id = id
+    self.entryID = entryID
+    self.createdAt = createdAt
+    self.relativeFileName = relativeFileName
+    self.duration = duration
+    self.format = format
+    self.transcript = transcript
+  }
+}

@@ -41,6 +41,46 @@ enum EchoPersistenceMapper {
     )
   }
 
+  static func makeVoiceAttachmentRecord(
+    from attachment: EchoVoiceAttachment
+  ) -> PersistentEchoVoiceAttachment {
+    PersistentEchoVoiceAttachment(
+      id: attachment.id,
+      entryID: attachment.entryID,
+      createdAt: attachment.createdAt,
+      relativeFileName: attachment.relativeFileName,
+      duration: attachment.duration,
+      format: attachment.format,
+      transcript: attachment.transcript
+    )
+  }
+
+  static func update(
+    _ record: PersistentEchoVoiceAttachment,
+    from attachment: EchoVoiceAttachment
+  ) {
+    record.entryID = attachment.entryID
+    record.createdAt = attachment.createdAt
+    record.relativeFileName = attachment.relativeFileName
+    record.duration = attachment.duration
+    record.format = attachment.format
+    record.transcript = attachment.transcript
+  }
+
+  static func makeVoiceAttachment(
+    from record: PersistentEchoVoiceAttachment
+  ) -> EchoVoiceAttachment {
+    EchoVoiceAttachment(
+      id: record.id,
+      entryID: record.entryID,
+      createdAt: record.createdAt,
+      relativeFileName: record.relativeFileName,
+      duration: record.duration,
+      format: record.format,
+      transcript: record.transcript
+    )
+  }
+
   static func dayKey(for day: EchoDayIdentifier) throws -> String {
     try encodeDay(day).base64EncodedString()
   }

@@ -41,6 +41,13 @@ protocol EchoEntryRepository: Sendable {
   func delete(id: UUID) async throws
 }
 
+protocol EchoVoiceAttachmentRepository: Sendable {
+  func create(_ attachment: EchoVoiceAttachment) async throws
+  func attachment(for entryID: UUID) async throws -> EchoVoiceAttachment?
+  func update(_ attachment: EchoVoiceAttachment) async throws
+  func delete(id: UUID) async throws
+}
+
 extension EchoEntryRepository {
   func searchEntries(matching query: EchoEntrySearchQuery) async throws -> [EchoEntry] {
     guard !query.isEmpty else { return [] }
