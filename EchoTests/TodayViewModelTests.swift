@@ -244,6 +244,59 @@ struct TodayViewModelTests {
     #expect(viewModel.memories.saved == [saved])
     #expect(await repository.allEntries().count == 3)
   }
+
+  @Test("Voice capture saves, transcribes, and plays a private entry")
+  func voiceCaptureWorkflow() async throws {
+    let directory = FileManager.default.temporaryDirectory
+      .appendingPathComponent("EchoVoiceCaptureTests-\(UUID().uuidString)", isDirectory: true)
+    defer { try? FileManager.default.removeItem(at: directory) }
+    let calendar = try makeGregorianCalendar(timeZone: "UTC")
+    let entries = TodayEntryRepositoryStub()
+    let attachments = VoiceAttachmentRepositoryStub()
+    let service = VoiceCaptureServiceStub(transcript: "A fictional spoken memory.")
+    let timestamp = try makeDate("2026-10-05T12:00:00Z")
+    let viewModel = VoiceCaptureViewModel(
+      entryRepository: entries,
+      attachmentRepository: attachments,
+      fileStore: EchoVoiceFileStore(rootDirectory: directory),
+      service: service,
+      calendar: calendar,
+      now: { timestamp }
+    )
+
+    await viewModel.start()
+    #expect(viewModel.state == .recording)
+    let entry = try #require(await viewModel.stopAndSave())
+    let attachment = try #require(await attachments.attachment(for: entry.id))
+
+    #expect(entry.type == .voice)
+    #expect(entry.rawText == "A fictional spoken memory.")
+    #expect(attachment.transcript == "A fictional spoken memory.")
+    #expect(viewModel.state == .ready)
+    await viewModel.play(entryID: entry.id)
+    #expect(viewModel.state == .playing)
+    #expect(service.playedURL?.lastPathComponent == attachment.relativeFileName)
+  }
+
+  @Test("Denied microphone permission creates no entry or file")
+  func deniedVoicePermission() async throws {
+    let directory = FileManager.default.temporaryDirectory
+      .appendingPathComponent("EchoDeniedVoiceTests-\(UUID().uuidString)", isDirectory: true)
+    defer { try? FileManager.default.removeItem(at: directory) }
+    let entries = TodayEntryRepositoryStub()
+    let viewModel = VoiceCaptureViewModel(
+      entryRepository: entries,
+      attachmentRepository: VoiceAttachmentRepositoryStub(),
+      fileStore: EchoVoiceFileStore(rootDirectory: directory),
+      service: VoiceCaptureServiceStub(isPermissionGranted: false)
+    )
+
+    await viewModel.start()
+
+    #expect(viewModel.state == .permissionDenied)
+    #expect(await entries.allEntries().isEmpty)
+    #expect(!FileManager.default.fileExists(atPath: directory.path))
+  }
 }
 
 private actor TodayEntryRepositoryStub: EchoEntryRepository {
@@ -326,4 +379,50 @@ private actor TodayHighlightRepositoryStub: EchoHighlightRepository {
   func delete(id: UUID) {
     highlights.removeAll { $0.id == id }
   }
+}
+
+private actor VoiceAttachmentRepositoryStub: EchoVoiceAttachmentRepository {
+  private var attachments: [UUID: EchoVoiceAttachment] = [:]
+
+  func create(_ attachment: EchoVoiceAttachment) {
+    attachments[attachment.entryID] = attachment
+  }
+
+  func attachment(for entryID: UUID) -> EchoVoiceAttachment? {
+    attachments[entryID]
+  }
+
+  func update(_ attachment: EchoVoiceAttachment) {
+    attachments[attachment.entryID] = attachment
+  }
+
+  func delete(id: UUID) {
+    attachments = attachments.filter { $0.value.id != id }
+  }
+}
+
+@MainActor
+private final class VoiceCaptureServiceStub: EchoVoiceCaptureService {
+  let isPermissionGranted: Bool
+  let transcript: String
+  private(set) var recordingURL: URL?
+  private(set) var playedURL: URL?
+
+  init(isPermissionGranted: Bool = true, transcript: String = "") {
+    self.isPermissionGranted = isPermissionGranted
+    self.transcript = transcript
+  }
+
+  func requestRecordingPermission() async -> Bool { isPermissionGranted }
+
+  func startRecording(to url: URL) throws {
+    recordingURL = url
+    try Data("fictional recorded audio".utf8).write(to: url, options: .atomic)
+  }
+
+  func stopRecording() throws -> TimeInterval { 8.25 }
+
+  func play(url: URL) throws { playedURL = url }
+
+  func transcribeOnDevice(url: URL) async throws -> String { transcript }
 }

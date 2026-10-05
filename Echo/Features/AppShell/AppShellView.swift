@@ -8,6 +8,7 @@ struct AppShellView: View {
   let aiService: any EchoAIService
   let journalRepository: any EchoOrganizedJournalRepository
   let weeklyReflectionViewModel: WeeklyReflectionViewModel
+  let voiceCaptureViewModel: VoiceCaptureViewModel
   let visualWorldSelection: EchoVisualWorldSelection
 
   @State private var selection: EchoPrimarySection = .today
@@ -51,7 +52,8 @@ struct AppShellView: View {
       TodayView(
         viewModel: todayViewModel,
         highlightViewModel: highlightViewModel,
-        aiService: aiService
+        aiService: aiService,
+        voiceCaptureViewModel: voiceCaptureViewModel
       )
     case .timeline:
       TimelineView(

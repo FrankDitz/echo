@@ -1,5 +1,135 @@
+import AVFoundation
 import Foundation
 import Observation
+import Speech
+
+enum EchoVoiceCaptureError: Error, Equatable {
+  case permissionDenied
+  case recordingUnavailable
+  case transcriptionUnavailable
+  case noRecording
+}
+
+@MainActor
+protocol EchoVoiceCaptureService: AnyObject {
+  func requestRecordingPermission() async -> Bool
+  func startRecording(to url: URL) throws
+  func stopRecording() throws -> TimeInterval
+  func play(url: URL) throws
+  func transcribeOnDevice(url: URL) async throws -> String
+}
+
+@MainActor
+final class SystemEchoVoiceCaptureService: NSObject, EchoVoiceCaptureService {
+  private var recorder: AVAudioRecorder?
+  private var player: AVAudioPlayer?
+
+  func requestRecordingPermission() async -> Bool {
+    switch AVCaptureDevice.authorizationStatus(for: .audio) {
+    case .authorized:
+      return true
+    case .notDetermined:
+      return await AVCaptureDevice.requestAccess(for: .audio)
+    case .denied, .restricted:
+      return false
+    @unknown default:
+      return false
+    }
+  }
+
+  func startRecording(to url: URL) throws {
+    #if os(iOS)
+      let session = AVAudioSession.sharedInstance()
+      try session.setCategory(.playAndRecord, mode: .spokenAudio, options: [.defaultToSpeaker])
+      try session.setActive(true)
+    #endif
+
+    let settings: [String: Any] = [
+      AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
+      AVSampleRateKey: 44_100,
+      AVNumberOfChannelsKey: 1,
+      AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue,
+    ]
+    let recorder = try AVAudioRecorder(url: url, settings: settings)
+    guard recorder.record() else { throw EchoVoiceCaptureError.recordingUnavailable }
+    self.recorder = recorder
+  }
+
+  func stopRecording() throws -> TimeInterval {
+    guard let recorder else { throw EchoVoiceCaptureError.noRecording }
+    let duration = recorder.currentTime
+    recorder.stop()
+    self.recorder = nil
+    #if os(iOS)
+      try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+    #endif
+    return duration
+  }
+
+  func play(url: URL) throws {
+    let player = try AVAudioPlayer(contentsOf: url)
+    guard player.play() else { throw EchoVoiceCaptureError.recordingUnavailable }
+    self.player = player
+  }
+
+  func transcribeOnDevice(url: URL) async throws -> String {
+    guard await requestSpeechPermission(),
+      let recognizer = SFSpeechRecognizer(),
+      recognizer.isAvailable,
+      recognizer.supportsOnDeviceRecognition
+    else {
+      throw EchoVoiceCaptureError.transcriptionUnavailable
+    }
+
+    let request = SFSpeechURLRecognitionRequest(url: url)
+    request.requiresOnDeviceRecognition = true
+    request.shouldReportPartialResults = false
+
+    return try await withCheckedThrowingContinuation { continuation in
+      let completion = SpeechRecognitionCompletion(continuation: continuation)
+      recognizer.recognitionTask(with: request) { result, error in
+        if let error {
+          completion.resume(throwing: error)
+        } else if let result, result.isFinal {
+          completion.resume(returning: result.bestTranscription.formattedString)
+        }
+      }
+    }
+  }
+
+  private func requestSpeechPermission() async -> Bool {
+    let status = SFSpeechRecognizer.authorizationStatus()
+    if status == .authorized { return true }
+    guard status == .notDetermined else { return false }
+    return await withCheckedContinuation { continuation in
+      SFSpeechRecognizer.requestAuthorization { continuation.resume(returning: $0 == .authorized) }
+    }
+  }
+}
+
+private final class SpeechRecognitionCompletion: @unchecked Sendable {
+  private let lock = NSLock()
+  private var continuation: CheckedContinuation<String, any Error>?
+
+  init(continuation: CheckedContinuation<String, any Error>) {
+    self.continuation = continuation
+  }
+
+  func resume(returning value: String) {
+    take()?.resume(returning: value)
+  }
+
+  func resume(throwing error: any Error) {
+    take()?.resume(throwing: error)
+  }
+
+  private func take() -> CheckedContinuation<String, any Error>? {
+    lock.lock()
+    defer { lock.unlock() }
+    defer { continuation = nil }
+    return continuation
+  }
+}
 
 enum TodayEntrySaveState: Equatable {
   case idle
@@ -26,6 +156,7 @@ struct TodayMemorySnapshot: Equatable, Sendable {
 final class TodayViewModel {
   private let repository: any EchoEntryRepository
   private let highlightRepository: (any EchoHighlightRepository)?
+  private let voiceLifecycle: EchoVoiceAttachmentLifecycle?
   private let calendar: Calendar
   private let now: () -> Date
 
@@ -40,11 +171,13 @@ final class TodayViewModel {
   init(
     repository: any EchoEntryRepository,
     highlightRepository: (any EchoHighlightRepository)? = nil,
+    voiceLifecycle: EchoVoiceAttachmentLifecycle? = nil,
     calendar: Calendar = .autoupdatingCurrent,
     now: @escaping () -> Date = Date.init
   ) {
     self.repository = repository
     self.highlightRepository = highlightRepository
+    self.voiceLifecycle = voiceLifecycle
     self.calendar = calendar
     self.now = now
     self.displayedDate = now()
@@ -185,6 +318,7 @@ final class TodayViewModel {
     do {
       try await repository.delete(id: id)
       entries.removeAll(where: { $0.id == id })
+      try? await voiceLifecycle?.removeAttachment(for: id)
       failure = nil
       return true
     } catch {
@@ -221,5 +355,153 @@ final class TodayViewModel {
 
   private func containsWriting(_ text: String) -> Bool {
     text.contains(where: { !$0.isWhitespace })
+  }
+}
+
+enum VoiceCaptureState: Equatable {
+  case idle
+  case requestingPermission
+  case recording
+  case processing
+  case ready
+  case playing
+  case permissionDenied
+  case failed
+}
+
+@MainActor
+@Observable
+final class VoiceCaptureViewModel {
+  private let entryRepository: any EchoEntryRepository
+  private let attachmentRepository: any EchoVoiceAttachmentRepository
+  private let fileStore: EchoVoiceFileStore
+  private let service: any EchoVoiceCaptureService
+  private let calendar: Calendar
+  private let now: () -> Date
+  private var pendingAttachmentID: UUID?
+  private var pendingURL: URL?
+
+  private(set) var state: VoiceCaptureState = .idle
+  private(set) var statusMessage: String?
+
+  init(
+    entryRepository: any EchoEntryRepository,
+    attachmentRepository: any EchoVoiceAttachmentRepository,
+    fileStore: EchoVoiceFileStore,
+    service: any EchoVoiceCaptureService,
+    calendar: Calendar = .autoupdatingCurrent,
+    now: @escaping () -> Date = Date.init
+  ) {
+    self.entryRepository = entryRepository
+    self.attachmentRepository = attachmentRepository
+    self.fileStore = fileStore
+    self.service = service
+    self.calendar = calendar
+    self.now = now
+  }
+
+  func start() async {
+    guard state != .recording, state != .processing else { return }
+    state = .requestingPermission
+    guard await service.requestRecordingPermission() else {
+      state = .permissionDenied
+      statusMessage = "Microphone access is off. Enable it in System Settings to record."
+      return
+    }
+
+    do {
+      let attachmentID = UUID()
+      let url = try fileStore.destinationURL(for: attachmentID)
+      try service.startRecording(to: url)
+      pendingAttachmentID = attachmentID
+      pendingURL = url
+      statusMessage = "Recording stays on this device."
+      state = .recording
+    } catch {
+      state = .failed
+      statusMessage = "Echo could not start recording."
+    }
+  }
+
+  func stopAndSave() async -> EchoEntry? {
+    guard state == .recording,
+      let attachmentID = pendingAttachmentID,
+      let url = pendingURL
+    else { return nil }
+
+    state = .processing
+    let timestamp = now()
+    do {
+      let duration = try service.stopRecording()
+      var entry = EchoEntry(
+        createdAt: timestamp,
+        calendar: calendar,
+        rawText: "Voice entry",
+        type: .voice
+      )
+      var attachment = EchoVoiceAttachment(
+        id: attachmentID,
+        entryID: entry.id,
+        createdAt: timestamp,
+        relativeFileName: url.lastPathComponent,
+        duration: duration
+      )
+      try await entryRepository.create(entry)
+      do {
+        try await attachmentRepository.create(attachment)
+      } catch {
+        try? await entryRepository.delete(id: entry.id)
+        try? fileStore.deleteFile(for: attachment)
+        throw error
+      }
+
+      do {
+        let transcript = try await service.transcribeOnDevice(url: url)
+          .trimmingCharacters(in: .whitespacesAndNewlines)
+        if !transcript.isEmpty {
+          attachment.setTranscript(transcript)
+          try await attachmentRepository.update(attachment)
+          entry.editRawText(transcript, at: now())
+          try await entryRepository.update(entry)
+          statusMessage = "Saved with an on-device transcript."
+        } else {
+          statusMessage = "Saved audio. No speech was detected for transcription."
+        }
+      } catch {
+        statusMessage = "Saved audio. On-device transcription is unavailable."
+      }
+
+      pendingAttachmentID = nil
+      pendingURL = nil
+      state = .ready
+      return entry
+    } catch {
+      try? FileManager.default.removeItem(at: url)
+      pendingAttachmentID = nil
+      pendingURL = nil
+      state = .failed
+      statusMessage = "The voice entry could not be saved."
+      return nil
+    }
+  }
+
+  func play(entryID: UUID) async {
+    do {
+      guard let attachment = try await attachmentRepository.attachment(for: entryID) else {
+        throw EchoVoiceCaptureError.noRecording
+      }
+      try service.play(url: fileStore.url(for: attachment))
+      state = .playing
+      statusMessage = "Playing the private recording."
+    } catch {
+      state = .failed
+      statusMessage = "The recording could not be played."
+    }
+  }
+
+  func resetStatus() {
+    guard state != .recording, state != .processing else { return }
+    state = .idle
+    statusMessage = nil
   }
 }

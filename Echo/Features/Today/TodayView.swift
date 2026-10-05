@@ -4,6 +4,7 @@ struct TodayView: View {
   let viewModel: TodayViewModel
   let highlightViewModel: EntryHighlightViewModel
   let aiService: any EchoAIService
+  let voiceCaptureViewModel: VoiceCaptureViewModel
 
   @State private var draft = ""
   @State private var selectedEntry: EchoEntry?
@@ -66,6 +67,7 @@ struct TodayView: View {
 
       promptHeader(isWide: false)
       captureControl
+      voiceStatus
       entrySection(isWide: false)
       memorySection
     }
@@ -104,6 +106,7 @@ struct TodayView: View {
         VStack(alignment: .leading, spacing: EchoLayout.contentSpacing) {
           promptHeader(isWide: true)
           captureControl
+          voiceStatus
         }
         .frame(maxWidth: 610, alignment: .leading)
 
@@ -132,8 +135,46 @@ struct TodayView: View {
       draft: $draft,
       isFocused: $isComposerFocused,
       saveState: viewModel.saveState,
-      onSubmit: submitDraft
+      onSubmit: submitDraft,
+      onVoiceAction: voiceAction,
+      isRecording: voiceCaptureViewModel.state == .recording
     )
+  }
+
+  @ViewBuilder
+  private var voiceStatus: some View {
+    if let message = voiceCaptureViewModel.statusMessage {
+      Label(message, systemImage: voiceStatusIcon)
+        .font(EchoTypography.metadata)
+        .foregroundStyle(
+          voiceCaptureViewModel.state == .failed
+            || voiceCaptureViewModel.state == .permissionDenied ? world.error : world.secondaryText
+        )
+        .padding(.horizontal, EchoLayout.contentSpacing)
+    }
+  }
+
+  private var voiceStatusIcon: String {
+    switch voiceCaptureViewModel.state {
+    case .recording: "record.circle.fill"
+    case .processing: "waveform.badge.magnifyingglass"
+    case .ready: "checkmark.circle.fill"
+    case .playing: "speaker.wave.2.fill"
+    case .permissionDenied, .failed: "exclamationmark.circle"
+    case .idle, .requestingPermission: "mic"
+    }
+  }
+
+  private func voiceAction() {
+    Task {
+      if voiceCaptureViewModel.state == .recording {
+        if await voiceCaptureViewModel.stopAndSave() != nil {
+          await viewModel.load()
+        }
+      } else {
+        await voiceCaptureViewModel.start()
+      }
+    }
   }
 
   private func entrySection(isWide: Bool) -> some View {
@@ -179,6 +220,9 @@ struct TodayView: View {
           TodayEntryRow(
             entry: entry,
             highlightViewModel: highlightViewModel,
+            onPlay: entry.type == .voice ? {
+              Task { await voiceCaptureViewModel.play(entryID: entry.id) }
+            } : nil,
             onOpen: { selectedEntry = entry },
             onDelete: { confirmDeletion(of: entry) }
           )
@@ -390,6 +434,8 @@ private struct TodayCaptureControl: View {
   let isFocused: FocusState<Bool>.Binding
   let saveState: TodayEntrySaveState
   let onSubmit: () -> Void
+  let onVoiceAction: () -> Void
+  let isRecording: Bool
 
   var body: some View {
     VStack(alignment: .leading, spacing: EchoLayout.inlineSpacing) {
@@ -423,6 +469,16 @@ private struct TodayCaptureControl: View {
         .opacity(containsWriting ? 1 : 0.48)
         .keyboardShortcut(.return, modifiers: [.command])
         .accessibilityLabel("Save entry")
+
+        Button(action: onVoiceAction) {
+          Image(systemName: isRecording ? "stop.fill" : "mic.fill")
+            .font(.subheadline.weight(.bold))
+            .foregroundStyle(isRecording ? .white : world.canvas)
+            .frame(width: 38, height: 38)
+            .background(isRecording ? world.error : world.accent, in: Circle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(isRecording ? "Stop and save recording" : "Record voice entry")
       }
       .padding(.leading, EchoLayout.contentSpacing)
       .padding(.trailing, EchoLayout.tightSpacing)
@@ -474,6 +530,7 @@ private struct TodayCaptureControl: View {
 private struct TodayEntryRow: View {
   let entry: EchoEntry
   let highlightViewModel: EntryHighlightViewModel
+  let onPlay: (() -> Void)?
   let onOpen: () -> Void
   let onDelete: () -> Void
 
@@ -496,6 +553,16 @@ private struct TodayEntryRow: View {
       .buttonStyle(.plain)
       .accessibilityHint("Opens the entry editor")
 
+      if let onPlay {
+        Button(action: onPlay) {
+          Image(systemName: "play.fill")
+            .foregroundStyle(world.accent)
+            .frame(width: 30, height: 30)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Play voice entry")
+      }
+
       Menu("Entry Actions", systemImage: "ellipsis") {
         EntryHighlightButton(entryID: entry.id, viewModel: highlightViewModel)
         Button("Edit", systemImage: "pencil", action: onOpen)
@@ -511,4 +578,6 @@ private struct TodayEntryRow: View {
       Button("Delete", systemImage: "trash", role: .destructive, action: onDelete)
     }
   }
+
+  @Environment(\.echoVisualWorld) private var world
 }
