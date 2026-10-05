@@ -14,6 +14,7 @@ struct EchoApp: App {
   private let journalRepository: any EchoOrganizedJournalRepository
   private let weeklyReflectionViewModel: WeeklyReflectionViewModel
   private let voiceCaptureViewModel: VoiceCaptureViewModel
+  private let dataExportService: EchoDataExportService
 
   init() {
     do {
@@ -49,6 +50,12 @@ struct EchoApp: App {
         fileStore: voiceFileStore,
         service: SystemEchoVoiceCaptureService()
       )
+      dataExportService = EchoDataExportService(
+        entryRepository: entryRepository,
+        highlightRepository: highlightRepository,
+        journalRepository: journalRepository,
+        weeklyRepository: weeklyRepository
+      )
       todayViewModel = TodayViewModel(
         repository: entryRepository,
         highlightRepository: highlightRepository,
@@ -77,6 +84,7 @@ struct EchoApp: App {
         journalRepository: journalRepository,
         weeklyReflectionViewModel: weeklyReflectionViewModel,
         voiceCaptureViewModel: voiceCaptureViewModel,
+        dataExportService: dataExportService,
         visualWorldSelection: visualWorldSelection
       )
       .environment(\.echoVisualWorld, visualWorldSelection.selectedWorld)

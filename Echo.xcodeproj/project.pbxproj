@@ -69,6 +69,7 @@
 		S10000000000000000000001 /* EchoVisualWorldSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = S10000000000000000000021 /* EchoVisualWorldSelection.swift */; };
 		S10000000000000000000002 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = S10000000000000000000022 /* SettingsView.swift */; };
 		S10000000000000000000003 /* EchoVisualWorldSelectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = S10000000000000000000023 /* EchoVisualWorldSelectionTests.swift */; };
+		T10000000000000000000001 /* EchoDataExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = T10000000000000000000021 /* EchoDataExportService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -146,6 +147,7 @@
 		S10000000000000000000021 /* EchoVisualWorldSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoVisualWorldSelection.swift; sourceTree = "<group>"; };
 		S10000000000000000000022 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		S10000000000000000000023 /* EchoVisualWorldSelectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoVisualWorldSelectionTests.swift; sourceTree = "<group>"; };
+		T10000000000000000000021 /* EchoDataExportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoDataExportService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -241,6 +243,7 @@
 		A10000000000000000000008 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				T10000000000000000000021 /* EchoDataExportService.swift */,
 				L10000000000000000000040 /* AI */,
 			);
 			path = Services;
@@ -604,6 +607,7 @@
 				R10000000000000000000002 /* EchoWorldCanvas.swift in Sources */,
 				S10000000000000000000001 /* EchoVisualWorldSelection.swift in Sources */,
 				S10000000000000000000002 /* SettingsView.swift in Sources */,
+				T10000000000000000000001 /* EchoDataExportService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
