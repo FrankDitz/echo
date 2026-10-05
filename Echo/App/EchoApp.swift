@@ -25,7 +25,10 @@ struct EchoApp: App {
       modelContainer = container
       self.aiService = aiService
       self.journalRepository = journalRepository
-      todayViewModel = TodayViewModel(repository: entryRepository)
+      todayViewModel = TodayViewModel(
+        repository: entryRepository,
+        highlightRepository: highlightRepository
+      )
       timelineViewModel = TimelineViewModel(repository: entryRepository)
       highlightViewModel = EntryHighlightViewModel(repository: highlightRepository)
       highlightsViewModel = HighlightsViewModel(

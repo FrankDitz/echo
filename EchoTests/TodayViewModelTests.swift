@@ -206,6 +206,44 @@ struct TodayViewModelTests {
     #expect(viewModel.entries == [entry])
     #expect(viewModel.failure == .updateEntry)
   }
+
+  @Test("Loading resurfaces private memories without altering entries")
+  func loadingMemorySignals() async throws {
+    let now = try makeDate("2026-10-03T12:00:00Z")
+    let calendar = try makeGregorianCalendar(timeZone: "UTC")
+    let onThisDay = EchoEntry(
+      createdAt: try makeDate("2025-10-03T09:00:00Z"),
+      calendar: calendar,
+      rawText: "A fictional memory from this date."
+    )
+    let unfinished = EchoEntry(
+      createdAt: try makeDate("2026-10-01T09:00:00Z"),
+      calendar: calendar,
+      rawText: "Still thinking about a fictional next step."
+    )
+    let saved = EchoEntry(
+      createdAt: try makeDate("2026-09-30T09:00:00Z"),
+      calendar: calendar,
+      rawText: "A fictional saved memory."
+    )
+    let repository = TodayEntryRepositoryStub(entries: [saved, unfinished, onThisDay])
+    let highlightRepository = TodayHighlightRepositoryStub(
+      highlights: [EchoHighlight(target: .entry(saved.id), createdAt: saved.createdAt)]
+    )
+    let viewModel = TodayViewModel(
+      repository: repository,
+      highlightRepository: highlightRepository,
+      calendar: calendar,
+      now: { now }
+    )
+
+    await viewModel.load()
+
+    #expect(viewModel.memories.onThisDay == [onThisDay])
+    #expect(viewModel.memories.unfinished == [unfinished])
+    #expect(viewModel.memories.saved == [saved])
+    #expect(await repository.allEntries().count == 3)
+  }
 }
 
 private actor TodayEntryRepositoryStub: EchoEntryRepository {
@@ -263,5 +301,29 @@ private actor TodayEntryRepositoryStub: EchoEntryRepository {
 
   private enum StubError: Error {
     case requestedFailure
+  }
+}
+
+private actor TodayHighlightRepositoryStub: EchoHighlightRepository {
+  private var highlights: [EchoHighlight]
+
+  init(highlights: [EchoHighlight]) {
+    self.highlights = highlights
+  }
+
+  func create(_ highlight: EchoHighlight) {
+    highlights.append(highlight)
+  }
+
+  func highlight(for target: EchoHighlightTarget) -> EchoHighlight? {
+    highlights.first { $0.target == target }
+  }
+
+  func allHighlights() -> [EchoHighlight] {
+    highlights
+  }
+
+  func delete(id: UUID) {
+    highlights.removeAll { $0.id == id }
   }
 }
