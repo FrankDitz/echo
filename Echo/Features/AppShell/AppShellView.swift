@@ -9,6 +9,7 @@ struct AppShellView: View {
   let journalRepository: any EchoOrganizedJournalRepository
   let weeklyReflectionViewModel: WeeklyReflectionViewModel
   let voiceCaptureViewModel: VoiceCaptureViewModel
+  let dataExportService: EchoDataExportService
   let visualWorldSelection: EchoVisualWorldSelection
 
   @State private var selection: EchoPrimarySection = .today
@@ -35,7 +36,10 @@ struct AppShellView: View {
     }
     .animation(EchoMotion.animation(reduceMotion: reduceMotion), value: selection)
     .sheet(isPresented: $isShowingSettings) {
-      SettingsView(visualWorldSelection: visualWorldSelection)
+      SettingsView(
+        visualWorldSelection: visualWorldSelection,
+        dataExportService: dataExportService
+      )
     }
   }
 
