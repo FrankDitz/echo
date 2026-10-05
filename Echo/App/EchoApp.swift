@@ -12,6 +12,7 @@ struct EchoApp: App {
   private let highlightsViewModel: HighlightsViewModel
   private let aiService: any EchoAIService
   private let journalRepository: any EchoOrganizedJournalRepository
+  private let weeklyReflectionViewModel: WeeklyReflectionViewModel
 
   init() {
     do {
@@ -22,9 +23,17 @@ struct EchoApp: App {
       let journalRepository = SwiftDataEchoOrganizedJournalRepository(
         modelContainer: container
       )
+      let weeklyRepository = SwiftDataEchoWeeklyReflectionRepository(
+        modelContainer: container
+      )
       modelContainer = container
       self.aiService = aiService
       self.journalRepository = journalRepository
+      weeklyReflectionViewModel = WeeklyReflectionViewModel(
+        entryRepository: entryRepository,
+        reflectionRepository: weeklyRepository,
+        aiService: aiService
+      )
       todayViewModel = TodayViewModel(
         repository: entryRepository,
         highlightRepository: highlightRepository
@@ -50,6 +59,7 @@ struct EchoApp: App {
         highlightsViewModel: highlightsViewModel,
         aiService: aiService,
         journalRepository: journalRepository,
+        weeklyReflectionViewModel: weeklyReflectionViewModel,
         visualWorldSelection: visualWorldSelection
       )
       .environment(\.echoVisualWorld, visualWorldSelection.selectedWorld)

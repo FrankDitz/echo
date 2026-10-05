@@ -36,6 +36,33 @@ struct DeterministicLocalAIService: EchoAIService {
     )
   }
 
+  func organizeWeek(
+    entries: [EchoEntry],
+    week: EchoWeekIdentifier
+  ) async throws -> EchoWeeklyReflectionDraft {
+    guard !entries.isEmpty else { throw EchoAIServiceError.emptyDay }
+
+    let ordered = EchoEntryOrdering.chronological(entries)
+    let paragraphs = ordered.map { normalized($0.rawText) }
+    let themes = recurringThemes(in: paragraphs)
+    let notableEntryIDs = ordered
+      .sorted { lhs, rhs in
+        if lhs.rawText.count != rhs.rawText.count { return lhs.rawText.count > rhs.rawText.count }
+        return lhs.createdAt < rhs.createdAt
+      }
+      .prefix(3)
+      .map(\.id)
+
+    return EchoWeeklyReflectionDraft(
+      week: week,
+      body: paragraphs.joined(separator: "\n\n"),
+      themes: themes,
+      notableEntryIDs: notableEntryIDs,
+      sourceEntryIDs: ordered.map(\.id),
+      question: reflectionQuestions(themes: themes).first
+    )
+  }
+
   private func reflectionTitle(themes: [String], entryCount: Int) -> String {
     guard let leadingTheme = themes.first else {
       return entryCount == 1 ? "A Moment in Focus" : "The Day in Focus"

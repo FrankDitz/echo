@@ -63,6 +63,32 @@ struct EchoAIServiceTests {
     #expect(day.entries == [morning, evening])
   }
 
+  @Test("Weekly organization keeps complete provenance and selects notable entries")
+  func organizeWeek() async throws {
+    let calendar = try makeGregorianCalendar(timeZone: "UTC")
+    let short = EchoEntry(
+      id: try makeUUID("00000000-0000-0000-0000-000000000803"),
+      createdAt: try makeDate("2026-10-05T08:00:00Z"),
+      calendar: calendar,
+      rawText: "A fictional short note."
+    )
+    let long = EchoEntry(
+      id: try makeUUID("00000000-0000-0000-0000-000000000804"),
+      createdAt: try makeDate("2026-10-07T18:00:00Z"),
+      calendar: calendar,
+      rawText: "A fictional longer note about steady creative momentum."
+    )
+    let week = EchoWeekIdentifier(containing: short.createdAt, calendar: calendar)
+
+    let result = try await service.organizeWeek(entries: [long, short], week: week)
+
+    #expect(result.week == week)
+    #expect(result.sourceEntryIDs == [short.id, long.id])
+    #expect(result.notableEntryIDs.first == long.id)
+    #expect(!result.themes.isEmpty)
+    #expect(result.question != nil)
+  }
+
   @Test("Blank writing is rejected without manufacturing content")
   func blankWriting() async {
     await #expect(throws: EchoAIServiceError.emptyWriting) {

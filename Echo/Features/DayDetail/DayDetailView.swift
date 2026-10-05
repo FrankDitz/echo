@@ -6,40 +6,92 @@ struct DayReflectionView: View {
   let highlightViewModel: EntryHighlightViewModel
   let aiService: any EchoAIService
   let journalRepository: any EchoOrganizedJournalRepository
+  let weeklyViewModel: WeeklyReflectionViewModel
+
+  @State private var reflectionMode: ReflectionMode = .daily
 
   var body: some View {
     Group {
-      if let latestDay {
-        DayDetailView(
-          day: latestDay,
+      if reflectionMode == .weekly {
+        WeeklyReflectionView(
+          viewModel: weeklyViewModel,
           highlightViewModel: highlightViewModel,
           aiService: aiService,
           journalRepository: journalRepository
         )
-        .id(latestDay.id)
-      } else if todayViewModel.isLoading || timelineViewModel.isLoading {
-        EchoPage(spacing: EchoLayout.compactSectionSpacing) {
-          reflectionHeader
-          EchoLoadingState(title: "Loading your reflection…")
-        }
       } else {
-        EchoPage(spacing: EchoLayout.compactSectionSpacing) {
-          reflectionHeader
-          EchoSurface {
-            EchoEmptyState(
-              title: "A reflection needs a day",
-              systemImage: "sparkles.rectangle.stack",
-              description: "Write an entry first, then Echo can organize the day without changing your original words.",
-              minHeight: EchoLayout.mediumStateHeight
+        Group {
+          if let latestDay {
+            DayDetailView(
+              day: latestDay,
+              highlightViewModel: highlightViewModel,
+              aiService: aiService,
+              journalRepository: journalRepository
             )
+            .id(latestDay.id)
+          } else if todayViewModel.isLoading || timelineViewModel.isLoading {
+            EchoPage(spacing: EchoLayout.compactSectionSpacing) {
+              reflectionHeader
+              EchoLoadingState(title: "Loading your reflection…")
+            }
+          } else {
+            EchoPage(spacing: EchoLayout.compactSectionSpacing) {
+              reflectionHeader
+              EchoSurface {
+                EchoEmptyState(
+                  title: "A reflection needs a day",
+                  systemImage: "sparkles.rectangle.stack",
+                  description: "Write an entry first, then Echo can organize the day without changing your original words.",
+                  minHeight: EchoLayout.mediumStateHeight
+                )
+              }
+            }
           }
         }
       }
+    }
+    .safeAreaInset(edge: .top, spacing: 0) {
+      reflectionModePicker
     }
     .task {
       await todayViewModel.load()
       await timelineViewModel.load()
     }
+  }
+
+  private var reflectionModePicker: some View {
+    HStack(spacing: EchoLayout.tightSpacing) {
+      ForEach(ReflectionMode.allCases) { mode in
+        Button {
+          reflectionMode = mode
+        } label: {
+          Text(mode.title)
+            .font(EchoTypography.metadata.weight(.semibold))
+            .foregroundStyle(reflectionMode == mode ? world.canvas : world.primaryText)
+            .padding(.horizontal, EchoLayout.contentSpacing)
+            .padding(.vertical, EchoLayout.tightSpacing)
+            .background(
+              reflectionMode == mode ? world.accent : Color.clear,
+              in: Capsule()
+            )
+        }
+        .buttonStyle(.plain)
+      }
+      Spacer()
+    }
+    .padding(.horizontal, EchoLayout.pageHorizontalPadding)
+    .padding(.vertical, EchoLayout.tightSpacing)
+    .background(.ultraThinMaterial)
+  }
+
+  @Environment(\.echoVisualWorld) private var world
+
+  private enum ReflectionMode: String, CaseIterable, Identifiable {
+    case daily
+    case weekly
+
+    var id: String { rawValue }
+    var title: String { self == .daily ? "Day Reflection" : "Weekly Echo" }
   }
 
   private var latestDay: EchoDay? {
@@ -60,6 +112,216 @@ struct DayReflectionView: View {
         .foregroundStyle(.secondary)
     }
     .accessibilityElement(children: .combine)
+  }
+}
+
+private struct WeeklyReflectionView: View {
+  let viewModel: WeeklyReflectionViewModel
+  let highlightViewModel: EntryHighlightViewModel
+  let aiService: any EchoAIService
+  let journalRepository: any EchoOrganizedJournalRepository
+
+  @State private var selectedDay: EchoDay?
+  @Environment(\.echoVisualWorld) private var world
+  @Environment(\.timeZone) private var timeZone
+
+  var body: some View {
+    EchoWorldCanvas {
+      ScrollView {
+        VStack(alignment: .leading, spacing: EchoLayout.sectionSpacing) {
+          weekHeader
+          reflectionPanel
+          sourceDays
+          actionBar
+        }
+        .frame(maxWidth: EchoLayout.contentMaxWidth, alignment: .leading)
+        .padding(.horizontal, EchoLayout.pageHorizontalPadding)
+        .padding(.vertical, EchoLayout.pageVerticalPadding)
+        .frame(maxWidth: .infinity)
+      }
+      .scrollIndicators(.hidden)
+    }
+    .task { await viewModel.load() }
+    .sheet(item: $selectedDay) { day in
+      DayDetailView(
+        day: day,
+        highlightViewModel: highlightViewModel,
+        aiService: aiService,
+        journalRepository: journalRepository
+      )
+    }
+  }
+
+  private var weekHeader: some View {
+    HStack(alignment: .bottom, spacing: EchoLayout.contentSpacing) {
+      VStack(alignment: .leading, spacing: EchoLayout.inlineSpacing) {
+        Text("WEEKLY ECHO")
+          .font(EchoTypography.editorialEyebrow)
+          .tracking(1.5)
+          .foregroundStyle(.secondary)
+        Text(weekRangeLabel)
+          .font(EchoTypography.editorialDisplay)
+          .accessibilityAddTraits(.isHeader)
+        Text("A wider view of what kept returning.")
+          .font(EchoTypography.supporting)
+          .foregroundStyle(.secondary)
+      }
+      Spacer()
+      HStack(spacing: EchoLayout.tightSpacing) {
+        weekButton(systemImage: "chevron.left", offset: -1, disabled: false)
+        weekButton(systemImage: "chevron.right", offset: 1, disabled: !viewModel.canMoveForward)
+      }
+    }
+  }
+
+  @ViewBuilder
+  private var reflectionPanel: some View {
+    EchoReadabilityPanel {
+      if viewModel.isLoading {
+        EchoLoadingState(title: "Loading this week…", minHeight: 120)
+      } else if viewModel.entries.isEmpty {
+        EchoEmptyState(
+          title: "A quiet week",
+          systemImage: "calendar",
+          description: "There are no entries to reflect on for this week.",
+          minHeight: 120
+        )
+      } else if let reflection = viewModel.reflection {
+        VStack(alignment: .leading, spacing: EchoLayout.sectionSpacing) {
+          Text(reflection.body)
+            .font(EchoTypography.editorialNarrative)
+            .lineSpacing(6)
+            .textSelection(.enabled)
+
+          if !reflection.themes.isEmpty {
+            Divider()
+            ReflectionSectionLabel(title: "Recurring themes", systemImage: "repeat")
+            ScrollView(.horizontal) {
+              HStack(spacing: EchoLayout.tightSpacing) {
+                ForEach(reflection.themes, id: \.self) { theme in
+                  Text(theme)
+                    .font(EchoTypography.metadata.weight(.semibold))
+                    .foregroundStyle(world.canvas)
+                    .padding(.horizontal, EchoLayout.rowSpacing)
+                    .padding(.vertical, EchoLayout.inlineSpacing)
+                    .background(world.accent, in: Capsule())
+                }
+              }
+            }
+            .scrollIndicators(.hidden)
+          }
+
+          if let question = reflection.question {
+            Divider()
+            ReflectionSectionLabel(title: "For the week ahead", systemImage: "arrow.up.right")
+            Text(question)
+              .font(EchoTypography.contentTitle)
+              .padding(EchoLayout.contentSpacing)
+              .frame(maxWidth: .infinity, alignment: .leading)
+              .background(world.accent.opacity(0.14), in: RoundedRectangle(cornerRadius: 12))
+          }
+
+          Divider()
+          Label(
+            "Built privately from \(reflection.sourceEntryIDs.count) original \(reflection.sourceEntryIDs.count == 1 ? "entry" : "entries")",
+            systemImage: "lock.shield.fill"
+          )
+          .font(EchoTypography.metadata)
+          .foregroundStyle(.secondary)
+        }
+      } else {
+        VStack(alignment: .leading, spacing: EchoLayout.rowSpacing) {
+          Image(systemName: "calendar.badge.sparkles")
+            .font(.title2.weight(.semibold))
+            .foregroundStyle(world.accent)
+          Text("Find the shape of the week")
+            .font(EchoTypography.sectionTitle)
+          Text("Weekly Echo can organize these entries locally while every original stays unchanged.")
+            .font(EchoTypography.supporting)
+            .foregroundStyle(.secondary)
+        }
+      }
+
+      if viewModel.failure != nil {
+        EchoErrorState(message: "This weekly reflection could not be loaded or saved.")
+      }
+    }
+  }
+
+  private var sourceDays: some View {
+    VStack(alignment: .leading, spacing: EchoLayout.rowSpacing) {
+      HStack {
+        Text("Source days")
+          .font(EchoTypography.contentTitle)
+        Spacer()
+        Text(viewModel.entries.count, format: .number)
+          .font(EchoTypography.metadata)
+          .foregroundStyle(.secondary)
+      }
+
+      ForEach(viewModel.sourceDays) { day in
+        Button { selectedDay = day } label: {
+          HStack(spacing: EchoLayout.rowSpacing) {
+            VStack(alignment: .leading, spacing: EchoLayout.inlineSpacing) {
+              Text(day.id.date(in: timeZone) ?? day.entries[0].createdAt, format: .dateTime.weekday(.wide).month(.abbreviated).day())
+                .font(EchoTypography.body.weight(.semibold))
+              Text(day.entries.first?.rawText ?? "")
+                .font(EchoTypography.supporting)
+                .foregroundStyle(.secondary)
+                .lineLimit(2)
+            }
+            Spacer()
+            Image(systemName: "chevron.right")
+              .foregroundStyle(world.accent)
+          }
+          .padding(EchoLayout.contentSpacing)
+          .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+          .overlay {
+            RoundedRectangle(cornerRadius: 12)
+              .stroke(world.separator, lineWidth: EchoShape.hairlineWidth)
+          }
+        }
+        .buttonStyle(.plain)
+      }
+    }
+  }
+
+  private var actionBar: some View {
+    Button {
+      Task { await viewModel.generate() }
+    } label: {
+      Label(
+        viewModel.reflection == nil ? "Create Weekly Echo" : "Regenerate Weekly Echo",
+        systemImage: viewModel.reflection == nil ? "sparkles" : "arrow.clockwise"
+      )
+      .font(.body.weight(.semibold))
+      .frame(maxWidth: .infinity, minHeight: 48)
+      .foregroundStyle(world.canvas)
+      .background(world.accent, in: RoundedRectangle(cornerRadius: EchoShape.embeddedRadius))
+    }
+    .buttonStyle(.plain)
+    .disabled(viewModel.entries.isEmpty || viewModel.isGenerating)
+    .opacity(viewModel.entries.isEmpty ? 0.48 : 1)
+  }
+
+  private func weekButton(systemImage: String, offset: Int, disabled: Bool) -> some View {
+    Button { Task { await viewModel.moveWeek(by: offset) } } label: {
+      Image(systemName: systemImage)
+        .frame(width: 38, height: 38)
+        .background(.ultraThinMaterial, in: Circle())
+        .overlay { Circle().stroke(world.separator, lineWidth: EchoShape.hairlineWidth) }
+    }
+    .buttonStyle(.plain)
+    .disabled(disabled || viewModel.isLoading)
+    .opacity(disabled ? 0.4 : 1)
+  }
+
+  private var weekRangeLabel: String {
+    guard let start = viewModel.selectedWeek.startDate(in: timeZone) else { return "This Week" }
+    var calendar = Calendar.autoupdatingCurrent
+    calendar.timeZone = timeZone
+    let end = calendar.date(byAdding: .day, value: 6, to: start) ?? start
+    return "\(start.formatted(.dateTime.month(.abbreviated).day())) – \(end.formatted(.dateTime.month(.abbreviated).day()))"
   }
 }
 
