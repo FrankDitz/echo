@@ -110,6 +110,49 @@ struct DayOrganizationViewModelTests {
   }
 }
 
+@MainActor
+@Suite("Weekly reflection workflow")
+struct WeeklyReflectionViewModelTests {
+  @Test("Loading, browsing, and generation preserve source entries")
+  func weeklyWorkflow() async throws {
+    let calendar = try makeGregorianCalendar(timeZone: "UTC")
+    let now = try makeDate("2026-10-09T12:00:00Z")
+    let previous = EchoEntry(
+      createdAt: try makeDate("2026-10-01T09:00:00Z"),
+      calendar: calendar,
+      rawText: "A fictional previous-week note."
+    )
+    let current = EchoEntry(
+      createdAt: try makeDate("2026-10-07T09:00:00Z"),
+      calendar: calendar,
+      rawText: "A fictional current-week note with momentum."
+    )
+    let entries = WeeklyEntryRepositoryStub(entries: [current, previous])
+    let reflections = WeeklyReflectionRepositoryStub()
+    let viewModel = WeeklyReflectionViewModel(
+      entryRepository: entries,
+      reflectionRepository: reflections,
+      aiService: DeterministicLocalAIService(),
+      calendar: calendar,
+      now: { now }
+    )
+
+    await viewModel.load()
+    #expect(viewModel.entries == [current])
+    #expect(await viewModel.generate())
+    let generated = try #require(viewModel.reflection)
+    #expect(generated.sourceEntryIDs == [current.id])
+    #expect(generated.generator == .deterministicLocal)
+    #expect(await viewModel.generate())
+    #expect(viewModel.reflection?.id == generated.id)
+
+    await viewModel.moveWeek(by: -1)
+    #expect(viewModel.entries == [previous])
+    #expect(viewModel.reflection == nil)
+    #expect(await entries.allEntries() == [previous, current])
+  }
+}
+
 private actor OrganizedJournalRepositoryStub: EchoOrganizedJournalRepository {
   private var storedJournal: EchoOrganizedJournal?
   private var shouldFail = false
@@ -149,4 +192,31 @@ private actor OrganizedJournalRepositoryStub: EchoOrganizedJournalRepository {
   private enum StubError: Error {
     case requestedFailure
   }
+}
+
+private actor WeeklyEntryRepositoryStub: EchoEntryRepository {
+  private var entries: [EchoEntry]
+
+  init(entries: [EchoEntry]) { self.entries = entries }
+  func create(_ entry: EchoEntry) { entries.append(entry) }
+  func entry(id: UUID) -> EchoEntry? { entries.first { $0.id == id } }
+  func entries(for day: EchoDayIdentifier) -> [EchoEntry] {
+    EchoEntryOrdering.chronological(entries.filter { $0.day == day })
+  }
+  func allEntries() -> [EchoEntry] { EchoEntryOrdering.chronological(entries) }
+  func update(_ entry: EchoEntry) {
+    entries.removeAll { $0.id == entry.id }
+    entries.append(entry)
+  }
+  func delete(id: UUID) { entries.removeAll { $0.id == id } }
+}
+
+private actor WeeklyReflectionRepositoryStub: EchoWeeklyReflectionRepository {
+  private var reflections: [EchoWeekIdentifier: EchoWeeklyReflection] = [:]
+
+  func create(_ reflection: EchoWeeklyReflection) { reflections[reflection.week] = reflection }
+  func reflection(for week: EchoWeekIdentifier) -> EchoWeeklyReflection? { reflections[week] }
+  func allReflections() -> [EchoWeeklyReflection] { Array(reflections.values) }
+  func update(_ reflection: EchoWeeklyReflection) { reflections[reflection.week] = reflection }
+  func delete(id: UUID) { reflections = reflections.filter { $0.value.id != id } }
 }
