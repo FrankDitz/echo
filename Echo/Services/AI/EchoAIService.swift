@@ -7,6 +7,10 @@ struct EchoAssistedWriting: Equatable, Sendable {
 struct EchoOrganizedJournalDraft: Equatable, Sendable {
   let day: EchoDayIdentifier
   let body: String
+  let title: String?
+  let themes: [String]
+  let keyMoments: [String]
+  let reflectionQuestions: [String]
   let sourceEntryIDs: [UUID]
 }
 

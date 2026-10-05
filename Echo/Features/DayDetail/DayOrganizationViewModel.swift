@@ -57,6 +57,10 @@ final class DayOrganizationViewModel {
       if var existing = journal {
         existing.regenerate(
           body: draft.body,
+          title: draft.title,
+          themes: draft.themes,
+          keyMoments: draft.keyMoments,
+          reflectionQuestions: draft.reflectionQuestions,
           sourceEntryIDs: draft.sourceEntryIDs,
           at: timestamp
         )
@@ -67,6 +71,10 @@ final class DayOrganizationViewModel {
           day: draft.day,
           createdAt: timestamp,
           body: draft.body,
+          title: draft.title,
+          themes: draft.themes,
+          keyMoments: draft.keyMoments,
+          reflectionQuestions: draft.reflectionQuestions,
           sourceEntryIDs: draft.sourceEntryIDs,
           generator: .deterministicLocal
         )

@@ -252,15 +252,63 @@ private struct DayReflectionSection: View {
     } else if viewModel.isGenerating {
       EchoLoadingState(title: "Organizing this day…", minHeight: 0)
     } else if let journal = viewModel.journal {
+      if let title = journal.title {
+        Text(title)
+          .font(EchoTypography.editorialDisplay)
+          .foregroundStyle(world.primaryText)
+          .accessibilityAddTraits(.isHeader)
+      }
+
       Text(journal.body)
         .font(EchoTypography.editorialNarrative)
         .lineSpacing(6)
         .textSelection(.enabled)
 
-      Divider()
+      if !journal.themes.isEmpty {
+        ReflectionSectionLabel(title: "Themes", systemImage: "circle.hexagongrid")
+        ScrollView(.horizontal) {
+          HStack(spacing: EchoLayout.tightSpacing) {
+            ForEach(journal.themes, id: \.self) { theme in
+              Text(theme)
+                .font(EchoTypography.metadata.weight(.semibold))
+                .foregroundStyle(world.canvas)
+                .padding(.horizontal, EchoLayout.rowSpacing)
+                .padding(.vertical, EchoLayout.inlineSpacing)
+                .background(world.accent, in: Capsule())
+            }
+          }
+        }
+        .scrollIndicators(.hidden)
+      }
 
+      if !journal.keyMoments.isEmpty {
+        Divider()
+        ReflectionSectionLabel(title: "Key moments", systemImage: "sparkles")
+        VStack(alignment: .leading, spacing: EchoLayout.rowSpacing) {
+          ForEach(journal.keyMoments, id: \.self) { moment in
+            Label(moment, systemImage: "diamond.fill")
+              .font(EchoTypography.supporting)
+              .symbolRenderingMode(.monochrome)
+          }
+        }
+      }
+
+      if !journal.reflectionQuestions.isEmpty {
+        Divider()
+        ReflectionSectionLabel(title: "Keep thinking", systemImage: "quote.bubble")
+        ForEach(journal.reflectionQuestions, id: \.self) { question in
+          Text(question)
+            .font(EchoTypography.contentTitle)
+            .foregroundStyle(world.primaryText)
+            .padding(EchoLayout.contentSpacing)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(world.accent.opacity(0.14), in: RoundedRectangle(cornerRadius: 12))
+        }
+      }
+
+      Divider()
       VStack(alignment: .leading, spacing: EchoLayout.tightSpacing) {
-        Label("Created privately on this device", systemImage: "lock.shield")
+        Label("Created privately on this device", systemImage: "lock.shield.fill")
         Text(
           "\(journal.sourceEntryIDs.count) original \(journal.sourceEntryIDs.count == 1 ? "entry" : "entries") · Updated \(journal.modifiedAt.formatted(.dateTime.month(.abbreviated).day().hour().minute()))"
         )
@@ -281,6 +329,19 @@ private struct DayReflectionSection: View {
     }
   }
 
+}
+
+private struct ReflectionSectionLabel: View {
+  let title: String
+  let systemImage: String
+
+  @Environment(\.echoVisualWorld) private var world
+
+  var body: some View {
+    Label(title, systemImage: systemImage)
+      .font(EchoTypography.contentTitle)
+      .foregroundStyle(world.primaryText)
+  }
 }
 
 private struct ReflectionActionBar: View {
