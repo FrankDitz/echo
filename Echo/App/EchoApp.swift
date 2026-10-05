@@ -13,6 +13,7 @@ struct EchoApp: App {
   private let aiService: any EchoAIService
   private let journalRepository: any EchoOrganizedJournalRepository
   private let weeklyReflectionViewModel: WeeklyReflectionViewModel
+  private let voiceCaptureViewModel: VoiceCaptureViewModel
 
   init() {
     do {
@@ -26,6 +27,14 @@ struct EchoApp: App {
       let weeklyRepository = SwiftDataEchoWeeklyReflectionRepository(
         modelContainer: container
       )
+      let voiceAttachmentRepository = SwiftDataEchoVoiceAttachmentRepository(
+        modelContainer: container
+      )
+      let voiceFileStore = try EchoVoiceFileStore.applicationSupport()
+      let voiceLifecycle = EchoVoiceAttachmentLifecycle(
+        repository: voiceAttachmentRepository,
+        fileStore: voiceFileStore
+      )
       modelContainer = container
       self.aiService = aiService
       self.journalRepository = journalRepository
@@ -34,9 +43,16 @@ struct EchoApp: App {
         reflectionRepository: weeklyRepository,
         aiService: aiService
       )
+      voiceCaptureViewModel = VoiceCaptureViewModel(
+        entryRepository: entryRepository,
+        attachmentRepository: voiceAttachmentRepository,
+        fileStore: voiceFileStore,
+        service: SystemEchoVoiceCaptureService()
+      )
       todayViewModel = TodayViewModel(
         repository: entryRepository,
-        highlightRepository: highlightRepository
+        highlightRepository: highlightRepository,
+        voiceLifecycle: voiceLifecycle
       )
       timelineViewModel = TimelineViewModel(repository: entryRepository)
       highlightViewModel = EntryHighlightViewModel(repository: highlightRepository)
@@ -60,6 +76,7 @@ struct EchoApp: App {
         aiService: aiService,
         journalRepository: journalRepository,
         weeklyReflectionViewModel: weeklyReflectionViewModel,
+        voiceCaptureViewModel: voiceCaptureViewModel,
         visualWorldSelection: visualWorldSelection
       )
       .environment(\.echoVisualWorld, visualWorldSelection.selectedWorld)

@@ -54,7 +54,7 @@ Phase 8 begins only after the completed Phase 7 application has been reviewed to
 7. **Weekly Echo foundation (complete):** define, persist, and test a weekly reflection containing source provenance, recurring themes, notable entries, and an optional question for the coming week.
 8. **Weekly Echo experience (complete):** add browsing, generation, regeneration, and source navigation for weekly reflections without replacing daily reflections.
 9. **Voice entry foundation (complete):** add versioned local attachment metadata and lifecycle rules for voice entries, including safe file placement, deletion, migration, and repository-safety tests.
-10. **Voice capture, playback, and transcription:** add permission-aware recording, playback, and on-device transcription where supported, with clear failure and privacy states on iPhone, iPad, and Mac.
+10. **Voice capture, playback, and transcription (complete):** add permission-aware recording, playback, and on-device transcription where supported, with clear failure and privacy states on iPhone, iPad, and Mac.
 11. **Export and recovery:** add user-initiated Markdown and PDF export plus an explicit local recovery workflow; exports never enter Git or silently leave the selected destination.
 12. **App privacy lock:** add optional Face ID or Touch ID protection, app-switcher privacy shielding, and careful fallback and accessibility behavior.
 13. **Private synchronization design:** document encryption, CloudKit ownership, conflict resolution, deletion propagation, account changes, recovery, and opt-in consent before enabling any synchronization.
