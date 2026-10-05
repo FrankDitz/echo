@@ -74,3 +74,114 @@ actor SwiftDataEchoEntryRepository: EchoEntryRepository {
     return try modelContext.fetch(descriptor).first
   }
 }
+
+@ModelActor
+actor SwiftDataEchoVoiceAttachmentRepository: EchoVoiceAttachmentRepository {
+  func create(_ attachment: EchoVoiceAttachment) async throws {
+    guard try record(id: attachment.id) == nil else {
+      throw EchoRepositoryError.duplicateVoiceAttachment(attachment.id)
+    }
+    guard try record(entryID: attachment.entryID) == nil else {
+      throw EchoRepositoryError.duplicateVoiceAttachmentEntry(attachment.entryID)
+    }
+    modelContext.insert(EchoPersistenceMapper.makeVoiceAttachmentRecord(from: attachment))
+    try modelContext.save()
+  }
+
+  func attachment(for entryID: UUID) async throws -> EchoVoiceAttachment? {
+    try record(entryID: entryID).map(EchoPersistenceMapper.makeVoiceAttachment)
+  }
+
+  func update(_ attachment: EchoVoiceAttachment) async throws {
+    guard let record = try record(id: attachment.id) else {
+      throw EchoRepositoryError.voiceAttachmentNotFound(attachment.id)
+    }
+    EchoPersistenceMapper.update(record, from: attachment)
+    try modelContext.save()
+  }
+
+  func delete(id: UUID) async throws {
+    guard let record = try record(id: id) else {
+      throw EchoRepositoryError.voiceAttachmentNotFound(id)
+    }
+    modelContext.delete(record)
+    try modelContext.save()
+  }
+
+  private func record(id: UUID) throws -> PersistentEchoVoiceAttachment? {
+    var descriptor = FetchDescriptor<PersistentEchoVoiceAttachment>(
+      predicate: #Predicate { $0.id == id }
+    )
+    descriptor.fetchLimit = 1
+    return try modelContext.fetch(descriptor).first
+  }
+
+  private func record(entryID: UUID) throws -> PersistentEchoVoiceAttachment? {
+    var descriptor = FetchDescriptor<PersistentEchoVoiceAttachment>(
+      predicate: #Predicate { $0.entryID == entryID }
+    )
+    descriptor.fetchLimit = 1
+    return try modelContext.fetch(descriptor).first
+  }
+}
+
+enum EchoVoiceFileStoreError: Error, Equatable {
+  case invalidFileName
+}
+
+struct EchoVoiceFileStore: Sendable {
+  let rootDirectory: URL
+
+  static func applicationSupport() throws -> Self {
+    let base = try FileManager.default.url(
+      for: .applicationSupportDirectory,
+      in: .userDomainMask,
+      appropriateFor: nil,
+      create: true
+    )
+    return Self(
+      rootDirectory: base
+        .appendingPathComponent("Echo", isDirectory: true)
+        .appendingPathComponent("VoiceAttachments", isDirectory: true)
+    )
+  }
+
+  func prepareDirectory() throws {
+    try FileManager.default.createDirectory(
+      at: rootDirectory,
+      withIntermediateDirectories: true,
+      attributes: [.protectionKey: FileProtectionType.completeUntilFirstUserAuthentication]
+    )
+  }
+
+  func destinationURL(for attachmentID: UUID) throws -> URL {
+    try prepareDirectory()
+    return rootDirectory.appendingPathComponent("\(attachmentID.uuidString.lowercased()).m4a")
+  }
+
+  func url(for attachment: EchoVoiceAttachment) throws -> URL {
+    guard attachment.relativeFileName == URL(fileURLWithPath: attachment.relativeFileName).lastPathComponent,
+      attachment.relativeFileName.lowercased().hasSuffix(".m4a")
+    else {
+      throw EchoVoiceFileStoreError.invalidFileName
+    }
+    return rootDirectory.appendingPathComponent(attachment.relativeFileName)
+  }
+
+  func deleteFile(for attachment: EchoVoiceAttachment) throws {
+    let fileURL = try url(for: attachment)
+    guard FileManager.default.fileExists(atPath: fileURL.path) else { return }
+    try FileManager.default.removeItem(at: fileURL)
+  }
+}
+
+struct EchoVoiceAttachmentLifecycle: Sendable {
+  let repository: any EchoVoiceAttachmentRepository
+  let fileStore: EchoVoiceFileStore
+
+  func removeAttachment(for entryID: UUID) async throws {
+    guard let attachment = try await repository.attachment(for: entryID) else { return }
+    try await repository.delete(id: attachment.id)
+    try fileStore.deleteFile(for: attachment)
+  }
+}
