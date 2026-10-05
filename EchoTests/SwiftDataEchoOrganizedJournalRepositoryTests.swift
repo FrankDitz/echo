@@ -191,3 +191,54 @@ struct SwiftDataEchoOrganizedJournalRepositoryTests {
     #expect(try await entryRepository.entry(id: entry.id) == entry)
   }
 }
+
+@Suite("SwiftData weekly reflection repository")
+struct SwiftDataEchoWeeklyReflectionRepositoryTests {
+  @Test("Weekly reflections persist, update, and remain unique by week")
+  func persistenceAndUniqueness() async throws {
+    let location = try makeDisposableStoreLocation()
+    defer { try? FileManager.default.removeItem(at: location.directory) }
+    let calendar = try makeGregorianCalendar(timeZone: "UTC")
+    let week = EchoWeekIdentifier(
+      containing: try makeDate("2026-10-07T12:00:00Z"),
+      calendar: calendar
+    )
+    let source = try makeUUID("00000000-0000-0000-0000-000000000922")
+    var reflection = EchoWeeklyReflection(
+      id: try makeUUID("00000000-0000-0000-0000-000000000923"),
+      week: week,
+      createdAt: try makeDate("2026-10-11T20:00:00Z"),
+      body: "A fictional durable weekly reflection.",
+      themes: ["Clarity"],
+      notableEntryIDs: [source],
+      sourceEntryIDs: [source],
+      question: "What should continue?",
+      generator: .deterministicLocal
+    )
+
+    do {
+      let repository = SwiftDataEchoWeeklyReflectionRepository(
+        modelContainer: try EchoModelContainerFactory.makePersistent(at: location.store)
+      )
+      try await repository.create(reflection)
+      await #expect(throws: EchoRepositoryError.duplicateWeeklyReflection(reflection.id)) {
+        try await repository.create(reflection)
+      }
+      reflection.regenerate(
+        body: "A fictional revised weekly reflection.",
+        themes: ["Clarity", "Momentum"],
+        notableEntryIDs: [source],
+        sourceEntryIDs: [source],
+        question: "What deserves more room?",
+        at: try makeDate("2026-10-11T21:00:00Z")
+      )
+      try await repository.update(reflection)
+    }
+
+    let reopened = SwiftDataEchoWeeklyReflectionRepository(
+      modelContainer: try EchoModelContainerFactory.makePersistent(at: location.store)
+    )
+    #expect(try await reopened.reflection(for: week) == reflection)
+    #expect(try await reopened.allReflections() == [reflection])
+  }
+}

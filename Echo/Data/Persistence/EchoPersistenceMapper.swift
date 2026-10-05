@@ -123,6 +123,63 @@ enum EchoPersistenceMapper {
     )
   }
 
+  static func weekKey(for week: EchoWeekIdentifier) throws -> String {
+    try encodeWeek(week).base64EncodedString()
+  }
+
+  static func makeWeeklyReflectionRecord(
+    from reflection: EchoWeeklyReflection
+  ) throws -> PersistentEchoWeeklyReflection {
+    let weekPayload = try encodeWeek(reflection.week)
+    return PersistentEchoWeeklyReflection(
+      id: reflection.id,
+      weekKey: weekPayload.base64EncodedString(),
+      weekPayload: weekPayload,
+      createdAt: reflection.createdAt,
+      modifiedAt: reflection.modifiedAt,
+      body: reflection.body,
+      themesPayload: try encodeStrings(reflection.themes),
+      notableEntryIDsPayload: try encodeEntryIDs(reflection.notableEntryIDs),
+      sourceEntryIDsPayload: try encodeEntryIDs(reflection.sourceEntryIDs),
+      question: reflection.question,
+      generatorRawValue: reflection.generator.rawValue
+    )
+  }
+
+  static func update(
+    _ record: PersistentEchoWeeklyReflection,
+    from reflection: EchoWeeklyReflection
+  ) throws {
+    let weekPayload = try encodeWeek(reflection.week)
+    record.weekKey = weekPayload.base64EncodedString()
+    record.weekPayload = weekPayload
+    record.createdAt = reflection.createdAt
+    record.modifiedAt = reflection.modifiedAt
+    record.body = reflection.body
+    record.themesPayload = try encodeStrings(reflection.themes)
+    record.notableEntryIDsPayload = try encodeEntryIDs(reflection.notableEntryIDs)
+    record.sourceEntryIDsPayload = try encodeEntryIDs(reflection.sourceEntryIDs)
+    record.question = reflection.question
+    record.generatorRawValue = reflection.generator.rawValue
+  }
+
+  static func makeWeeklyReflection(
+    from record: PersistentEchoWeeklyReflection
+  ) throws -> EchoWeeklyReflection {
+    EchoWeeklyReflection(
+      id: record.id,
+      week: try decodeWeek(record.weekPayload),
+      createdAt: record.createdAt,
+      modifiedAt: record.modifiedAt,
+      body: record.body,
+      themes: try decodeStrings(record.themesPayload),
+      notableEntryIDs: try decodeEntryIDs(record.notableEntryIDsPayload),
+      sourceEntryIDs: try decodeEntryIDs(record.sourceEntryIDsPayload),
+      question: record.question,
+      generator: EchoJournalGenerator(rawValue: record.generatorRawValue)
+    )
+  }
+
   private static func encodeDay(_ day: EchoDayIdentifier) throws -> Data {
     let encoder = JSONEncoder()
     encoder.outputFormatting = [.sortedKeys]
@@ -131,6 +188,16 @@ enum EchoPersistenceMapper {
 
   private static func decodeDay(_ data: Data) throws -> EchoDayIdentifier {
     try JSONDecoder().decode(EchoDayIdentifier.self, from: data)
+  }
+
+  private static func encodeWeek(_ week: EchoWeekIdentifier) throws -> Data {
+    let encoder = JSONEncoder()
+    encoder.outputFormatting = [.sortedKeys]
+    return try encoder.encode(week)
+  }
+
+  private static func decodeWeek(_ data: Data) throws -> EchoWeekIdentifier {
+    try JSONDecoder().decode(EchoWeekIdentifier.self, from: data)
   }
 
   private static func encodeEntryIDs(_ ids: [UUID]) throws -> Data {
