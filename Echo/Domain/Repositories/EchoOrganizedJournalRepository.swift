@@ -7,3 +7,11 @@ protocol EchoOrganizedJournalRepository: Sendable {
   func update(_ journal: EchoOrganizedJournal) async throws
   func delete(id: UUID) async throws
 }
+
+protocol EchoWeeklyReflectionRepository: Sendable {
+  func create(_ reflection: EchoWeeklyReflection) async throws
+  func reflection(for week: EchoWeekIdentifier) async throws -> EchoWeeklyReflection?
+  func allReflections() async throws -> [EchoWeeklyReflection]
+  func update(_ reflection: EchoWeeklyReflection) async throws
+  func delete(id: UUID) async throws
+}

@@ -77,3 +77,44 @@ final class PersistentEchoOrganizedJournalV3 {
     self.generatorRawValue = generatorRawValue
   }
 }
+
+@Model
+final class PersistentEchoWeeklyReflection {
+  @Attribute(.unique) var id: UUID
+  @Attribute(.unique) var weekKey: String
+  var weekPayload: Data
+  var createdAt: Date
+  var modifiedAt: Date
+  var body: String
+  var themesPayload: Data
+  var notableEntryIDsPayload: Data
+  var sourceEntryIDsPayload: Data
+  var question: String?
+  var generatorRawValue: String
+
+  init(
+    id: UUID,
+    weekKey: String,
+    weekPayload: Data,
+    createdAt: Date,
+    modifiedAt: Date,
+    body: String,
+    themesPayload: Data,
+    notableEntryIDsPayload: Data,
+    sourceEntryIDsPayload: Data,
+    question: String?,
+    generatorRawValue: String
+  ) {
+    self.id = id
+    self.weekKey = weekKey
+    self.weekPayload = weekPayload
+    self.createdAt = createdAt
+    self.modifiedAt = modifiedAt
+    self.body = body
+    self.themesPayload = themesPayload
+    self.notableEntryIDsPayload = notableEntryIDsPayload
+    self.sourceEntryIDsPayload = sourceEntryIDsPayload
+    self.question = question
+    self.generatorRawValue = generatorRawValue
+  }
+}

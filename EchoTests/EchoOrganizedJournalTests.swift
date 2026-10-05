@@ -111,3 +111,48 @@ struct EchoOrganizedJournalTests {
     #expect(journal.reflectionQuestions.isEmpty)
   }
 }
+
+@Suite("Weekly reflection domain")
+struct EchoWeeklyReflectionTests {
+  @Test("Week identity is stable and reflection regeneration preserves provenance")
+  func weekIdentityAndRegeneration() throws {
+    let calendar = try makeGregorianCalendar(timeZone: "UTC")
+    let week = EchoWeekIdentifier(
+      containing: try makeDate("2026-10-07T12:00:00Z"),
+      calendar: calendar
+    )
+    #expect(
+      week == EchoWeekIdentifier(
+        containing: try makeDate("2026-10-09T12:00:00Z"),
+        calendar: calendar
+      )
+    )
+
+    let source = try makeUUID("00000000-0000-0000-0000-000000000921")
+    var reflection = EchoWeeklyReflection(
+      week: week,
+      createdAt: try makeDate("2026-10-11T20:00:00Z"),
+      body: "A fictional first weekly reflection.",
+      themes: ["Focus"],
+      notableEntryIDs: [source],
+      sourceEntryIDs: [source],
+      question: "What mattered?",
+      generator: .deterministicLocal
+    )
+    let id = reflection.id
+    reflection.regenerate(
+      body: "A fictional revised weekly reflection.",
+      themes: ["Momentum"],
+      notableEntryIDs: [source],
+      sourceEntryIDs: [source],
+      question: "What comes next?",
+      at: try makeDate("2026-10-11T21:00:00Z")
+    )
+
+    #expect(reflection.id == id)
+    #expect(reflection.week == week)
+    #expect(reflection.themes == ["Momentum"])
+    #expect(reflection.sourceEntryIDs == [source])
+    #expect(reflection.question == "What comes next?")
+  }
+}

@@ -9,4 +9,7 @@ enum EchoRepositoryError: Error, Equatable, Sendable {
   case duplicateOrganizedJournal(UUID)
   case duplicateOrganizedJournalDay(EchoDayIdentifier)
   case organizedJournalNotFound(UUID)
+  case duplicateWeeklyReflection(UUID)
+  case duplicateWeeklyReflectionWeek(EchoWeekIdentifier)
+  case weeklyReflectionNotFound(UUID)
 }
