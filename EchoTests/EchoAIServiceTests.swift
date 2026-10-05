@@ -51,6 +51,15 @@ struct EchoAIServiceTests {
       result.body
         == "A fictional morning note.\n\nA fictional evening note."
     )
+    #expect(result.title == "Fictional in Focus")
+    #expect(result.themes == ["Fictional", "Note", "Morning"])
+    #expect(result.keyMoments == [
+      "A fictional morning note",
+      "A fictional evening note",
+    ])
+    #expect(result.reflectionQuestions == [
+      "What about fictional would you like to carry forward?"
+    ])
     #expect(day.entries == [morning, evening])
   }
 

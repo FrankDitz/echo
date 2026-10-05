@@ -23,6 +23,12 @@ struct DayOrganizationViewModelTests {
     let journal = try #require(viewModel.journal)
     #expect(journal.day == fixture.day.id)
     #expect(journal.body == "A fictional morning.\n\nA fictional evening.")
+    #expect(journal.title == "Fictional in Focus")
+    #expect(journal.themes == ["Fictional", "Morning", "Evening"])
+    #expect(journal.keyMoments == ["A fictional morning", "A fictional evening"])
+    #expect(journal.reflectionQuestions == [
+      "What about fictional would you like to carry forward?"
+    ])
     #expect(journal.sourceEntryIDs == fixture.day.entries.map(\.id))
     #expect(journal.generator == .deterministicLocal)
     #expect(fixture.day.entries == fixture.originalEntries)
@@ -56,6 +62,8 @@ struct DayOrganizationViewModelTests {
     #expect(regenerated.id == existing.id)
     #expect(regenerated.createdAt == createdAt)
     #expect(regenerated.modifiedAt == regeneratedAt)
+    #expect(regenerated.title == "Fictional in Focus")
+    #expect(!regenerated.themes.isEmpty)
     #expect(regenerated.sourceEntryIDs == fixture.day.entries.map(\.id))
   }
 
