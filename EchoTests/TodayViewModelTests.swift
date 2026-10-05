@@ -392,6 +392,10 @@ private actor VoiceAttachmentRepositoryStub: EchoVoiceAttachmentRepository {
     attachments[entryID]
   }
 
+  func allAttachments() -> [EchoVoiceAttachment] {
+    Array(attachments.values)
+  }
+
   func update(_ attachment: EchoVoiceAttachment) {
     attachments[attachment.entryID] = attachment
   }

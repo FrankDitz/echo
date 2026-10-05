@@ -60,6 +60,133 @@ struct EchoDataExportServiceTests {
     #expect(export.suggestedFileName == "Echo Journal 2026-10-05")
   }
 
+  @Test("Recovery archive restores missing records and never replaces existing records")
+  func recoveryRoundTrip() async throws {
+    let sourceContainer = try EchoModelContainerFactory.makeInMemory()
+    let sourceEntries = SwiftDataEchoEntryRepository(modelContainer: sourceContainer)
+    let sourceHighlights = SwiftDataEchoHighlightRepository(modelContainer: sourceContainer)
+    let sourceJournals = SwiftDataEchoOrganizedJournalRepository(modelContainer: sourceContainer)
+    let sourceWeeks = SwiftDataEchoWeeklyReflectionRepository(modelContainer: sourceContainer)
+    let sourceAttachments = SwiftDataEchoVoiceAttachmentRepository(
+      modelContainer: sourceContainer
+    )
+    let sourceDirectory = FileManager.default.temporaryDirectory
+      .appendingPathComponent("EchoRecoverySource-\(UUID().uuidString)", isDirectory: true)
+    let destinationDirectory = FileManager.default.temporaryDirectory
+      .appendingPathComponent("EchoRecoveryDestination-\(UUID().uuidString)", isDirectory: true)
+    defer {
+      try? FileManager.default.removeItem(at: sourceDirectory)
+      try? FileManager.default.removeItem(at: destinationDirectory)
+    }
+    let sourceFiles = EchoVoiceFileStore(rootDirectory: sourceDirectory)
+    let calendar = try makeGregorianCalendar(timeZone: "UTC")
+    let createdAt = try makeDate("2026-10-02T18:00:00Z")
+    let entry = EchoEntry(
+      id: try makeUUID("00000000-0000-0000-0000-000000000511"),
+      createdAt: createdAt,
+      calendar: calendar,
+      rawText: "A fictional recovery entry."
+    )
+    let highlight = EchoHighlight(
+      id: try makeUUID("00000000-0000-0000-0000-000000000512"),
+      target: .entry(entry.id),
+      createdAt: createdAt
+    )
+    let journal = EchoOrganizedJournal(
+      id: try makeUUID("00000000-0000-0000-0000-000000000513"),
+      day: entry.day,
+      createdAt: createdAt,
+      body: "A fictional recovered reflection.",
+      sourceEntryIDs: [entry.id],
+      generator: .deterministicLocal
+    )
+    let week = EchoWeeklyReflection(
+      id: try makeUUID("00000000-0000-0000-0000-000000000514"),
+      week: EchoWeekIdentifier(containing: createdAt, calendar: calendar),
+      createdAt: createdAt,
+      body: "A fictional recovered week.",
+      themes: ["Recovery"],
+      notableEntryIDs: [entry.id],
+      sourceEntryIDs: [entry.id],
+      question: nil,
+      generator: .deterministicLocal
+    )
+    let attachmentID = try makeUUID("00000000-0000-0000-0000-000000000515")
+    let audioURL = try sourceFiles.destinationURL(for: attachmentID)
+    let audio = Data("fictional recovery audio".utf8)
+    try audio.write(to: audioURL, options: .atomic)
+    let attachment = EchoVoiceAttachment(
+      id: attachmentID,
+      entryID: entry.id,
+      createdAt: createdAt,
+      relativeFileName: audioURL.lastPathComponent,
+      duration: 4.5,
+      transcript: "A fictional recovery transcript."
+    )
+    try await sourceEntries.create(entry)
+    try await sourceHighlights.create(highlight)
+    try await sourceJournals.create(journal)
+    try await sourceWeeks.create(week)
+    try await sourceAttachments.create(attachment)
+
+    let sourceService = EchoDataRecoveryService(
+      entryRepository: sourceEntries,
+      highlightRepository: sourceHighlights,
+      journalRepository: sourceJournals,
+      weeklyRepository: sourceWeeks,
+      voiceAttachmentRepository: sourceAttachments,
+      voiceFileStore: sourceFiles
+    )
+    let archive = try await sourceService.makeRecoveryArchive(generatedAt: createdAt)
+    #expect(archive.suggestedFileName == "Echo Recovery 2026-10-02.echobackup")
+
+    let destinationContainer = try EchoModelContainerFactory.makeInMemory()
+    let destinationEntries = SwiftDataEchoEntryRepository(modelContainer: destinationContainer)
+    let destinationHighlights = SwiftDataEchoHighlightRepository(
+      modelContainer: destinationContainer
+    )
+    let destinationJournals = SwiftDataEchoOrganizedJournalRepository(
+      modelContainer: destinationContainer
+    )
+    let destinationWeeks = SwiftDataEchoWeeklyReflectionRepository(
+      modelContainer: destinationContainer
+    )
+    let destinationAttachments = SwiftDataEchoVoiceAttachmentRepository(
+      modelContainer: destinationContainer
+    )
+    let destinationFiles = EchoVoiceFileStore(rootDirectory: destinationDirectory)
+    let destinationService = EchoDataRecoveryService(
+      entryRepository: destinationEntries,
+      highlightRepository: destinationHighlights,
+      journalRepository: destinationJournals,
+      weeklyRepository: destinationWeeks,
+      voiceAttachmentRepository: destinationAttachments,
+      voiceFileStore: destinationFiles
+    )
+
+    let firstRestore = try await destinationService.restore(from: archive.data)
+    #expect(firstRestore.addedEntries == 1)
+    #expect(firstRestore.addedHighlights == 1)
+    #expect(firstRestore.addedJournals == 1)
+    #expect(firstRestore.addedWeeklyReflections == 1)
+    #expect(firstRestore.addedVoiceAttachments == 1)
+    #expect(firstRestore.skippedExistingItems == 0)
+    #expect(try await destinationEntries.entry(id: entry.id) == entry)
+    #expect(try await destinationHighlights.highlight(for: highlight.target) == highlight)
+    #expect(try await destinationJournals.journal(for: journal.day) == journal)
+    #expect(try await destinationWeeks.reflection(for: week.week) == week)
+    let restoredAttachment = try #require(
+      try await destinationAttachments.attachment(for: entry.id)
+    )
+    #expect(restoredAttachment == attachment)
+    #expect(try Data(contentsOf: destinationFiles.url(for: restoredAttachment)) == audio)
+
+    let secondRestore = try await destinationService.restore(from: archive.data)
+    #expect(secondRestore.skippedExistingItems == 5)
+    #expect(secondRestore.addedEntries == 0)
+    #expect(try await destinationEntries.allEntries().count == 1)
+  }
+
   private func makeFixture() async throws -> ExportFixture {
     let container = try EchoModelContainerFactory.makeInMemory()
     let entryRepository = SwiftDataEchoEntryRepository(modelContainer: container)

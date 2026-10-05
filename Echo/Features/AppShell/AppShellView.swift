@@ -10,6 +10,7 @@ struct AppShellView: View {
   let weeklyReflectionViewModel: WeeklyReflectionViewModel
   let voiceCaptureViewModel: VoiceCaptureViewModel
   let dataExportService: EchoDataExportService
+  let dataRecoveryService: EchoDataRecoveryService
   let visualWorldSelection: EchoVisualWorldSelection
 
   @State private var selection: EchoPrimarySection = .today
@@ -38,7 +39,8 @@ struct AppShellView: View {
     .sheet(isPresented: $isShowingSettings) {
       SettingsView(
         visualWorldSelection: visualWorldSelection,
-        dataExportService: dataExportService
+        dataExportService: dataExportService,
+        dataRecoveryService: dataRecoveryService
       )
     }
   }

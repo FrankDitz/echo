@@ -44,6 +44,7 @@ protocol EchoEntryRepository: Sendable {
 protocol EchoVoiceAttachmentRepository: Sendable {
   func create(_ attachment: EchoVoiceAttachment) async throws
   func attachment(for entryID: UUID) async throws -> EchoVoiceAttachment?
+  func allAttachments() async throws -> [EchoVoiceAttachment]
   func update(_ attachment: EchoVoiceAttachment) async throws
   func delete(id: UUID) async throws
 }
