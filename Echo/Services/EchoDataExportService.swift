@@ -75,6 +75,255 @@ struct EchoDataExportService: Sendable {
   }
 }
 
+struct EchoRecoveryResult: Equatable, Sendable {
+  let addedEntries: Int
+  let addedHighlights: Int
+  let addedJournals: Int
+  let addedWeeklyReflections: Int
+  let addedVoiceAttachments: Int
+  let skippedExistingItems: Int
+
+  var summary: String {
+    let added = addedEntries + addedHighlights + addedJournals
+      + addedWeeklyReflections + addedVoiceAttachments
+    return "Added \(added) items and kept \(skippedExistingItems) existing items unchanged."
+  }
+}
+
+enum EchoRecoveryError: LocalizedError, Equatable {
+  case unsupportedVersion(Int)
+  case invalidArchive
+
+  var errorDescription: String? {
+    switch self {
+    case .unsupportedVersion:
+      return "This backup was created by an unsupported version of Echo."
+    case .invalidArchive:
+      return "This file is not a valid Echo recovery backup."
+    }
+  }
+}
+
+struct EchoDataRecoveryService: Sendable {
+  private let entryRepository: any EchoEntryRepository
+  private let highlightRepository: any EchoHighlightRepository
+  private let journalRepository: any EchoOrganizedJournalRepository
+  private let weeklyRepository: any EchoWeeklyReflectionRepository
+  private let voiceAttachmentRepository: any EchoVoiceAttachmentRepository
+  private let voiceFileStore: EchoVoiceFileStore
+
+  init(
+    entryRepository: any EchoEntryRepository,
+    highlightRepository: any EchoHighlightRepository,
+    journalRepository: any EchoOrganizedJournalRepository,
+    weeklyRepository: any EchoWeeklyReflectionRepository,
+    voiceAttachmentRepository: any EchoVoiceAttachmentRepository,
+    voiceFileStore: EchoVoiceFileStore
+  ) {
+    self.entryRepository = entryRepository
+    self.highlightRepository = highlightRepository
+    self.journalRepository = journalRepository
+    self.weeklyRepository = weeklyRepository
+    self.voiceAttachmentRepository = voiceAttachmentRepository
+    self.voiceFileStore = voiceFileStore
+  }
+
+  func makeRecoveryArchive(generatedAt: Date = .now) async throws -> EchoDataExport {
+    async let entries = entryRepository.allEntries()
+    async let highlights = highlightRepository.allHighlights()
+    async let journals = journalRepository.allJournals()
+    async let weeklyReflections = weeklyRepository.allReflections()
+    async let voiceAttachments = voiceAttachmentRepository.allAttachments()
+
+    let attachments = try await voiceAttachments
+    var voiceFiles: [EchoRecoveryVoiceFile] = []
+    for attachment in attachments {
+      let url = try voiceFileStore.url(for: attachment)
+      voiceFiles.append(
+        EchoRecoveryVoiceFile(
+          attachmentID: attachment.id,
+          data: try Data(contentsOf: url)
+        )
+      )
+    }
+
+    let archive = EchoRecoveryArchive(
+      formatVersion: EchoRecoveryArchive.currentVersion,
+      createdAt: generatedAt,
+      entries: try await entries,
+      highlights: try await highlights,
+      journals: try await journals,
+      weeklyReflections: try await weeklyReflections,
+      voiceAttachments: attachments,
+      voiceFiles: voiceFiles
+    )
+    let encoder = JSONEncoder()
+    encoder.dateEncodingStrategy = .iso8601
+    encoder.outputFormatting = [.sortedKeys]
+    let dateStamp = Self.fileDateFormatter.string(from: generatedAt)
+    return EchoDataExport(
+      data: try encoder.encode(archive),
+      suggestedFileName: "Echo Recovery \(dateStamp).echobackup"
+    )
+  }
+
+  func restore(from data: Data) async throws -> EchoRecoveryResult {
+    let decoder = JSONDecoder()
+    decoder.dateDecodingStrategy = .iso8601
+    let archive: EchoRecoveryArchive
+    do {
+      archive = try decoder.decode(EchoRecoveryArchive.self, from: data)
+    } catch {
+      throw EchoRecoveryError.invalidArchive
+    }
+    guard archive.formatVersion == EchoRecoveryArchive.currentVersion else {
+      throw EchoRecoveryError.unsupportedVersion(archive.formatVersion)
+    }
+    try validate(archive)
+
+    let currentEntries = try await entryRepository.allEntries()
+    let availableEntryIDs = Set(currentEntries.map(\.id)).union(archive.entries.map(\.id))
+    guard archive.voiceAttachments.allSatisfy({ availableEntryIDs.contains($0.entryID) }) else {
+      throw EchoRecoveryError.invalidArchive
+    }
+
+    var addedEntries = 0
+    var addedHighlights = 0
+    var addedJournals = 0
+    var addedWeeklyReflections = 0
+    var addedVoiceAttachments = 0
+    var skipped = 0
+
+    let currentEntryIDs = Set(currentEntries.map(\.id))
+    for entry in archive.entries {
+      if currentEntryIDs.contains(entry.id) {
+        skipped += 1
+      } else {
+        try await entryRepository.create(entry)
+        addedEntries += 1
+      }
+    }
+
+    for highlight in archive.highlights {
+      if try await highlightRepository.highlight(for: highlight.target) != nil {
+        skipped += 1
+      } else {
+        try await highlightRepository.create(highlight)
+        addedHighlights += 1
+      }
+    }
+
+    for journal in archive.journals {
+      if try await journalRepository.journal(for: journal.day) != nil {
+        skipped += 1
+      } else {
+        try await journalRepository.create(journal)
+        addedJournals += 1
+      }
+    }
+
+    for reflection in archive.weeklyReflections {
+      if try await weeklyRepository.reflection(for: reflection.week) != nil {
+        skipped += 1
+      } else {
+        try await weeklyRepository.create(reflection)
+        addedWeeklyReflections += 1
+      }
+    }
+
+    let audioByAttachmentID = Dictionary(
+      uniqueKeysWithValues: archive.voiceFiles.map { ($0.attachmentID, $0.data) }
+    )
+    for attachment in archive.voiceAttachments {
+      if try await voiceAttachmentRepository.attachment(for: attachment.entryID) != nil {
+        skipped += 1
+        continue
+      }
+      guard let audio = audioByAttachmentID[attachment.id] else {
+        throw EchoRecoveryError.invalidArchive
+      }
+      let destination = try voiceFileStore.destinationURL(for: attachment.id)
+      let restoredAttachment = EchoVoiceAttachment(
+        id: attachment.id,
+        entryID: attachment.entryID,
+        createdAt: attachment.createdAt,
+        relativeFileName: destination.lastPathComponent,
+        duration: attachment.duration,
+        format: attachment.format,
+        transcript: attachment.transcript
+      )
+      try audio.write(to: destination, options: .atomic)
+      do {
+        try await voiceAttachmentRepository.create(restoredAttachment)
+      } catch {
+        try? FileManager.default.removeItem(at: destination)
+        throw error
+      }
+      addedVoiceAttachments += 1
+    }
+
+    return EchoRecoveryResult(
+      addedEntries: addedEntries,
+      addedHighlights: addedHighlights,
+      addedJournals: addedJournals,
+      addedWeeklyReflections: addedWeeklyReflections,
+      addedVoiceAttachments: addedVoiceAttachments,
+      skippedExistingItems: skipped
+    )
+  }
+
+  private func validate(_ archive: EchoRecoveryArchive) throws {
+    let entryIDs = archive.entries.map(\.id)
+    let highlightIDs = archive.highlights.map(\.id)
+    let highlightTargets = archive.highlights.map(\.target)
+    let journalIDs = archive.journals.map(\.id)
+    let journalDays = archive.journals.map(\.day)
+    let weeklyIDs = archive.weeklyReflections.map(\.id)
+    let weeks = archive.weeklyReflections.map(\.week)
+    let attachmentIDs = archive.voiceAttachments.map(\.id)
+    let attachmentEntryIDs = archive.voiceAttachments.map(\.entryID)
+    let voiceFileIDs = archive.voiceFiles.map(\.attachmentID)
+    guard isUnique(entryIDs), isUnique(highlightIDs), isUnique(highlightTargets),
+      isUnique(journalIDs), isUnique(journalDays), isUnique(weeklyIDs), isUnique(weeks),
+      isUnique(attachmentIDs), isUnique(attachmentEntryIDs), isUnique(voiceFileIDs),
+      Set(attachmentIDs) == Set(voiceFileIDs)
+    else {
+      throw EchoRecoveryError.invalidArchive
+    }
+  }
+
+  private func isUnique<Value: Hashable>(_ values: [Value]) -> Bool {
+    Set(values).count == values.count
+  }
+
+  private static var fileDateFormatter: DateFormatter {
+    let formatter = DateFormatter()
+    formatter.calendar = Calendar(identifier: .gregorian)
+    formatter.locale = Locale(identifier: "en_US_POSIX")
+    formatter.timeZone = TimeZone(secondsFromGMT: 0)
+    formatter.dateFormat = "yyyy-MM-dd"
+    return formatter
+  }
+}
+
+private struct EchoRecoveryArchive: Codable, Sendable {
+  static let currentVersion = 1
+
+  let formatVersion: Int
+  let createdAt: Date
+  let entries: [EchoEntry]
+  let highlights: [EchoHighlight]
+  let journals: [EchoOrganizedJournal]
+  let weeklyReflections: [EchoWeeklyReflection]
+  let voiceAttachments: [EchoVoiceAttachment]
+  let voiceFiles: [EchoRecoveryVoiceFile]
+}
+
+private struct EchoRecoveryVoiceFile: Codable, Sendable {
+  let attachmentID: UUID
+  let data: Data
+}
+
 private struct EchoExportSnapshot {
   let generatedAt: Date
   let timeZone: TimeZone

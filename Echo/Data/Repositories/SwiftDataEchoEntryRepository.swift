@@ -92,6 +92,15 @@ actor SwiftDataEchoVoiceAttachmentRepository: EchoVoiceAttachmentRepository {
     try record(entryID: entryID).map(EchoPersistenceMapper.makeVoiceAttachment)
   }
 
+  func allAttachments() async throws -> [EchoVoiceAttachment] {
+    try modelContext.fetch(FetchDescriptor<PersistentEchoVoiceAttachment>())
+      .map(EchoPersistenceMapper.makeVoiceAttachment)
+      .sorted { lhs, rhs in
+        if lhs.createdAt != rhs.createdAt { return lhs.createdAt < rhs.createdAt }
+        return lhs.id.uuidString < rhs.id.uuidString
+      }
+  }
+
   func update(_ attachment: EchoVoiceAttachment) async throws {
     guard let record = try record(id: attachment.id) else {
       throw EchoRepositoryError.voiceAttachmentNotFound(attachment.id)

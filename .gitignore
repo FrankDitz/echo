@@ -55,3 +55,4 @@ Exports/
 *.store-*
 *.journal
 *.backup
+*.echobackup

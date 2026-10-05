@@ -5,13 +5,17 @@ struct SettingsView: View {
   @Environment(\.dismiss) private var dismiss
   @Bindable var visualWorldSelection: EchoVisualWorldSelection
   let dataExportService: EchoDataExportService
+  let dataRecoveryService: EchoDataRecoveryService
 
   @State private var exportDocument: EchoExportDocument?
   @State private var exportContentType = UTType.plainText
   @State private var exportFileName = "Echo Journal"
   @State private var isPreparingExport = false
   @State private var isShowingExporter = false
-  @State private var exportErrorMessage: String?
+  @State private var isShowingRecoveryImporter = false
+  @State private var isConfirmingRecovery = false
+  @State private var pendingRecoveryData: Data?
+  @State private var noticeMessage: String?
 
   var body: some View {
     NavigationStack {
@@ -65,8 +69,35 @@ struct SettingsView: View {
                 }
 
                 if isPreparingExport {
-                  ProgressView("Preparing private export…")
+                  ProgressView("Preparing private file…")
                     .font(EchoTypography.status)
+                }
+
+                Divider()
+
+                Label("Recovery backup", systemImage: "externaldrive.badge.timemachine")
+                  .font(EchoTypography.contentTitle)
+
+                Text(
+                  "Create a complete local backup, including voice recordings, or merge one "
+                    + "back into Echo. Restore never deletes or replaces current items."
+                )
+                .font(EchoTypography.supporting)
+                .foregroundStyle(visualWorldSelection.selectedWorld.secondaryText)
+
+                HStack(spacing: EchoLayout.rowSpacing) {
+                  recoveryButton(
+                    "Create Backup",
+                    systemImage: "archivebox"
+                  ) {
+                    prepareRecoveryArchive()
+                  }
+                  recoveryButton(
+                    "Restore Backup",
+                    systemImage: "arrow.clockwise.icloud"
+                  ) {
+                    isShowingRecoveryImporter = true
+                  }
                 }
               }
             }
@@ -101,20 +132,40 @@ struct SettingsView: View {
       defaultFilename: exportFileName
     ) { result in
       if case .failure(let error) = result {
-        exportErrorMessage = error.localizedDescription
+        noticeMessage = error.localizedDescription
       }
       exportDocument = nil
     }
+    .fileImporter(
+      isPresented: $isShowingRecoveryImporter,
+      allowedContentTypes: [.echoRecoveryArchive],
+      allowsMultipleSelection: false,
+      onCompletion: loadRecoveryArchive
+    )
+    .confirmationDialog(
+      "Merge this backup into Echo?",
+      isPresented: $isConfirmingRecovery,
+      titleVisibility: .visible
+    ) {
+      Button("Restore Missing Items") {
+        restorePendingArchive()
+      }
+      Button("Cancel", role: .cancel) {
+        pendingRecoveryData = nil
+      }
+    } message: {
+      Text("Existing entries and reflections stay unchanged. Echo only adds missing items.")
+    }
     .alert(
-      "Export couldn’t be prepared",
+      "Echo Data",
       isPresented: Binding(
-        get: { exportErrorMessage != nil },
-        set: { if !$0 { exportErrorMessage = nil } }
+        get: { noticeMessage != nil },
+        set: { if !$0 { noticeMessage = nil } }
       )
     ) {
       Button("OK", role: .cancel) {}
     } message: {
-      Text(exportErrorMessage ?? "Please try again.")
+      Text(noticeMessage ?? "Please try again.")
     }
   }
 
@@ -129,7 +180,20 @@ struct SettingsView: View {
       Label(title, systemImage: systemImage)
         .frame(maxWidth: .infinity)
     }
-    .buttonStyle(.bordered)
+    .buttonStyle(EchoDataActionButtonStyle(world: visualWorldSelection.selectedWorld))
+    .disabled(isPreparingExport)
+  }
+
+  private func recoveryButton(
+    _ title: String,
+    systemImage: String,
+    action: @escaping () -> Void
+  ) -> some View {
+    Button(action: action) {
+      Label(title, systemImage: systemImage)
+        .frame(maxWidth: .infinity)
+    }
+    .buttonStyle(EchoDataActionButtonStyle(world: visualWorldSelection.selectedWorld))
     .disabled(isPreparingExport)
   }
 
@@ -144,14 +208,82 @@ struct SettingsView: View {
         exportFileName = export.suggestedFileName
         isShowingExporter = true
       } catch {
-        exportErrorMessage = error.localizedDescription
+        noticeMessage = error.localizedDescription
+      }
+    }
+  }
+
+  private func prepareRecoveryArchive() {
+    isPreparingExport = true
+    Task {
+      defer { isPreparingExport = false }
+      do {
+        let export = try await dataRecoveryService.makeRecoveryArchive()
+        exportDocument = EchoExportDocument(data: export.data)
+        exportContentType = .echoRecoveryArchive
+        exportFileName = export.suggestedFileName
+        isShowingExporter = true
+      } catch {
+        noticeMessage = error.localizedDescription
+      }
+    }
+  }
+
+  private func loadRecoveryArchive(_ result: Result<[URL], any Error>) {
+    do {
+      let url = try result.get().first
+      guard let url else { return }
+      let isAccessing = url.startAccessingSecurityScopedResource()
+      defer { if isAccessing { url.stopAccessingSecurityScopedResource() } }
+      pendingRecoveryData = try Data(contentsOf: url)
+      isConfirmingRecovery = true
+    } catch {
+      noticeMessage = error.localizedDescription
+    }
+  }
+
+  private func restorePendingArchive() {
+    guard let data = pendingRecoveryData else { return }
+    pendingRecoveryData = nil
+    isPreparingExport = true
+    Task {
+      defer { isPreparingExport = false }
+      do {
+        let result = try await dataRecoveryService.restore(from: data)
+        noticeMessage = result.summary
+      } catch {
+        noticeMessage = error.localizedDescription
       }
     }
   }
 }
 
+private struct EchoDataActionButtonStyle: ButtonStyle {
+  let world: EchoVisualWorld
+
+  func makeBody(configuration: Configuration) -> some View {
+    configuration.label
+      .font(.headline)
+      .foregroundStyle(world.primaryText)
+      .padding(.horizontal, EchoLayout.inlineSpacing)
+      .padding(.vertical, 10)
+      .background {
+        RoundedRectangle(cornerRadius: EchoShape.embeddedRadius)
+          .fill(world.selectedFill)
+      }
+      .overlay {
+        RoundedRectangle(cornerRadius: EchoShape.embeddedRadius)
+          .stroke(
+            world.accent.opacity(configuration.isPressed ? 0.8 : 0.42),
+            lineWidth: EchoShape.emphasizedBorderWidth
+          )
+      }
+      .opacity(configuration.isPressed ? 0.78 : 1)
+  }
+}
+
 private struct EchoExportDocument: FileDocument {
-  static let readableContentTypes: [UTType] = [.echoMarkdown, .pdf]
+  static let readableContentTypes: [UTType] = [.echoMarkdown, .pdf, .echoRecoveryArchive]
 
   let data: Data
 
@@ -170,6 +302,10 @@ private struct EchoExportDocument: FileDocument {
 
 private extension UTType {
   static let echoMarkdown = UTType("net.daringfireball.markdown") ?? .plainText
+  static let echoRecoveryArchive = UTType(
+    filenameExtension: "echobackup",
+    conformingTo: .data
+  ) ?? .data
 }
 
 private struct VisualWorldOption: View {

@@ -8,7 +8,7 @@ cd "$repository_root"
 path_list=$(mktemp "${TMPDIR:-/tmp}/echo-paths.XXXXXX")
 trap 'rm -f "$path_list"' EXIT HUP INT TERM
 
-private_path_pattern='(^|/)(LocalData|UserData|JournalData|PrivateData|RuntimeData|UserContent|JournalMedia|Recordings|Backups|Exports)(/|$)|(^|/)(\.env($|\.)|Secrets\.xcconfig$|[^/]+\.secrets\.xcconfig$|credentials?(\.[^/]*)?\.json$|service-account[^/]*\.json$|GoogleService-Info\.plist$|AuthKey_[^/]+\.p8$)|\.(sqlite|sqlite-(shm|wal)|db|db-(shm|wal)|store|store-(shm|wal)|journal|backup|p8|p12|pem|key|cer|mobileprovision|provisionprofile)$'
+private_path_pattern='(^|/)(LocalData|UserData|JournalData|PrivateData|RuntimeData|UserContent|JournalMedia|Recordings|Backups|Exports)(/|$)|(^|/)(\.env($|\.)|Secrets\.xcconfig$|[^/]+\.secrets\.xcconfig$|credentials?(\.[^/]*)?\.json$|service-account[^/]*\.json$|GoogleService-Info\.plist$|AuthKey_[^/]+\.p8$)|\.(sqlite|sqlite-(shm|wal)|db|db-(shm|wal)|store|store-(shm|wal)|journal|backup|echobackup|p8|p12|pem|key|cer|mobileprovision|provisionprofile)$'
 private_media_pattern='\.(heic|jpe?g|png|gif|tiff?|mov|mp4|m4v|m4a|wav|caf|aac)$'
 credential_pattern='(sk-(proj-)?[A-Za-z0-9_-]{20,}|gh[pousr]_[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}|AIza[0-9A-Za-z_-]{35}|xox[baprs]-[0-9A-Za-z-]{10,}|-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----)'
 assignment_pattern="(api[_-]?key|access[_-]?token|client[_-]?secret|password)[[:space:]]*[:=][[:space:]]*[\"']?[A-Za-z0-9_+./=-]{16,}"
