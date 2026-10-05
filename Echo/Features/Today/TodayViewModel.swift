@@ -15,10 +15,17 @@ enum TodayJournalFailure: Equatable {
   case deleteEntry
 }
 
+struct TodayMemorySnapshot: Equatable, Sendable {
+  var onThisDay: [EchoEntry] = []
+  var unfinished: [EchoEntry] = []
+  var saved: [EchoEntry] = []
+}
+
 @MainActor
 @Observable
 final class TodayViewModel {
   private let repository: any EchoEntryRepository
+  private let highlightRepository: (any EchoHighlightRepository)?
   private let calendar: Calendar
   private let now: () -> Date
 
@@ -27,13 +34,17 @@ final class TodayViewModel {
   private(set) var isLoading = false
   private(set) var saveState: TodayEntrySaveState = .idle
   private(set) var failure: TodayJournalFailure?
+  private(set) var memories = TodayMemorySnapshot()
+  private(set) var isLoadingMemories = false
 
   init(
     repository: any EchoEntryRepository,
+    highlightRepository: (any EchoHighlightRepository)? = nil,
     calendar: Calendar = .autoupdatingCurrent,
     now: @escaping () -> Date = Date.init
   ) {
     self.repository = repository
+    self.highlightRepository = highlightRepository
     self.calendar = calendar
     self.now = now
     self.displayedDate = now()
@@ -53,6 +64,66 @@ final class TodayViewModel {
     } catch {
       failure = .loadEntries
     }
+
+    await loadMemories(relativeTo: currentDate)
+  }
+
+  private func loadMemories(relativeTo currentDate: Date) async {
+    isLoadingMemories = true
+    defer { isLoadingMemories = false }
+
+    do {
+      async let allEntriesRequest = repository.allEntries()
+      async let highlightsRequest = highlightRepository?.allHighlights() ?? []
+      let (allEntries, highlights) = try await (allEntriesRequest, highlightsRequest)
+      let historicalEntries = allEntries.filter {
+        $0.createdAt < currentDate
+          && !calendar.isDate($0.createdAt, inSameDayAs: currentDate)
+      }
+      let recentCutoff = calendar.date(
+        byAdding: .day,
+        value: -90,
+        to: currentDate
+      ) ?? .distantPast
+      let currentComponents = calendar.dateComponents([.month, .day], from: currentDate)
+      let highlightedEntryIDs = Set(
+        highlights.compactMap { highlight in
+          highlight.target.kind == .entry ? highlight.target.entityID : nil
+        }
+      )
+
+      memories = TodayMemorySnapshot(
+        onThisDay: newestFirst(
+          historicalEntries.filter { entry in
+            let components = calendar.dateComponents([.month, .day], from: entry.createdAt)
+            return components.month == currentComponents.month
+              && components.day == currentComponents.day
+          }
+        ),
+        unfinished: newestFirst(
+          historicalEntries.filter { $0.createdAt >= recentCutoff && isUnfinished($0) }
+        ),
+        saved: newestFirst(
+          historicalEntries.filter { highlightedEntryIDs.contains($0.id) }
+        )
+      )
+    } catch {
+      memories = TodayMemorySnapshot()
+    }
+  }
+
+  private func isUnfinished(_ entry: EchoEntry) -> Bool {
+    let text = entry.rawText.lowercased()
+    return text.trimmingCharacters(in: .whitespacesAndNewlines).hasSuffix("?")
+      || ["still thinking", "need to", "want to", "come back", "later"]
+        .contains(where: text.contains)
+  }
+
+  private func newestFirst(_ entries: [EchoEntry]) -> [EchoEntry] {
+    Array(entries.sorted { lhs, rhs in
+      if lhs.createdAt != rhs.createdAt { return lhs.createdAt > rhs.createdAt }
+      return lhs.id.uuidString < rhs.id.uuidString
+    }.prefix(3))
   }
 
   @discardableResult

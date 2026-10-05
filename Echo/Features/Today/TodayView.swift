@@ -67,6 +67,7 @@ struct TodayView: View {
       promptHeader(isWide: false)
       captureControl
       entrySection(isWide: false)
+      memorySection
     }
     .frame(maxWidth: EchoLayout.contentMaxWidth, alignment: .leading)
     .padding(.horizontal, EchoLayout.pageHorizontalPadding)
@@ -109,6 +110,8 @@ struct TodayView: View {
         entrySection(isWide: true)
           .frame(width: min(max(availableSize.width * 0.34, 390), 470))
       }
+
+      memorySection
     }
     .frame(maxWidth: EchoLayout.wideContentMaxWidth, alignment: .leading)
     .padding(.horizontal, 40)
@@ -226,6 +229,14 @@ struct TodayView: View {
     )
   }
 
+  private var memorySection: some View {
+    TodayMemorySection(
+      snapshot: viewModel.memories,
+      isLoading: viewModel.isLoadingMemories,
+      onOpen: { selectedEntry = $0 }
+    )
+  }
+
   @Environment(\.echoVisualWorld) private var world
   @Environment(\.horizontalSizeClass) private var horizontalSizeClass
   @Environment(\.dynamicTypeSize) private var dynamicTypeSize
@@ -280,6 +291,96 @@ struct TodayView: View {
       }
     }
   }
+}
+
+private struct TodayMemorySection: View {
+  let snapshot: TodayMemorySnapshot
+  let isLoading: Bool
+  let onOpen: (EchoEntry) -> Void
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: EchoLayout.contentSpacing) {
+      VStack(alignment: .leading, spacing: EchoLayout.inlineSpacing) {
+        Text("MEMORY SIGNALS")
+          .font(EchoTypography.editorialEyebrow)
+          .tracking(1.5)
+          .foregroundStyle(.secondary)
+        Text("A few things worth meeting again.")
+          .font(EchoTypography.sectionTitle)
+      }
+
+      if isLoading {
+        EchoLoadingState(title: "Looking through your private journal…", minHeight: 80)
+      } else {
+        LazyVGrid(
+          columns: [GridItem(.adaptive(minimum: 240), spacing: EchoLayout.contentSpacing)],
+          alignment: .leading,
+          spacing: EchoLayout.contentSpacing
+        ) {
+          memoryLane(
+            title: "On this day",
+            systemImage: "calendar.badge.clock",
+            entries: snapshot.onThisDay,
+            emptyMessage: "No earlier entry shares today’s date yet."
+          )
+          memoryLane(
+            title: "Unfinished thoughts",
+            systemImage: "ellipsis.bubble",
+            entries: snapshot.unfinished,
+            emptyMessage: "Nothing is asking to be picked back up."
+          )
+          memoryLane(
+            title: "Saved memories",
+            systemImage: "bookmark",
+            entries: snapshot.saved,
+            emptyMessage: "Saved entries will quietly return here."
+          )
+        }
+      }
+    }
+  }
+
+  private func memoryLane(
+    title: String,
+    systemImage: String,
+    entries: [EchoEntry],
+    emptyMessage: String
+  ) -> some View {
+    EchoReadabilityPanel {
+      VStack(alignment: .leading, spacing: EchoLayout.rowSpacing) {
+        Label(title, systemImage: systemImage)
+          .font(EchoTypography.contentTitle)
+          .foregroundStyle(world.accent)
+
+        if entries.isEmpty {
+          Text(emptyMessage)
+            .font(EchoTypography.supporting)
+            .foregroundStyle(.secondary)
+        } else {
+          ForEach(entries) { entry in
+            Button { onOpen(entry) } label: {
+              VStack(alignment: .leading, spacing: EchoLayout.inlineSpacing) {
+                Text(entry.rawText)
+                  .font(EchoTypography.supporting)
+                  .lineLimit(3)
+                  .multilineTextAlignment(.leading)
+                Text(entry.createdAt, format: .dateTime.month(.abbreviated).day().year())
+                  .font(EchoTypography.metadata)
+                  .foregroundStyle(.secondary)
+              }
+              .frame(maxWidth: .infinity, alignment: .leading)
+              .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+
+            if entry.id != entries.last?.id { Divider() }
+          }
+        }
+      }
+    }
+  }
+
+  @Environment(\.echoVisualWorld) private var world
 }
 
 private struct TodayCaptureControl: View {

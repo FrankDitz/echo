@@ -50,7 +50,7 @@ Phase 8 begins only after the completed Phase 7 application has been reviewed to
 3. **Calendar browsing (complete):** replace decorative calendar affordances with a real month browser, day indicators, date selection, and direct navigation to days containing entries.
 4. **Reflection structure domain (complete):** extend organized journals with optional generated title, themes, key moments, and reflection questions through a versioned migration that preserves existing journals and raw entries.
 5. **Richer reflection generation and UI (complete):** produce and present the new reflection structure with the deterministic local provider first, keeping regeneration explicit and original-source provenance visible.
-6. **Memory resurfacing:** add private “On This Day,” recent unfinished thoughts, and saved-memory resurfacing with neutral empty states and no streaks, guilt, or engagement pressure.
+6. **Memory resurfacing (complete):** add private “On This Day,” recent unfinished thoughts, and saved-memory resurfacing with neutral empty states and no streaks, guilt, or engagement pressure.
 7. **Weekly Echo foundation:** define, persist, and test a weekly reflection containing source provenance, recurring themes, notable entries, and an optional question for the coming week.
 8. **Weekly Echo experience:** add browsing, generation, regeneration, and source navigation for weekly reflections without replacing daily reflections.
 9. **Voice entry foundation:** add versioned local attachment metadata and lifecycle rules for voice entries, including safe file placement, deletion, migration, and repository-safety tests.
