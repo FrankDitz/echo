@@ -69,8 +69,8 @@ struct TodayView: View {
       promptHeader(isWide: false)
       captureControl
       voiceStatus
-      entrySection(isWide: false)
       memorySection
+      entrySection(isWide: false)
     }
     .frame(maxWidth: EchoLayout.contentMaxWidth, alignment: .leading)
     .padding(.horizontal, EchoLayout.pageHorizontalPadding)
@@ -108,6 +108,7 @@ struct TodayView: View {
           promptHeader(isWide: true)
           captureControl
           voiceStatus
+          memorySection
         }
         .frame(maxWidth: 610, alignment: .leading)
 
@@ -115,11 +116,10 @@ struct TodayView: View {
           .frame(width: min(max(availableSize.width * 0.34, 390), 470))
       }
 
-      memorySection
     }
     .frame(maxWidth: EchoLayout.wideContentMaxWidth, alignment: .leading)
     .padding(.horizontal, 40)
-    .padding(.top, 92)
+    .padding(.top, 44)
     .padding(.bottom, 64)
     .frame(maxWidth: .infinity, minHeight: max(availableSize.height, 0), alignment: .top)
   }
@@ -356,73 +356,84 @@ private struct TodayMemorySection: View {
 
       if isLoading {
         EchoLoadingState(title: "Looking through your private journal…", minHeight: 80)
+      } else if populatedLanes.isEmpty {
+        EchoReadabilityPanel {
+          Label("Your memories will gather here as you write.", systemImage: "sparkles")
+            .font(EchoTypography.supporting)
+            .foregroundStyle(world.secondaryText)
+        }
       } else {
-        LazyVGrid(
-          columns: [GridItem(.adaptive(minimum: 240), spacing: EchoLayout.contentSpacing)],
-          alignment: .leading,
-          spacing: EchoLayout.contentSpacing
-        ) {
-          memoryLane(
-            title: "On this day",
-            systemImage: "calendar.badge.clock",
-            entries: snapshot.onThisDay,
-            emptyMessage: "No earlier entry shares today’s date yet."
-          )
-          memoryLane(
-            title: "Unfinished thoughts",
-            systemImage: "ellipsis.bubble",
-            entries: snapshot.unfinished,
-            emptyMessage: "Nothing is asking to be picked back up."
-          )
-          memoryLane(
-            title: "Saved memories",
-            systemImage: "bookmark",
-            entries: snapshot.saved,
-            emptyMessage: "Saved entries will quietly return here."
-          )
+        ScrollView(.horizontal) {
+          LazyHStack(alignment: .top, spacing: EchoLayout.contentSpacing) {
+            ForEach(populatedLanes) { lane in
+              memoryLane(lane)
+                .containerRelativeFrame(.horizontal, count: 1, spacing: EchoLayout.contentSpacing)
+            }
+          }
+          .scrollTargetLayout()
+        }
+        .scrollTargetBehavior(.viewAligned)
+        .scrollIndicators(.hidden)
+      }
+    }
+  }
+
+  private var populatedLanes: [MemoryLane] {
+    [
+      MemoryLane(
+        title: "On this day",
+        systemImage: "calendar.badge.clock",
+        entries: snapshot.onThisDay
+      ),
+      MemoryLane(
+        title: "Unfinished thoughts",
+        systemImage: "ellipsis.bubble",
+        entries: snapshot.unfinished
+      ),
+      MemoryLane(
+        title: "Saved memories",
+        systemImage: "bookmark",
+        entries: snapshot.saved
+      ),
+    ]
+    .filter { !$0.entries.isEmpty }
+  }
+
+  private func memoryLane(_ lane: MemoryLane) -> some View {
+    EchoReadabilityPanel {
+      VStack(alignment: .leading, spacing: EchoLayout.rowSpacing) {
+        Label(lane.title, systemImage: lane.systemImage)
+          .font(EchoTypography.contentTitle)
+          .foregroundStyle(world.accent)
+
+        ForEach(lane.entries) { entry in
+          Button { onOpen(entry) } label: {
+            VStack(alignment: .leading, spacing: EchoLayout.inlineSpacing) {
+              Text(entry.rawText)
+                .font(EchoTypography.supporting)
+                .lineLimit(3)
+                .multilineTextAlignment(.leading)
+              Text(entry.createdAt, format: .dateTime.month(.abbreviated).day().year())
+                .font(EchoTypography.metadata)
+                .foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .contentShape(Rectangle())
+          }
+          .buttonStyle(.plain)
+
+          if entry.id != lane.entries.last?.id { Divider() }
         }
       }
     }
   }
 
-  private func memoryLane(
-    title: String,
-    systemImage: String,
-    entries: [EchoEntry],
-    emptyMessage: String
-  ) -> some View {
-    EchoReadabilityPanel {
-      VStack(alignment: .leading, spacing: EchoLayout.rowSpacing) {
-        Label(title, systemImage: systemImage)
-          .font(EchoTypography.contentTitle)
-          .foregroundStyle(world.accent)
+  private struct MemoryLane: Identifiable {
+    let title: String
+    let systemImage: String
+    let entries: [EchoEntry]
 
-        if entries.isEmpty {
-          Text(emptyMessage)
-            .font(EchoTypography.supporting)
-            .foregroundStyle(.secondary)
-        } else {
-          ForEach(entries) { entry in
-            Button { onOpen(entry) } label: {
-              VStack(alignment: .leading, spacing: EchoLayout.inlineSpacing) {
-                Text(entry.rawText)
-                  .font(EchoTypography.supporting)
-                  .lineLimit(3)
-                  .multilineTextAlignment(.leading)
-                Text(entry.createdAt, format: .dateTime.month(.abbreviated).day().year())
-                  .font(EchoTypography.metadata)
-                  .foregroundStyle(.secondary)
-              }
-              .frame(maxWidth: .infinity, alignment: .leading)
-              .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-
-            if entry.id != entries.last?.id { Divider() }
-          }
-        }
-      }
-    }
+    var id: String { title }
   }
 
   @Environment(\.echoVisualWorld) private var world

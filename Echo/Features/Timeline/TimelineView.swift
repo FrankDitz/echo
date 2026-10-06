@@ -22,19 +22,33 @@ struct TimelineView: View {
         ScrollView {
           let isWide = proxy.size.width >= EchoLayout.wideLayoutBreakpoint
 
-          LazyVStack(alignment: .leading, spacing: EchoLayout.compactSectionSpacing) {
+          Group {
             if isWide {
-              timelineHeader
+              HStack(alignment: .top, spacing: 48) {
+                VStack(alignment: .leading, spacing: EchoLayout.compactSectionSpacing) {
+                  timelineHeader
+                  searchControl
+                }
+                .frame(width: 300, alignment: .leading)
+
+                LazyVStack(alignment: .leading, spacing: EchoLayout.compactSectionSpacing) {
+                  timelineContent(isWide: true)
+                }
+                .frame(maxWidth: 760, alignment: .leading)
+              }
+            } else {
+              LazyVStack(alignment: .leading, spacing: EchoLayout.compactSectionSpacing) {
+                searchControl
+                timelineContent(isWide: false)
+              }
             }
-            searchControl
-            timelineContent(isWide: isWide)
           }
           .frame(
-            maxWidth: isWide ? 960 : EchoLayout.contentMaxWidth,
+            maxWidth: isWide ? EchoLayout.wideContentMaxWidth : EchoLayout.contentMaxWidth,
             alignment: .leading
           )
           .padding(.horizontal, isWide ? 40 : EchoLayout.pageHorizontalPadding)
-          .padding(.vertical, isWide ? 46 : EchoLayout.pageVerticalPadding)
+          .padding(.vertical, isWide ? 32 : EchoLayout.pageVerticalPadding)
           .frame(maxWidth: .infinity)
           .frame(minHeight: max(proxy.size.height, 0), alignment: .top)
         }

@@ -127,19 +127,40 @@ private struct WeeklyReflectionView: View {
 
   var body: some View {
     EchoWorldCanvas {
-      ScrollView {
-        VStack(alignment: .leading, spacing: EchoLayout.sectionSpacing) {
-          weekHeader
-          reflectionPanel
-          sourceDays
-          actionBar
+      GeometryReader { geometry in
+        ScrollView {
+          let isWide = geometry.size.width >= EchoLayout.wideLayoutBreakpoint
+
+          VStack(alignment: .leading, spacing: EchoLayout.sectionSpacing) {
+            weekHeader
+
+            if isWide {
+              HStack(alignment: .top, spacing: 42) {
+                reflectionPanel(isWide: true)
+                  .frame(maxWidth: 680, alignment: .topLeading)
+
+                VStack(alignment: .leading, spacing: EchoLayout.contentSpacing) {
+                  sourceDays
+                  actionBar
+                }
+                .frame(maxWidth: 420, alignment: .topLeading)
+              }
+            } else {
+              reflectionPanel(isWide: false)
+              sourceDays
+              actionBar
+            }
+          }
+          .frame(
+            maxWidth: isWide ? EchoLayout.wideContentMaxWidth : EchoLayout.contentMaxWidth,
+            alignment: .leading
+          )
+          .padding(.horizontal, isWide ? 40 : EchoLayout.pageHorizontalPadding)
+          .padding(.vertical, isWide ? 36 : EchoLayout.pageVerticalPadding)
+          .frame(maxWidth: .infinity)
         }
-        .frame(maxWidth: EchoLayout.contentMaxWidth, alignment: .leading)
-        .padding(.horizontal, EchoLayout.pageHorizontalPadding)
-        .padding(.vertical, EchoLayout.pageVerticalPadding)
-        .frame(maxWidth: .infinity)
+        .scrollIndicators(.hidden)
       }
-      .scrollIndicators(.hidden)
     }
     .task { await viewModel.load() }
     .sheet(item: $selectedDay) { day in
@@ -177,7 +198,7 @@ private struct WeeklyReflectionView: View {
   }
 
   @ViewBuilder
-  private var reflectionPanel: some View {
+  private func reflectionPanel(isWide: Bool) -> some View {
     EchoReadabilityPanel {
       if viewModel.isLoading {
         EchoLoadingState(title: "Loading this week…", minHeight: 120)
@@ -191,8 +212,8 @@ private struct WeeklyReflectionView: View {
       } else if let reflection = viewModel.reflection {
         VStack(alignment: .leading, spacing: EchoLayout.sectionSpacing) {
           Text(reflection.body)
-            .font(EchoTypography.editorialNarrative)
-            .lineSpacing(6)
+            .font(isWide ? EchoTypography.editorialNarrative : EchoTypography.compactEditorialNarrative)
+            .lineSpacing(isWide ? 6 : 4)
             .textSelection(.enabled)
 
           if !reflection.themes.isEmpty {
@@ -364,7 +385,7 @@ struct DayDetailView: View {
               HStack(alignment: .top, spacing: 42) {
                 VStack(alignment: .leading, spacing: EchoLayout.sectionSpacing) {
                   dayHeader
-                  DayReflectionSection(viewModel: organizationViewModel)
+                  DayReflectionSection(viewModel: organizationViewModel, isCompact: false)
                   ReflectionActionBar(viewModel: organizationViewModel)
                 }
                 .frame(maxWidth: 610, alignment: .leading)
@@ -379,7 +400,7 @@ struct DayDetailView: View {
             } else {
               LazyVStack(alignment: .leading, spacing: EchoLayout.sectionSpacing) {
                 dayHeader
-                DayReflectionSection(viewModel: organizationViewModel)
+                DayReflectionSection(viewModel: organizationViewModel, isCompact: true)
                 entries
                 ReflectionActionBar(viewModel: organizationViewModel)
               }
@@ -477,7 +498,7 @@ private struct DayDateHeader: View {
       )
         .font(EchoTypography.editorialEyebrow)
         .tracking(1.5)
-        .foregroundStyle(.secondary)
+        .foregroundStyle(world.accent)
 
       Text("Day Reflection")
         .font(EchoTypography.editorialDisplay)
@@ -485,7 +506,7 @@ private struct DayDateHeader: View {
 
       Text(entryCountLabel)
         .font(EchoTypography.supporting)
-        .foregroundStyle(.secondary)
+        .foregroundStyle(world.primaryText.opacity(0.82))
     }
     .shadow(color: world.contentShadow, radius: 10, y: 3)
     .accessibilityElement(children: .combine)
@@ -494,12 +515,16 @@ private struct DayDateHeader: View {
 
 private struct DayReflectionSection: View {
   let viewModel: DayOrganizationViewModel
+  let isCompact: Bool
 
   @Environment(\.echoVisualWorld) private var world
 
   var body: some View {
     EchoReadabilityPanel {
-      VStack(alignment: .leading, spacing: EchoLayout.sectionSpacing) {
+      VStack(
+        alignment: .leading,
+        spacing: isCompact ? EchoLayout.contentSpacing : EchoLayout.sectionSpacing
+      ) {
         reflectionContent
 
         if viewModel.failure != nil {
@@ -524,8 +549,8 @@ private struct DayReflectionSection: View {
       }
 
       Text(journal.body)
-        .font(EchoTypography.editorialNarrative)
-        .lineSpacing(6)
+        .font(isCompact ? EchoTypography.compactEditorialNarrative : EchoTypography.editorialNarrative)
+        .lineSpacing(isCompact ? 4 : 6)
         .textSelection(.enabled)
 
       if !journal.themes.isEmpty {

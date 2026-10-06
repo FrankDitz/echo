@@ -13,23 +13,18 @@ struct HighlightsView: View {
       GeometryReader { geometry in
         ScrollView {
           if geometry.size.width >= EchoLayout.wideLayoutBreakpoint {
-            HStack(alignment: .top, spacing: 64) {
+            LazyVStack(alignment: .leading, spacing: EchoLayout.compactSectionSpacing) {
               highlightsHeader
-                .frame(width: 300, alignment: .leading)
-
-              VStack(alignment: .leading, spacing: EchoLayout.contentSpacing) {
-                content
-              }
-              .frame(maxWidth: 620, alignment: .leading)
+              content(isWide: true)
             }
             .frame(maxWidth: EchoLayout.wideContentMaxWidth, alignment: .topLeading)
             .padding(.horizontal, 40)
-            .padding(.vertical, 56)
+            .padding(.vertical, 36)
             .frame(maxWidth: .infinity, alignment: .top)
           } else {
             LazyVStack(alignment: .leading, spacing: EchoLayout.compactSectionSpacing) {
               highlightsHeader
-              content
+              content(isWide: false)
             }
             .frame(maxWidth: EchoLayout.contentMaxWidth, alignment: .leading)
             .padding(.horizontal, EchoLayout.pageHorizontalPadding)
@@ -78,7 +73,7 @@ struct HighlightsView: View {
   }
 
   @ViewBuilder
-  private var content: some View {
+  private func content(isWide: Bool) -> some View {
     if viewModel.isLoading && viewModel.items.isEmpty {
       EchoLoadingState(title: "Loading your highlights…")
     } else if viewModel.items.isEmpty {
@@ -94,22 +89,47 @@ struct HighlightsView: View {
       VStack(alignment: .leading, spacing: EchoLayout.contentSpacing) {
         filterRibbon
 
-        EchoReadabilityPanel(padding: 0) {
-          VStack(alignment: .leading, spacing: 0) {
+        if isWide {
+          LazyVGrid(
+            columns: [
+              GridItem(.flexible(), spacing: EchoLayout.contentSpacing, alignment: .top),
+              GridItem(.flexible(), spacing: EchoLayout.contentSpacing, alignment: .top),
+            ],
+            alignment: .leading,
+            spacing: EchoLayout.contentSpacing
+          ) {
             ForEach(viewModel.items) { item in
-              HighlightedEntryRow(
-                item: item,
-                onOpen: { selectedItem = item },
-                onRemove: {
-                  Task {
-                    await viewModel.remove(entryID: item.entry.id)
+              EchoReadabilityPanel(padding: 0) {
+                HighlightedEntryRow(
+                  item: item,
+                  onOpen: { selectedItem = item },
+                  onRemove: {
+                    Task {
+                      await viewModel.remove(entryID: item.entry.id)
+                    }
                   }
-                }
-              )
+                )
+              }
+            }
+          }
+        } else {
+          EchoReadabilityPanel(padding: 0) {
+            VStack(alignment: .leading, spacing: 0) {
+              ForEach(viewModel.items) { item in
+                HighlightedEntryRow(
+                  item: item,
+                  onOpen: { selectedItem = item },
+                  onRemove: {
+                    Task {
+                      await viewModel.remove(entryID: item.entry.id)
+                    }
+                  }
+                )
 
-              if item.id != viewModel.items.last?.id {
-                Divider()
-                  .overlay(world.separator.opacity(0.7))
+                if item.id != viewModel.items.last?.id {
+                  Divider()
+                    .overlay(world.separator.opacity(0.7))
+                }
               }
             }
           }
