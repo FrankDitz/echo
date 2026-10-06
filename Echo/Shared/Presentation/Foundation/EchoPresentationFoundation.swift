@@ -37,6 +37,7 @@ enum EchoTypography {
   static let editorialPrompt = Font.system(.title2, design: .serif).weight(.regular)
   static let wideEditorialPrompt = Font.system(size: 42, weight: .regular, design: .serif)
   static let editorialNarrative = Font.system(.title2, design: .serif).weight(.regular)
+  static let compactEditorialNarrative = Font.system(.title3, design: .serif).weight(.regular)
   static let editorialEyebrow = Font.caption.weight(.semibold)
   static let screenTitle = Font.largeTitle.weight(.bold)
   static let screenSubtitle = Font.title3
