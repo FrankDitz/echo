@@ -42,6 +42,7 @@ struct TodayView: View {
           await viewModel.saveAssistedText(entryID: entry.id, text: text)
         }
       )
+      .echoPrivacyProtected()
     }
     .confirmationDialog(
       "Delete this entry?",
@@ -75,7 +76,7 @@ struct TodayView: View {
     .padding(.horizontal, EchoLayout.pageHorizontalPadding)
     .padding(.bottom, EchoLayout.pageVerticalPadding)
     .frame(maxWidth: .infinity)
-    .frame(minHeight: availableHeight, alignment: .top)
+    .frame(minHeight: max(availableHeight, 0), alignment: .top)
   }
 
   private func wideContent(availableSize: CGSize) -> some View {
@@ -120,7 +121,7 @@ struct TodayView: View {
     .padding(.horizontal, 40)
     .padding(.top, 92)
     .padding(.bottom, 64)
-    .frame(maxWidth: .infinity, minHeight: availableSize.height, alignment: .top)
+    .frame(maxWidth: .infinity, minHeight: max(availableSize.height, 0), alignment: .top)
   }
 
   private func promptHeader(isWide: Bool) -> some View {

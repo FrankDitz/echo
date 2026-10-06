@@ -6,6 +6,7 @@ struct SettingsView: View {
   @Bindable var visualWorldSelection: EchoVisualWorldSelection
   let dataExportService: EchoDataExportService
   let dataRecoveryService: EchoDataRecoveryService
+  let privacyLockController: EchoPrivacyLockController
 
   @State private var exportDocument: EchoExportDocument?
   @State private var exportContentType = UTType.plainText
@@ -34,6 +35,66 @@ struct SettingsView: View {
                   isSelected: visualWorldSelection.selectedID == id
                 ) {
                   visualWorldSelection.select(id)
+                }
+              }
+            }
+
+            EchoScreenHeader(
+              title: "Privacy",
+              subtitle: "Keep the journal hidden when Echo is not in use."
+            )
+
+            EchoSurface {
+              VStack(alignment: .leading, spacing: EchoLayout.contentSpacing) {
+                HStack(spacing: EchoLayout.contentSpacing) {
+                  Label("Echo Lock", systemImage: "lock.shield")
+                    .font(EchoTypography.contentTitle)
+
+                  Spacer()
+
+                  Toggle(
+                    "Echo Lock",
+                    isOn: Binding(
+                      get: { privacyLockController.isEnabled },
+                      set: { shouldEnable in
+                        Task { await privacyLockController.setEnabled(shouldEnable) }
+                      }
+                    )
+                  )
+                  .labelsHidden()
+                  .disabled(privacyLockController.isAuthenticating)
+                }
+
+                Text(
+                  "When enabled, Echo requires \(privacyLockController.authenticationMethodName) "
+                    + "or your device passcode after leaving the app. Journal content is always "
+                    + "hidden from the app switcher."
+                )
+                .font(EchoTypography.supporting)
+                .foregroundStyle(visualWorldSelection.selectedWorld.secondaryText)
+
+                if privacyLockController.isAuthenticating {
+                  ProgressView("Verifying on this device…")
+                    .font(EchoTypography.status)
+                }
+
+                if let notice = privacyLockController.noticeMessage {
+                  Text(notice)
+                    .font(EchoTypography.status)
+                    .foregroundStyle(visualWorldSelection.selectedWorld.secondaryText)
+                }
+
+                if privacyLockController.isEnabled {
+                  Button {
+                    privacyLockController.lock()
+                    dismiss()
+                  } label: {
+                    Label("Lock Echo Now", systemImage: "lock.fill")
+                      .frame(maxWidth: .infinity)
+                  }
+                  .buttonStyle(
+                    EchoDataActionButtonStyle(world: visualWorldSelection.selectedWorld)
+                  )
                 }
               }
             }
@@ -124,7 +185,7 @@ struct SettingsView: View {
         }
       }
     }
-    .frame(minWidth: 360, minHeight: 420)
+    .echoSettingsMinimumSize()
     .fileExporter(
       isPresented: $isShowingExporter,
       document: exportDocument,
@@ -166,6 +227,10 @@ struct SettingsView: View {
       Button("OK", role: .cancel) {}
     } message: {
       Text(noticeMessage ?? "Please try again.")
+    }
+    .echoPrivacyProtected()
+    .onDisappear {
+      privacyLockController.cancelAuthentication()
     }
   }
 
@@ -255,6 +320,17 @@ struct SettingsView: View {
         noticeMessage = error.localizedDescription
       }
     }
+  }
+}
+
+private extension View {
+  @ViewBuilder
+  func echoSettingsMinimumSize() -> some View {
+    #if os(macOS)
+      frame(minWidth: 620, minHeight: 720)
+    #else
+      self
+    #endif
   }
 }
 

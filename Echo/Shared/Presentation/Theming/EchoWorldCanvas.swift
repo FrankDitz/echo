@@ -14,16 +14,19 @@ struct EchoWorldCanvas<Content: View>: View {
   var body: some View {
     ZStack {
       GeometryReader { proxy in
+        let canvasWidth = max(proxy.size.width, 0)
+        let canvasHeight = max(proxy.size.height, 0)
+
         ZStack {
           Image(world.backgroundAssetName)
             .resizable()
             .scaledToFill()
-            .frame(width: proxy.size.width, height: proxy.size.height, alignment: .top)
+            .frame(width: canvasWidth, height: canvasHeight, alignment: .top)
             .clipped()
             .id(world.id)
             .transition(.opacity)
 
-          if proxy.size.width >= EchoLayout.wideLayoutBreakpoint {
+          if canvasWidth >= EchoLayout.wideLayoutBreakpoint {
             LinearGradient(
               colors: [
                 world.canvas.opacity(0.5),

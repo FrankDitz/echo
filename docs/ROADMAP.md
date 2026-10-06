@@ -56,7 +56,7 @@ Phase 8 begins only after the completed Phase 7 application has been reviewed to
 9. **Voice entry foundation (complete):** add versioned local attachment metadata and lifecycle rules for voice entries, including safe file placement, deletion, migration, and repository-safety tests.
 10. **Voice capture, playback, and transcription (complete):** add permission-aware recording, playback, and on-device transcription where supported, with clear failure and privacy states on iPhone, iPad, and Mac.
 11. **Export and recovery (complete):** add user-initiated Markdown and PDF export plus an explicit local recovery workflow; exports never enter Git or silently leave the selected destination.
-12. **App privacy lock:** add optional Face ID or Touch ID protection, app-switcher privacy shielding, and careful fallback and accessibility behavior.
+12. **App privacy lock (complete):** add optional Face ID or Touch ID protection, app-switcher privacy shielding, and careful fallback and accessibility behavior.
 13. **Private synchronization design:** document encryption, CloudKit ownership, conflict resolution, deletion propagation, account changes, recovery, and opt-in consent before enabling any synchronization.
 14. **Optional iCloud synchronization:** implement the approved design behind an explicit setting, preserve a fully local mode, and test migration and conflict behavior before enabling it by default anywhere.
 15. **Phase closeout:** validate daily and weekly value loops, privacy boundaries, cross-platform behavior, migration safety, exports, synchronization opt-in, full builds and tests, and reachable Git history.

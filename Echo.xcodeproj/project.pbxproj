@@ -70,6 +70,8 @@
 		S10000000000000000000002 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = S10000000000000000000022 /* SettingsView.swift */; };
 		S10000000000000000000003 /* EchoVisualWorldSelectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = S10000000000000000000023 /* EchoVisualWorldSelectionTests.swift */; };
 		T10000000000000000000001 /* EchoDataExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = T10000000000000000000021 /* EchoDataExportService.swift */; };
+		U10000000000000000000001 /* EchoPrivacyLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = U10000000000000000000021 /* EchoPrivacyLock.swift */; };
+		U10000000000000000000002 /* EchoPrivacyLockControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = U10000000000000000000022 /* EchoPrivacyLockControllerTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -148,6 +150,8 @@
 		S10000000000000000000022 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		S10000000000000000000023 /* EchoVisualWorldSelectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoVisualWorldSelectionTests.swift; sourceTree = "<group>"; };
 		T10000000000000000000021 /* EchoDataExportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoDataExportService.swift; sourceTree = "<group>"; };
+		U10000000000000000000021 /* EchoPrivacyLock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoPrivacyLock.swift; sourceTree = "<group>"; };
+		U10000000000000000000022 /* EchoPrivacyLockControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoPrivacyLockControllerTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -244,6 +248,7 @@
 			isa = PBXGroup;
 			children = (
 				T10000000000000000000021 /* EchoDataExportService.swift */,
+				U10000000000000000000021 /* EchoPrivacyLock.swift */,
 				L10000000000000000000040 /* AI */,
 			);
 			path = Services;
@@ -324,6 +329,7 @@
 				M10000000000000000000026 /* SwiftDataEchoOrganizedJournalRepositoryTests.swift */,
 				N10000000000000000000022 /* DayOrganizationViewModelTests.swift */,
 				S10000000000000000000023 /* EchoVisualWorldSelectionTests.swift */,
+				U10000000000000000000022 /* EchoPrivacyLockControllerTests.swift */,
 			);
 			path = EchoTests;
 			sourceTree = "<group>";
@@ -608,6 +614,7 @@
 				S10000000000000000000001 /* EchoVisualWorldSelection.swift in Sources */,
 				S10000000000000000000002 /* SettingsView.swift in Sources */,
 				T10000000000000000000001 /* EchoDataExportService.swift in Sources */,
+				U10000000000000000000001 /* EchoPrivacyLock.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -631,6 +638,7 @@
 				M10000000000000000000006 /* SwiftDataEchoOrganizedJournalRepositoryTests.swift in Sources */,
 				N10000000000000000000002 /* DayOrganizationViewModelTests.swift in Sources */,
 				S10000000000000000000003 /* EchoVisualWorldSelectionTests.swift in Sources */,
+				U10000000000000000000002 /* EchoPrivacyLockControllerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -754,6 +762,7 @@
 				ENABLE_USER_SELECTED_FILES = readwrite;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Echo;
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "Echo uses Face ID only when you enable Echo Lock to protect your private journal.";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Echo uses the microphone only when you choose to record a private voice entry.";
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Echo can transcribe a voice entry on this device when you request it.";
@@ -788,6 +797,7 @@
 				ENABLE_USER_SELECTED_FILES = readwrite;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Echo;
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "Echo uses Face ID only when you enable Echo Lock to protect your private journal.";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Echo uses the microphone only when you choose to record a private voice entry.";
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Echo can transcribe a voice entry on this device when you request it.";
