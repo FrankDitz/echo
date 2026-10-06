@@ -4,6 +4,7 @@ import SwiftUI
 @main
 struct EchoApp: App {
   @State private var visualWorldSelection = EchoVisualWorldSelection()
+  @State private var privacyLockController = EchoPrivacyLockController()
 
   private let modelContainer: ModelContainer
   private let todayViewModel: TodayViewModel
@@ -95,9 +96,11 @@ struct EchoApp: App {
         voiceCaptureViewModel: voiceCaptureViewModel,
         dataExportService: dataExportService,
         dataRecoveryService: dataRecoveryService,
-        visualWorldSelection: visualWorldSelection
+        visualWorldSelection: visualWorldSelection,
+        privacyLockController: privacyLockController
       )
       .environment(\.echoVisualWorld, visualWorldSelection.selectedWorld)
+      .environment(privacyLockController)
       .tint(visualWorldSelection.selectedWorld.accent)
       .preferredColorScheme(.dark)
     }

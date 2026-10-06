@@ -149,6 +149,7 @@ private struct WeeklyReflectionView: View {
         aiService: aiService,
         journalRepository: journalRepository
       )
+      .echoPrivacyProtected()
     }
   }
 

@@ -36,7 +36,7 @@ struct TimelineView: View {
           .padding(.horizontal, isWide ? 40 : EchoLayout.pageHorizontalPadding)
           .padding(.vertical, isWide ? 46 : EchoLayout.pageVerticalPadding)
           .frame(maxWidth: .infinity)
-          .frame(minHeight: proxy.size.height, alignment: .top)
+          .frame(minHeight: max(proxy.size.height, 0), alignment: .top)
         }
         .scrollIndicators(.hidden)
         .refreshable {
@@ -53,6 +53,7 @@ struct TimelineView: View {
         selectedDayID: $selectedDayID,
         initialDate: stripAnchorDate
       )
+      .echoPrivacyProtected()
     }
   }
 
