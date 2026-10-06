@@ -27,7 +27,7 @@ final class TimelineViewModel {
   private(set) var searchFailed = false
 
   var mostRecentTimelineDate: Date {
-    calendar.date(byAdding: .day, value: -1, to: now()) ?? now()
+    now()
   }
 
   init(
@@ -49,7 +49,7 @@ final class TimelineViewModel {
     do {
       let entries = try await repository.allEntries()
       days = EchoDay.grouping(entries)
-        .filter { $0.id < today }
+        .filter { $0.id <= today }
         .reversed()
       failure = nil
     } catch {

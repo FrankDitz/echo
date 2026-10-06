@@ -159,13 +159,14 @@ private struct WeeklyReflectionView: View {
         Text("WEEKLY ECHO")
           .font(EchoTypography.editorialEyebrow)
           .tracking(1.5)
-          .foregroundStyle(.secondary)
+          .foregroundStyle(world.accent)
         Text(weekRangeLabel)
           .font(EchoTypography.editorialDisplay)
+          .foregroundStyle(world.primaryText)
           .accessibilityAddTraits(.isHeader)
         Text("A wider view of what kept returning.")
           .font(EchoTypography.supporting)
-          .foregroundStyle(.secondary)
+          .foregroundStyle(world.primaryText.opacity(0.82))
       }
       Spacer()
       HStack(spacing: EchoLayout.tightSpacing) {

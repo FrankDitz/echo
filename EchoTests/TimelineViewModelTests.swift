@@ -6,7 +6,7 @@ import Testing
 @MainActor
 @Suite("Timeline browsing workflow")
 struct TimelineViewModelTests {
-  @Test("The empty timeline still exposes the latest browsable date")
+  @Test("The empty timeline still exposes today as the latest browsable date")
   func latestBrowsableDate() throws {
     let calendar = try makeGregorianCalendar(timeZone: "UTC")
     let currentDate = try makeDate("2026-10-03T12:00:00Z")
@@ -15,13 +15,11 @@ struct TimelineViewModelTests {
       calendar: calendar,
       now: { currentDate }
     )
-    let expectedDate = try makeDate("2026-10-02T12:00:00Z")
-
-    #expect(viewModel.mostRecentTimelineDate == expectedDate)
+    #expect(viewModel.mostRecentTimelineDate == currentDate)
   }
 
-  @Test("Timeline groups previous days newest first")
-  func groupingPreviousDays() async throws {
+  @Test("Timeline includes today, excludes future entries, and groups days newest first")
+  func groupingThroughToday() async throws {
     let calendar = try makeGregorianCalendar(timeZone: "UTC")
     let firstDayEarly = try makeEntry(
       id: "00000000-0000-0000-0000-000000000601",
@@ -64,8 +62,8 @@ struct TimelineViewModelTests {
 
     await viewModel.load()
 
-    #expect(viewModel.days.map(\.id) == [entries[3].day, entries[4].day])
-    #expect(viewModel.days[1].entries == [entries[4], entries[1]])
+    #expect(viewModel.days.map(\.id) == [today.day, secondDay.day, firstDayEarly.day])
+    #expect(viewModel.days[2].entries == [firstDayEarly, firstDayLate])
     #expect(viewModel.failure == nil)
   }
 

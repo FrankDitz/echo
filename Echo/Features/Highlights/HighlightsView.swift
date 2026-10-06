@@ -62,15 +62,16 @@ struct HighlightsView: View {
       Text("SAVED WRITING")
         .font(EchoTypography.editorialEyebrow)
         .tracking(1.5)
-        .foregroundStyle(.secondary)
+        .foregroundStyle(world.accent)
 
       Text("Highlights")
         .font(EchoTypography.editorialDisplay)
+        .foregroundStyle(world.primaryText)
         .accessibilityAddTraits(.isHeader)
 
       Text("Meaningful moments, kept close.")
         .font(EchoTypography.supporting)
-        .foregroundStyle(.secondary)
+        .foregroundStyle(world.primaryText.opacity(0.82))
     }
     .shadow(color: world.contentShadow, radius: 10, y: 3)
     .accessibilityElement(children: .combine)
@@ -122,34 +123,15 @@ struct HighlightsView: View {
   }
 
   private var filterRibbon: some View {
-    HStack(spacing: EchoLayout.inlineSpacing) {
-      Label("Saved entries", systemImage: "bookmark.fill")
-        .font(EchoTypography.metadata.weight(.semibold))
-        .foregroundStyle(world.canvas)
-        .padding(.horizontal, EchoLayout.contentSpacing)
-        .frame(minHeight: 32)
-        .background(world.accent, in: Capsule())
-
-      Text("Text")
-        .font(EchoTypography.metadata.weight(.semibold))
-        .foregroundStyle(world.secondaryText)
-        .padding(.horizontal, EchoLayout.contentSpacing)
-        .frame(minHeight: 32)
-        .background(.ultraThinMaterial, in: Capsule())
-        .overlay {
-          Capsule()
-            .stroke(world.separator, lineWidth: EchoShape.hairlineWidth)
-        }
-
-      Spacer()
-
-      Text(viewModel.items.count, format: .number)
-        .font(EchoTypography.metadata)
-        .foregroundStyle(.secondary)
-        .accessibilityLabel(
-          "\(viewModel.items.count) saved \(viewModel.items.count == 1 ? "entry" : "entries")"
-        )
-    }
+    Label(
+      "\(viewModel.items.count) saved \(viewModel.items.count == 1 ? "moment" : "moments")",
+      systemImage: "bookmark.fill"
+    )
+    .font(EchoTypography.metadata.weight(.semibold))
+    .foregroundStyle(world.primaryText)
+    .accessibilityLabel(
+      "\(viewModel.items.count) saved \(viewModel.items.count == 1 ? "entry" : "entries")"
+    )
   }
 
   @Environment(\.echoVisualWorld) private var world
