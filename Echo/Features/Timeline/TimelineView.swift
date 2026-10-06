@@ -62,15 +62,16 @@ struct TimelineView: View {
       Text("YOUR HISTORY")
         .font(EchoTypography.editorialEyebrow)
         .tracking(1.5)
-        .foregroundStyle(.secondary)
+        .foregroundStyle(world.accent)
 
       Text("Timeline")
         .font(EchoTypography.editorialDisplay)
+        .foregroundStyle(world.primaryText)
         .accessibilityAddTraits(.isHeader)
 
-      Text("Previous days, kept in one quiet place.")
+      Text("Every day you have written, kept in one quiet place.")
         .font(EchoTypography.supporting)
-        .foregroundStyle(.secondary)
+        .foregroundStyle(world.primaryText.opacity(0.82))
     }
     .shadow(color: world.contentShadow, radius: 10, y: 3)
     .accessibilityElement(children: .combine)
@@ -482,7 +483,7 @@ private struct TimelineCalendarBrowser: View {
         EchoReadabilityPanel {
           VStack(spacing: EchoLayout.rowSpacing) {
             LazyVGrid(columns: calendarColumns, spacing: EchoLayout.inlineSpacing) {
-              ForEach(rotatedWeekdaySymbols, id: \.self) { symbol in
+              ForEach(Array(rotatedWeekdaySymbols.enumerated()), id: \.offset) { _, symbol in
                 Text(symbol.uppercased())
                   .font(EchoTypography.editorialEyebrow)
                   .foregroundStyle(world.secondaryText)
@@ -502,7 +503,7 @@ private struct TimelineCalendarBrowser: View {
           }
         }
 
-        Text("Only days containing journal entries can be opened.")
+        Text("Choose any day containing journal entries, including today.")
           .font(EchoTypography.supporting)
           .foregroundStyle(world.secondaryText)
           .frame(maxWidth: .infinity, alignment: .leading)

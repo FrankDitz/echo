@@ -57,9 +57,13 @@ Phase 8 begins only after the completed Phase 7 application has been reviewed to
 10. **Voice capture, playback, and transcription (complete):** add permission-aware recording, playback, and on-device transcription where supported, with clear failure and privacy states on iPhone, iPad, and Mac.
 11. **Export and recovery (complete):** add user-initiated Markdown and PDF export plus an explicit local recovery workflow; exports never enter Git or silently leave the selected destination.
 12. **App privacy lock (complete):** add optional Face ID or Touch ID protection, app-switcher privacy shielding, and careful fallback and accessibility behavior.
-13. **Private synchronization design:** document encryption, CloudKit ownership, conflict resolution, deletion propagation, account changes, recovery, and opt-in consent before enabling any synchronization.
-14. **Optional iCloud synchronization:** implement the approved design behind an explicit setting, preserve a fully local mode, and test migration and conflict behavior before enabling it by default anywhere.
-15. **Phase closeout:** validate daily and weekly value loops, privacy boundaries, cross-platform behavior, migration safety, exports, synchronization opt-in, full builds and tests, and reachable Git history.
+13. **Populated-state correctness and clarity (in progress):** fix defects and misleading presentation exposed by realistic local data, including current-day Timeline access, calendar labels, contrast, and controls that imply unsupported filtering.
+14. **Populated-state density and responsive layout:** keep capture, memory resurfacing, Timeline entries, Highlights, and reflection content useful when the journal contains realistic amounts of writing; give Mac purpose-built wide layouts instead of stretched mobile compositions.
+15. **Carry Forward:** let the user intentionally carry one meaningful reflection question, key moment, or thought into the next day without creating a streak, task manager, or engagement pressure.
+16. **Journaling and reflection UX optimization:** review the complete capture → revisit → reflect → carry-forward loop on iPhone and Mac, reduce unnecessary navigation and scrolling, and prioritize the writing and memories that help the user make sense of their life.
+17. **Private synchronization design (deferred):** document encryption, CloudKit ownership, conflict resolution, deletion propagation, account changes, recovery, and opt-in consent only after the local journaling experience has been optimized.
+18. **Optional iCloud synchronization (deferred):** implement an approved design behind an explicit setting, preserve a fully local mode, and test migration and conflict behavior before enabling it by default anywhere.
+19. **Phase closeout:** validate daily and weekly value loops, privacy boundaries, cross-platform behavior, migration safety, exports, full builds and tests, and reachable Git history.
 
 ## Near-term improvements
 
@@ -70,6 +74,7 @@ Phase 8 begins only after the completed Phase 7 application has been reviewed to
 - Voice notes, playback, and transcription
 - People, places, and custom tags
 - Editable organized journals
+- Intentional Carry Forward from reflections
 - Export to Markdown and PDF
 - iCloud synchronization
 - Face ID or Touch ID app locking

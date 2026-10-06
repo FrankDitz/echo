@@ -13,7 +13,7 @@ struct EchoScreenHeader: View {
         .foregroundStyle(world.primaryText)
       Text(subtitle)
         .font(EchoTypography.screenSubtitle)
-        .foregroundStyle(world.secondaryText)
+        .foregroundStyle(world.primaryText.opacity(0.82))
     }
     .shadow(color: world.contentShadow, radius: 10, y: 3)
     .accessibilityElement(children: .combine)
