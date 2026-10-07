@@ -255,11 +255,19 @@ struct TodayViewModelTests {
     let attachments = VoiceAttachmentRepositoryStub()
     let service = VoiceCaptureServiceStub(transcript: "A fictional spoken memory.")
     let timestamp = try makeDate("2026-10-05T12:00:00Z")
+    let capturePipeline = EchoEntryCapturePipeline(
+      repository: entries,
+      aiService: DeterministicLocalAIService(),
+      calendar: calendar,
+      now: { timestamp },
+      processorIdentifier: "echo.test.local"
+    )
     let viewModel = VoiceCaptureViewModel(
       entryRepository: entries,
       attachmentRepository: attachments,
       fileStore: EchoVoiceFileStore(rootDirectory: directory),
       service: service,
+      capturePipeline: capturePipeline,
       calendar: calendar,
       now: { timestamp }
     )
@@ -272,6 +280,7 @@ struct TodayViewModelTests {
     #expect(entry.type == .voice)
     #expect(entry.originalText == "A fictional spoken memory.")
     #expect(entry.rawText == "A fictional spoken memory.")
+    #expect(entry.refinementStatus == .refined)
     #expect(attachment.transcript == "A fictional spoken memory.")
     #expect(viewModel.state == .ready)
     await viewModel.play(entryID: entry.id)

@@ -244,6 +244,7 @@ final class TodayViewModel {
   private let repository: any EchoEntryRepository
   private let highlightRepository: (any EchoHighlightRepository)?
   private let voiceLifecycle: EchoVoiceAttachmentLifecycle?
+  private let capturePipeline: (any EchoEntryCapturing)?
   private let calendar: Calendar
   private let now: () -> Date
 
@@ -259,12 +260,14 @@ final class TodayViewModel {
     repository: any EchoEntryRepository,
     highlightRepository: (any EchoHighlightRepository)? = nil,
     voiceLifecycle: EchoVoiceAttachmentLifecycle? = nil,
+    capturePipeline: (any EchoEntryCapturing)? = nil,
     calendar: Calendar = .autoupdatingCurrent,
     now: @escaping () -> Date = Date.init
   ) {
     self.repository = repository
     self.highlightRepository = highlightRepository
     self.voiceLifecycle = voiceLifecycle
+    self.capturePipeline = capturePipeline
     self.calendar = calendar
     self.now = now
     self.displayedDate = now()
@@ -353,19 +356,36 @@ final class TodayViewModel {
     guard containsWriting(rawText) else { return false }
 
     let timestamp = now()
-    let entry = EchoEntry(
-      createdAt: timestamp,
-      calendar: calendar,
-      rawText: rawText
-    )
-
     saveState = .saving
     do {
-      try await repository.create(entry)
+      let entry: EchoEntry
+      if let capturePipeline {
+        entry = try await capturePipeline.preserve(
+          rawText,
+          id: UUID(),
+          createdAt: timestamp,
+          type: .text,
+          source: .user
+        )
+      } else {
+        entry = EchoEntry(
+          createdAt: timestamp,
+          calendar: calendar,
+          rawText: rawText
+        )
+        try await repository.create(entry)
+      }
       entries = EchoEntryOrdering.chronological(entries + [entry])
       displayedDate = timestamp
       saveState = .saved
       failure = nil
+
+      if let capturePipeline {
+        let refined = await capturePipeline.refine(entry)
+        if let index = entries.firstIndex(where: { $0.id == refined.id }) {
+          entries[index] = refined
+        }
+      }
       return true
     } catch {
       saveState = .failed
@@ -465,6 +485,7 @@ final class VoiceCaptureViewModel {
   private let attachmentRepository: any EchoVoiceAttachmentRepository
   private let fileStore: EchoVoiceFileStore
   private let service: any EchoVoiceCaptureService
+  private let capturePipeline: (any EchoEntryCapturing)?
   private let calendar: Calendar
   private let now: () -> Date
   private var pendingAttachmentID: UUID?
@@ -478,6 +499,7 @@ final class VoiceCaptureViewModel {
     attachmentRepository: any EchoVoiceAttachmentRepository,
     fileStore: EchoVoiceFileStore,
     service: any EchoVoiceCaptureService,
+    capturePipeline: (any EchoEntryCapturing)? = nil,
     calendar: Calendar = .autoupdatingCurrent,
     now: @escaping () -> Date = Date.init
   ) {
@@ -485,6 +507,7 @@ final class VoiceCaptureViewModel {
     self.attachmentRepository = attachmentRepository
     self.fileStore = fileStore
     self.service = service
+    self.capturePipeline = capturePipeline
     self.calendar = calendar
     self.now = now
   }
@@ -522,12 +545,24 @@ final class VoiceCaptureViewModel {
     let timestamp = now()
     do {
       let duration = try service.stopRecording()
-      var entry = EchoEntry(
-        createdAt: timestamp,
-        calendar: calendar,
-        rawText: "Voice entry",
-        type: .voice
-      )
+      var entry: EchoEntry
+      if let capturePipeline {
+        entry = try await capturePipeline.preserve(
+          "Voice entry",
+          id: UUID(),
+          createdAt: timestamp,
+          type: .voice,
+          source: .user
+        )
+      } else {
+        entry = EchoEntry(
+          createdAt: timestamp,
+          calendar: calendar,
+          rawText: "Voice entry",
+          type: .voice
+        )
+        try await entryRepository.create(entry)
+      }
       var attachment = EchoVoiceAttachment(
         id: attachmentID,
         entryID: entry.id,
@@ -535,7 +570,6 @@ final class VoiceCaptureViewModel {
         relativeFileName: url.lastPathComponent,
         duration: duration
       )
-      try await entryRepository.create(entry)
       do {
         try await attachmentRepository.create(attachment)
       } catch {
@@ -550,18 +584,23 @@ final class VoiceCaptureViewModel {
         if !transcript.isEmpty {
           attachment.setTranscript(transcript)
           try await attachmentRepository.update(attachment)
-          entry = EchoEntry(
-            id: entry.id,
-            createdAt: entry.createdAt,
-            modifiedAt: now(),
-            day: entry.day,
-            rawText: transcript,
-            polishedText: nil,
-            originalText: transcript,
-            type: entry.type,
-            source: entry.source
-          )
-          try await entryRepository.update(entry)
+          if let capturePipeline {
+            entry = try await capturePipeline.replaceOriginalText(transcript, for: entry)
+            entry = await capturePipeline.refine(entry)
+          } else {
+            entry = EchoEntry(
+              id: entry.id,
+              createdAt: entry.createdAt,
+              modifiedAt: now(),
+              day: entry.day,
+              rawText: transcript,
+              polishedText: nil,
+              originalText: transcript,
+              type: entry.type,
+              source: entry.source
+            )
+            try await entryRepository.update(entry)
+          }
           statusMessage = "Saved with an on-device transcript."
         } else {
           statusMessage = "Saved audio. No speech was detected for transcription."
