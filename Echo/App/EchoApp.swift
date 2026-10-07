@@ -25,6 +25,10 @@ struct EchoApp: App {
       let entryRepository = SwiftDataEchoEntryRepository(modelContainer: container)
       let highlightRepository = SwiftDataEchoHighlightRepository(modelContainer: container)
       let aiService = DeterministicLocalAIService()
+      let capturePipeline = EchoEntryCapturePipeline(
+        repository: entryRepository,
+        aiService: aiService
+      )
       let journalRepository = SwiftDataEchoOrganizedJournalRepository(
         modelContainer: container
       )
@@ -54,7 +58,8 @@ struct EchoApp: App {
         entryRepository: entryRepository,
         attachmentRepository: voiceAttachmentRepository,
         fileStore: voiceFileStore,
-        service: SystemEchoVoiceCaptureService()
+        service: SystemEchoVoiceCaptureService(),
+        capturePipeline: capturePipeline
       )
       dataExportService = EchoDataExportService(
         entryRepository: entryRepository,
@@ -75,7 +80,8 @@ struct EchoApp: App {
       todayViewModel = TodayViewModel(
         repository: entryRepository,
         highlightRepository: highlightRepository,
-        voiceLifecycle: voiceLifecycle
+        voiceLifecycle: voiceLifecycle,
+        capturePipeline: capturePipeline
       )
       timelineViewModel = TimelineViewModel(repository: entryRepository)
       highlightViewModel = EntryHighlightViewModel(repository: highlightRepository)
