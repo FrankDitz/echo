@@ -122,3 +122,56 @@ actor SwiftDataEchoWeeklyReflectionRepository: EchoWeeklyReflectionRepository {
     return try modelContext.fetch(descriptor).first
   }
 }
+
+@ModelActor
+actor SwiftDataEchoCarryForwardRepository: EchoCarryForwardRepository {
+  func create(_ carryForward: EchoCarryForward) async throws {
+    guard try record(id: carryForward.id) == nil else {
+      throw EchoRepositoryError.duplicateCarryForward(carryForward.id)
+    }
+    guard try record(targetDay: carryForward.targetDay) == nil else {
+      throw EchoRepositoryError.duplicateCarryForwardTargetDay(carryForward.targetDay)
+    }
+
+    modelContext.insert(try EchoPersistenceMapper.makeCarryForwardRecord(from: carryForward))
+    try modelContext.save()
+  }
+
+  func carryForward(for targetDay: EchoDayIdentifier) async throws -> EchoCarryForward? {
+    try record(targetDay: targetDay).map(EchoPersistenceMapper.makeCarryForward)
+  }
+
+  func allCarryForwards() async throws -> [EchoCarryForward] {
+    try modelContext.fetch(FetchDescriptor<PersistentEchoCarryForward>())
+      .map(EchoPersistenceMapper.makeCarryForward)
+      .sorted { lhs, rhs in
+        if lhs.targetDay != rhs.targetDay { return lhs.targetDay > rhs.targetDay }
+        return lhs.id.uuidString < rhs.id.uuidString
+      }
+  }
+
+  func delete(id: UUID) async throws {
+    guard let record = try record(id: id) else {
+      throw EchoRepositoryError.carryForwardNotFound(id)
+    }
+    modelContext.delete(record)
+    try modelContext.save()
+  }
+
+  private func record(id: UUID) throws -> PersistentEchoCarryForward? {
+    var descriptor = FetchDescriptor<PersistentEchoCarryForward>(
+      predicate: #Predicate { $0.id == id }
+    )
+    descriptor.fetchLimit = 1
+    return try modelContext.fetch(descriptor).first
+  }
+
+  private func record(targetDay: EchoDayIdentifier) throws -> PersistentEchoCarryForward? {
+    let targetDayKey = try EchoPersistenceMapper.dayKey(for: targetDay)
+    var descriptor = FetchDescriptor<PersistentEchoCarryForward>(
+      predicate: #Predicate { $0.targetDayKey == targetDayKey }
+    )
+    descriptor.fetchLimit = 1
+    return try modelContext.fetch(descriptor).first
+  }
+}

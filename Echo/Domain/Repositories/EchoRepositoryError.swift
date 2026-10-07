@@ -15,4 +15,7 @@ enum EchoRepositoryError: Error, Equatable, Sendable {
   case duplicateVoiceAttachment(UUID)
   case duplicateVoiceAttachmentEntry(UUID)
   case voiceAttachmentNotFound(UUID)
+  case duplicateCarryForward(UUID)
+  case duplicateCarryForwardTargetDay(EchoDayIdentifier)
+  case carryForwardNotFound(UUID)
 }

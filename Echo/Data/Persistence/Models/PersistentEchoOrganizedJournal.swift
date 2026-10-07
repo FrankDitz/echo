@@ -118,3 +118,35 @@ final class PersistentEchoWeeklyReflection {
     self.generatorRawValue = generatorRawValue
   }
 }
+
+@Model
+final class PersistentEchoCarryForward {
+  @Attribute(.unique) var id: UUID
+  @Attribute(.unique) var targetDayKey: String
+  var targetDayPayload: Data
+  var text: String
+  var sourceKindRawValue: String
+  var sourceDayPayload: Data?
+  var sourceEntryID: UUID?
+  var createdAt: Date
+
+  init(
+    id: UUID,
+    targetDayKey: String,
+    targetDayPayload: Data,
+    text: String,
+    sourceKindRawValue: String,
+    sourceDayPayload: Data?,
+    sourceEntryID: UUID?,
+    createdAt: Date
+  ) {
+    self.id = id
+    self.targetDayKey = targetDayKey
+    self.targetDayPayload = targetDayPayload
+    self.text = text
+    self.sourceKindRawValue = sourceKindRawValue
+    self.sourceDayPayload = sourceDayPayload
+    self.sourceEntryID = sourceEntryID
+    self.createdAt = createdAt
+  }
+}

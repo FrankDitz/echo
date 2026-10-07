@@ -15,3 +15,10 @@ protocol EchoWeeklyReflectionRepository: Sendable {
   func update(_ reflection: EchoWeeklyReflection) async throws
   func delete(id: UUID) async throws
 }
+
+protocol EchoCarryForwardRepository: Sendable {
+  func create(_ carryForward: EchoCarryForward) async throws
+  func carryForward(for targetDay: EchoDayIdentifier) async throws -> EchoCarryForward?
+  func allCarryForwards() async throws -> [EchoCarryForward]
+  func delete(id: UUID) async throws
+}
