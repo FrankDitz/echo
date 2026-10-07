@@ -339,6 +339,33 @@ struct SwiftDataEchoCarryForwardRepositoryTests {
     }
   }
 
+  @Test("Replacing changes tomorrow's thought without creating a duplicate")
+  func replacingCarryForward() async throws {
+    let container = try EchoModelContainerFactory.makeInMemory()
+    let repository = SwiftDataEchoCarryForwardRepository(modelContainer: container)
+    let calendar = try makeGregorianCalendar(timeZone: "UTC")
+    let targetDate = try makeDate("2026-10-05T12:00:00Z")
+    let targetDay = EchoDayIdentifier(containing: targetDate, calendar: calendar)
+    let original = EchoCarryForward(
+      text: "A fictional original thought.",
+      sourceKind: .entry,
+      targetDay: targetDay,
+      createdAt: try makeDate("2026-10-04T10:00:00Z")
+    )
+    let replacement = EchoCarryForward(
+      text: "A fictional replacement question?",
+      sourceKind: .dayReflectionQuestion,
+      targetDay: targetDay,
+      createdAt: try makeDate("2026-10-04T11:00:00Z")
+    )
+
+    try await repository.create(original)
+    try await repository.replace(replacement)
+
+    #expect(try await repository.carryForward(for: targetDay) == replacement)
+    #expect(try await repository.allCarryForwards() == [replacement])
+  }
+
   @Test("Version five stores migrate and accept carry forwards")
   func versionFiveMigration() async throws {
     let location = try makeDisposableStoreLocation()

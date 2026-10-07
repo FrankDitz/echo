@@ -61,7 +61,8 @@ Phase 8 begins only after the completed Phase 7 application has been reviewed to
 14. **Populated-state density and responsive layout (complete):** keep capture, memory resurfacing, Timeline entries, Highlights, and reflection content useful when the journal contains realistic amounts of writing; give Mac purpose-built wide layouts instead of stretched mobile compositions.
 15. **Carry Forward (in progress):** let the user intentionally carry one meaningful reflection question, key moment, or thought into the next day without creating a streak, task manager, or engagement pressure.
     - **Foundation (complete):** versioned local model, explicit provenance, one-item-per-day persistence, migration coverage, and repository behavior.
-    - **Experience:** reflection actions, next-day Today presentation, release/replace behavior, and recovery/export coverage.
+    - **Interaction (complete):** reflection and source-entry actions, next-day Today presentation, visible success feedback, and release/replace behavior on iPhone and Mac.
+    - **Portability:** include carried thoughts in explicit local recovery archives and human-readable exports without adding any automatic sharing.
 16. **Journaling and reflection UX optimization:** review the complete capture → revisit → reflect → carry-forward loop on iPhone and Mac, reduce unnecessary navigation and scrolling, and prioritize the writing and memories that help the user make sense of their life.
 17. **Private synchronization design (deferred):** document encryption, CloudKit ownership, conflict resolution, deletion propagation, account changes, recovery, and opt-in consent only after the local journaling experience has been optimized.
 18. **Optional iCloud synchronization (deferred):** implement an approved design behind an explicit setting, preserve a fully local mode, and test migration and conflict behavior before enabling it by default anywhere.

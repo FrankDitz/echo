@@ -137,6 +137,27 @@ actor SwiftDataEchoCarryForwardRepository: EchoCarryForwardRepository {
     try modelContext.save()
   }
 
+  func replace(_ carryForward: EchoCarryForward) async throws {
+    guard let existing = try record(targetDay: carryForward.targetDay) else {
+      try await create(carryForward)
+      return
+    }
+    if let duplicate = try record(id: carryForward.id), duplicate !== existing {
+      throw EchoRepositoryError.duplicateCarryForward(carryForward.id)
+    }
+
+    let replacement = try EchoPersistenceMapper.makeCarryForwardRecord(from: carryForward)
+    existing.id = replacement.id
+    existing.targetDayKey = replacement.targetDayKey
+    existing.targetDayPayload = replacement.targetDayPayload
+    existing.text = replacement.text
+    existing.sourceKindRawValue = replacement.sourceKindRawValue
+    existing.sourceDayPayload = replacement.sourceDayPayload
+    existing.sourceEntryID = replacement.sourceEntryID
+    existing.createdAt = replacement.createdAt
+    try modelContext.save()
+  }
+
   func carryForward(for targetDay: EchoDayIdentifier) async throws -> EchoCarryForward? {
     try record(targetDay: targetDay).map(EchoPersistenceMapper.makeCarryForward)
   }
