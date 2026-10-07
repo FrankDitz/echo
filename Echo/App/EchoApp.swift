@@ -17,6 +17,7 @@ struct EchoApp: App {
   private let voiceCaptureViewModel: VoiceCaptureViewModel
   private let dataExportService: EchoDataExportService
   private let dataRecoveryService: EchoDataRecoveryService
+  private let carryForwardViewModel: CarryForwardViewModel
 
   init() {
     do {
@@ -31,6 +32,9 @@ struct EchoApp: App {
         modelContainer: container
       )
       let voiceAttachmentRepository = SwiftDataEchoVoiceAttachmentRepository(
+        modelContainer: container
+      )
+      let carryForwardRepository = SwiftDataEchoCarryForwardRepository(
         modelContainer: container
       )
       let voiceFileStore = try EchoVoiceFileStore.applicationSupport()
@@ -78,6 +82,7 @@ struct EchoApp: App {
         highlightRepository: highlightRepository,
         entryHighlightViewModel: highlightViewModel
       )
+      carryForwardViewModel = CarryForwardViewModel(repository: carryForwardRepository)
     } catch {
       preconditionFailure("Echo could not initialize its local data store.")
     }
@@ -101,6 +106,7 @@ struct EchoApp: App {
       )
       .environment(\.echoVisualWorld, visualWorldSelection.selectedWorld)
       .environment(privacyLockController)
+      .environment(carryForwardViewModel)
       .tint(visualWorldSelection.selectedWorld.accent)
       .preferredColorScheme(.dark)
     }

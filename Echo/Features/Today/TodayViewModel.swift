@@ -151,6 +151,93 @@ struct TodayMemorySnapshot: Equatable, Sendable {
   var saved: [EchoEntry] = []
 }
 
+enum CarryForwardActionState: Equatable {
+  case idle
+  case saving
+  case saved
+  case failed
+}
+
+@MainActor
+@Observable
+final class CarryForwardViewModel {
+  private let repository: any EchoCarryForwardRepository
+  private let calendar: Calendar
+  private let now: () -> Date
+
+  private(set) var todayItem: EchoCarryForward?
+  private(set) var actionState: CarryForwardActionState = .idle
+
+  init(
+    repository: any EchoCarryForwardRepository,
+    calendar: Calendar = .autoupdatingCurrent,
+    now: @escaping () -> Date = Date.init
+  ) {
+    self.repository = repository
+    self.calendar = calendar
+    self.now = now
+  }
+
+  func loadToday() async {
+    do {
+      todayItem = try await repository.carryForward(
+        for: EchoDayIdentifier(containing: now(), calendar: calendar)
+      )
+    } catch {
+      actionState = .failed
+    }
+  }
+
+  @discardableResult
+  func carryToTomorrow(
+    text: String,
+    sourceKind: EchoCarryForwardSourceKind,
+    sourceDay: EchoDayIdentifier? = nil,
+    sourceEntryID: UUID? = nil
+  ) async -> Bool {
+    let cleanText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard !cleanText.isEmpty,
+      let tomorrow = calendar.date(byAdding: .day, value: 1, to: now())
+    else { return false }
+
+    actionState = .saving
+    let item = EchoCarryForward(
+      text: cleanText,
+      sourceKind: sourceKind,
+      sourceDay: sourceDay,
+      sourceEntryID: sourceEntryID,
+      targetDay: EchoDayIdentifier(containing: tomorrow, calendar: calendar),
+      createdAt: now()
+    )
+    do {
+      try await repository.replace(item)
+      actionState = .saved
+      return true
+    } catch {
+      actionState = .failed
+      return false
+    }
+  }
+
+  @discardableResult
+  func releaseToday() async -> Bool {
+    guard let todayItem else { return false }
+    do {
+      try await repository.delete(id: todayItem.id)
+      self.todayItem = nil
+      actionState = .idle
+      return true
+    } catch {
+      actionState = .failed
+      return false
+    }
+  }
+
+  func resetActionState() {
+    actionState = .idle
+  }
+}
+
 @MainActor
 @Observable
 final class TodayViewModel {
@@ -213,11 +300,12 @@ final class TodayViewModel {
         $0.createdAt < currentDate
           && !calendar.isDate($0.createdAt, inSameDayAs: currentDate)
       }
-      let recentCutoff = calendar.date(
-        byAdding: .day,
-        value: -90,
-        to: currentDate
-      ) ?? .distantPast
+      let recentCutoff =
+        calendar.date(
+          byAdding: .day,
+          value: -90,
+          to: currentDate
+        ) ?? .distantPast
       let currentComponents = calendar.dateComponents([.month, .day], from: currentDate)
       let highlightedEntryIDs = Set(
         highlights.compactMap { highlight in
@@ -253,10 +341,11 @@ final class TodayViewModel {
   }
 
   private func newestFirst(_ entries: [EchoEntry]) -> [EchoEntry] {
-    Array(entries.sorted { lhs, rhs in
-      if lhs.createdAt != rhs.createdAt { return lhs.createdAt > rhs.createdAt }
-      return lhs.id.uuidString < rhs.id.uuidString
-    }.prefix(3))
+    Array(
+      entries.sorted { lhs, rhs in
+        if lhs.createdAt != rhs.createdAt { return lhs.createdAt > rhs.createdAt }
+        return lhs.id.uuidString < rhs.id.uuidString
+      }.prefix(3))
   }
 
   @discardableResult

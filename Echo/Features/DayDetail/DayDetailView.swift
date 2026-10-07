@@ -41,7 +41,8 @@ struct DayReflectionView: View {
                 EchoEmptyState(
                   title: "A reflection needs a day",
                   systemImage: "sparkles.rectangle.stack",
-                  description: "Write an entry first, then Echo can organize the day without changing your original words.",
+                  description:
+                    "Write an entry first, then Echo can organize the day without changing your original words.",
                   minHeight: EchoLayout.mediumStateHeight
                 )
               }
@@ -212,7 +213,9 @@ private struct WeeklyReflectionView: View {
       } else if let reflection = viewModel.reflection {
         VStack(alignment: .leading, spacing: EchoLayout.sectionSpacing) {
           Text(reflection.body)
-            .font(isWide ? EchoTypography.editorialNarrative : EchoTypography.compactEditorialNarrative)
+            .font(
+              isWide ? EchoTypography.editorialNarrative : EchoTypography.compactEditorialNarrative
+            )
             .lineSpacing(isWide ? 6 : 4)
             .textSelection(.enabled)
 
@@ -237,11 +240,12 @@ private struct WeeklyReflectionView: View {
           if let question = reflection.question {
             Divider()
             ReflectionSectionLabel(title: "For the week ahead", systemImage: "arrow.up.right")
-            Text(question)
-              .font(EchoTypography.contentTitle)
-              .padding(EchoLayout.contentSpacing)
-              .frame(maxWidth: .infinity, alignment: .leading)
-              .background(world.accent.opacity(0.14), in: RoundedRectangle(cornerRadius: 12))
+            CarryForwardCandidate(text: question) {
+              await carryForwardViewModel.carryToTomorrow(
+                text: question,
+                sourceKind: .weeklyReflectionQuestion
+              )
+            }
           }
 
           Divider()
@@ -259,14 +263,19 @@ private struct WeeklyReflectionView: View {
             .foregroundStyle(world.accent)
           Text("Find the shape of the week")
             .font(EchoTypography.sectionTitle)
-          Text("Weekly Echo can organize these entries locally while every original stays unchanged.")
-            .font(EchoTypography.supporting)
-            .foregroundStyle(.secondary)
+          Text(
+            "Weekly Echo can organize these entries locally while every original stays unchanged."
+          )
+          .font(EchoTypography.supporting)
+          .foregroundStyle(.secondary)
         }
       }
 
       if viewModel.failure != nil {
         EchoErrorState(message: "This weekly reflection could not be loaded or saved.")
+      }
+      if carryForwardViewModel.actionState == .failed {
+        EchoErrorState(message: "That thought could not be carried forward.")
       }
     }
   }
@@ -283,11 +292,16 @@ private struct WeeklyReflectionView: View {
       }
 
       ForEach(viewModel.sourceDays) { day in
-        Button { selectedDay = day } label: {
+        Button {
+          selectedDay = day
+        } label: {
           HStack(spacing: EchoLayout.rowSpacing) {
             VStack(alignment: .leading, spacing: EchoLayout.inlineSpacing) {
-              Text(day.id.date(in: timeZone) ?? day.entries[0].createdAt, format: .dateTime.weekday(.wide).month(.abbreviated).day())
-                .font(EchoTypography.body.weight(.semibold))
+              Text(
+                day.id.date(in: timeZone) ?? day.entries[0].createdAt,
+                format: .dateTime.weekday(.wide).month(.abbreviated).day()
+              )
+              .font(EchoTypography.body.weight(.semibold))
               Text(day.entries.first?.rawText ?? "")
                 .font(EchoTypography.supporting)
                 .foregroundStyle(.secondary)
@@ -328,7 +342,9 @@ private struct WeeklyReflectionView: View {
   }
 
   private func weekButton(systemImage: String, offset: Int, disabled: Bool) -> some View {
-    Button { Task { await viewModel.moveWeek(by: offset) } } label: {
+    Button {
+      Task { await viewModel.moveWeek(by: offset) }
+    } label: {
       Image(systemName: systemImage)
         .frame(width: 38, height: 38)
         .background(.ultraThinMaterial, in: Circle())
@@ -344,8 +360,11 @@ private struct WeeklyReflectionView: View {
     var calendar = Calendar.autoupdatingCurrent
     calendar.timeZone = timeZone
     let end = calendar.date(byAdding: .day, value: 6, to: start) ?? start
-    return "\(start.formatted(.dateTime.month(.abbreviated).day())) – \(end.formatted(.dateTime.month(.abbreviated).day()))"
+    return
+      "\(start.formatted(.dateTime.month(.abbreviated).day())) – \(end.formatted(.dateTime.month(.abbreviated).day()))"
   }
+
+  @Environment(CarryForwardViewModel.self) private var carryForwardViewModel
 }
 
 struct DayDetailView: View {
@@ -385,7 +404,11 @@ struct DayDetailView: View {
               HStack(alignment: .top, spacing: 42) {
                 VStack(alignment: .leading, spacing: EchoLayout.sectionSpacing) {
                   dayHeader
-                  DayReflectionSection(viewModel: organizationViewModel, isCompact: false)
+                  DayReflectionSection(
+                    viewModel: organizationViewModel,
+                    sourceDay: day.id,
+                    isCompact: false
+                  )
                   ReflectionActionBar(viewModel: organizationViewModel)
                 }
                 .frame(maxWidth: 610, alignment: .leading)
@@ -400,7 +423,11 @@ struct DayDetailView: View {
             } else {
               LazyVStack(alignment: .leading, spacing: EchoLayout.sectionSpacing) {
                 dayHeader
-                DayReflectionSection(viewModel: organizationViewModel, isCompact: true)
+                DayReflectionSection(
+                  viewModel: organizationViewModel,
+                  sourceDay: day.id,
+                  isCompact: true
+                )
                 entries
                 ReflectionActionBar(viewModel: organizationViewModel)
               }
@@ -451,7 +478,16 @@ struct DayDetailView: View {
           entry: entry,
           highlightViewModel: highlightViewModel,
           isFocusedSource: entry.id == focusedEntryID,
-          isReflectionSource: organizationViewModel.journal?.sourceEntryIDs.contains(entry.id) == true
+          isReflectionSource: organizationViewModel.journal?.sourceEntryIDs.contains(entry.id)
+            == true,
+          onCarryForward: {
+            await carryForwardViewModel.carryToTomorrow(
+              text: entry.rawText,
+              sourceKind: .entry,
+              sourceDay: day.id,
+              sourceEntryID: entry.id
+            )
+          }
         )
         .id(entry.id)
         if entry.id != day.entries.last?.id {
@@ -473,6 +509,7 @@ struct DayDetailView: View {
   }
 
   @Environment(\.echoVisualWorld) private var world
+  @Environment(CarryForwardViewModel.self) private var carryForwardViewModel
 
   private var displayDate: Date {
     day.id.date(in: timeZone) ?? day.entries[0].createdAt
@@ -496,9 +533,9 @@ private struct DayDateHeader: View {
           .dateTime.weekday(.wide).month(.wide).day().year()
         ).uppercased()
       )
-        .font(EchoTypography.editorialEyebrow)
-        .tracking(1.5)
-        .foregroundStyle(world.accent)
+      .font(EchoTypography.editorialEyebrow)
+      .tracking(1.5)
+      .foregroundStyle(world.accent)
 
       Text("Day Reflection")
         .font(EchoTypography.editorialDisplay)
@@ -515,6 +552,7 @@ private struct DayDateHeader: View {
 
 private struct DayReflectionSection: View {
   let viewModel: DayOrganizationViewModel
+  let sourceDay: EchoDayIdentifier
   let isCompact: Bool
 
   @Environment(\.echoVisualWorld) private var world
@@ -529,6 +567,9 @@ private struct DayReflectionSection: View {
 
         if viewModel.failure != nil {
           EchoErrorState(message: "The organized journal could not be loaded or saved.")
+        }
+        if carryForwardViewModel.actionState == .failed {
+          EchoErrorState(message: "That thought could not be carried forward.")
         }
       }
     }
@@ -549,7 +590,9 @@ private struct DayReflectionSection: View {
       }
 
       Text(journal.body)
-        .font(isCompact ? EchoTypography.compactEditorialNarrative : EchoTypography.editorialNarrative)
+        .font(
+          isCompact ? EchoTypography.compactEditorialNarrative : EchoTypography.editorialNarrative
+        )
         .lineSpacing(isCompact ? 4 : 6)
         .textSelection(.enabled)
 
@@ -575,9 +618,13 @@ private struct DayReflectionSection: View {
         ReflectionSectionLabel(title: "Key moments", systemImage: "sparkles")
         VStack(alignment: .leading, spacing: EchoLayout.rowSpacing) {
           ForEach(journal.keyMoments, id: \.self) { moment in
-            Label(moment, systemImage: "diamond.fill")
-              .font(EchoTypography.supporting)
-              .symbolRenderingMode(.monochrome)
+            CarryForwardCandidate(text: moment, style: .plain) {
+              await carryForwardViewModel.carryToTomorrow(
+                text: moment,
+                sourceKind: .dayReflectionKeyMoment,
+                sourceDay: sourceDay
+              )
+            }
           }
         }
       }
@@ -586,12 +633,13 @@ private struct DayReflectionSection: View {
         Divider()
         ReflectionSectionLabel(title: "Keep thinking", systemImage: "quote.bubble")
         ForEach(journal.reflectionQuestions, id: \.self) { question in
-          Text(question)
-            .font(EchoTypography.contentTitle)
-            .foregroundStyle(world.primaryText)
-            .padding(EchoLayout.contentSpacing)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(world.accent.opacity(0.14), in: RoundedRectangle(cornerRadius: 12))
+          CarryForwardCandidate(text: question) {
+            await carryForwardViewModel.carryToTomorrow(
+              text: question,
+              sourceKind: .dayReflectionQuestion,
+              sourceDay: sourceDay
+            )
+          }
         }
       }
 
@@ -611,13 +659,60 @@ private struct DayReflectionSection: View {
           .foregroundStyle(world.accent)
         Text("Bring the day into focus")
           .font(EchoTypography.sectionTitle)
-        Text("Echo can shape these entries into a readable reflection while keeping every original word unchanged.")
-          .font(EchoTypography.supporting)
-          .foregroundStyle(.secondary)
+        Text(
+          "Echo can shape these entries into a readable reflection while keeping every original word unchanged."
+        )
+        .font(EchoTypography.supporting)
+        .foregroundStyle(.secondary)
       }
     }
   }
 
+  @Environment(CarryForwardViewModel.self) private var carryForwardViewModel
+
+}
+
+private struct CarryForwardCandidate: View {
+  enum Style { case card, plain }
+
+  let text: String
+  var style: Style = .card
+  let action: () async -> Bool
+
+  @State private var didCarry = false
+  @Environment(\.echoVisualWorld) private var world
+
+  var body: some View {
+    HStack(alignment: .firstTextBaseline, spacing: EchoLayout.rowSpacing) {
+      if style == .plain {
+        Image(systemName: "diamond.fill")
+          .font(.caption2)
+          .foregroundStyle(world.accent)
+          .accessibilityHidden(true)
+      }
+      Text(text)
+        .font(style == .card ? EchoTypography.contentTitle : EchoTypography.supporting)
+        .foregroundStyle(world.primaryText)
+        .frame(maxWidth: .infinity, alignment: .leading)
+
+      Button {
+        Task { didCarry = await action() }
+      } label: {
+        Image(systemName: didCarry ? "checkmark" : "arrow.turn.down.right")
+          .font(.subheadline.weight(.semibold))
+          .frame(width: 30, height: 30)
+      }
+      .buttonStyle(.plain)
+      .foregroundStyle(world.accent)
+      .accessibilityLabel(didCarry ? "Set for tomorrow" : "Carry to tomorrow")
+    }
+    .padding(style == .card ? EchoLayout.contentSpacing : 0)
+    .background(
+      style == .card ? world.accent.opacity(0.14) : Color.clear,
+      in: RoundedRectangle(cornerRadius: 12)
+    )
+    .animation(.easeOut(duration: 0.18), value: didCarry)
+  }
 }
 
 private struct ReflectionSectionLabel: View {
@@ -700,6 +795,8 @@ private struct DayDetailEntry: View {
   let highlightViewModel: EntryHighlightViewModel
   let isFocusedSource: Bool
   let isReflectionSource: Bool
+  let onCarryForward: () async -> Bool
+  @State private var didCarry = false
 
   var body: some View {
     HStack(alignment: .top, spacing: EchoLayout.rowSpacing) {
@@ -732,6 +829,16 @@ private struct DayDetailEntry: View {
         .buttonStyle(.borderless)
         .labelStyle(.iconOnly)
         .font(.body)
+
+      Button {
+        Task { didCarry = await onCarryForward() }
+      } label: {
+        Image(systemName: didCarry ? "checkmark" : "arrow.turn.down.right")
+      }
+      .buttonStyle(.borderless)
+      .font(.body)
+      .foregroundStyle(world.accent)
+      .accessibilityLabel(didCarry ? "Set for tomorrow" : "Carry entry to tomorrow")
     }
     .padding(EchoLayout.surfacePadding)
     .background(
@@ -749,7 +856,7 @@ private struct DayDetailEntry: View {
           )
       }
     }
-    .accessibilityElement(children: .combine)
+    .accessibilityElement(children: .contain)
     .accessibilityValue(accessibilityValue)
   }
 

@@ -30,6 +30,7 @@ struct TodayView: View {
     .task {
       await viewModel.load()
       await highlightViewModel.load()
+      await carryForwardViewModel.loadToday()
     }
     .sheet(item: $selectedEntry) { entry in
       EntryEditorView(
@@ -67,6 +68,7 @@ struct TodayView: View {
         .accessibilityHidden(true)
 
       promptHeader(isWide: false)
+      carryForwardCard
       captureControl
       voiceStatus
       memorySection
@@ -106,6 +108,7 @@ struct TodayView: View {
       HStack(alignment: .top, spacing: 72) {
         VStack(alignment: .leading, spacing: EchoLayout.contentSpacing) {
           promptHeader(isWide: true)
+          carryForwardCard
           captureControl
           voiceStatus
           memorySection
@@ -129,6 +132,60 @@ struct TodayView: View {
       .font(isWide ? EchoTypography.wideEditorialPrompt : EchoTypography.editorialPrompt)
       .accessibilityAddTraits(.isHeader)
       .shadow(color: world.contentShadow, radius: 8, y: 2)
+  }
+
+  @ViewBuilder
+  private var carryForwardCard: some View {
+    if let item = carryForwardViewModel.todayItem {
+      EchoReadabilityPanel {
+        HStack(alignment: .top, spacing: EchoLayout.contentSpacing) {
+          Image(systemName: "arrow.turn.down.right")
+            .font(.title3.weight(.semibold))
+            .foregroundStyle(world.accent)
+            .frame(width: 28)
+
+          VStack(alignment: .leading, spacing: EchoLayout.tightSpacing) {
+            Text("CARRIED FORWARD")
+              .font(EchoTypography.editorialEyebrow)
+              .tracking(1.4)
+              .foregroundStyle(world.accent)
+            Text(item.text)
+              .font(EchoTypography.contentTitle)
+              .lineSpacing(3)
+              .textSelection(.enabled)
+            Text(carryForwardSourceLabel(for: item.sourceKind))
+              .font(EchoTypography.metadata)
+              .foregroundStyle(world.secondaryText)
+          }
+
+          Spacer(minLength: EchoLayout.tightSpacing)
+
+          Button("Release") {
+            Task { await carryForwardViewModel.releaseToday() }
+          }
+          .font(EchoTypography.metadata.weight(.semibold))
+          .buttonStyle(.borderless)
+          .foregroundStyle(world.accent)
+          .accessibilityHint("Removes this thought from Today without deleting its source")
+        }
+      }
+      .accessibilityElement(children: .contain)
+    }
+  }
+
+  private func carryForwardSourceLabel(for kind: EchoCarryForwardSourceKind) -> String {
+    switch kind {
+    case .dayReflectionQuestion:
+      "From a reflection question"
+    case .dayReflectionKeyMoment:
+      "From a key moment"
+    case .weeklyReflectionQuestion:
+      "From your weekly reflection"
+    case .entry:
+      "From an original entry"
+    default:
+      "From an earlier reflection"
+    }
   }
 
   private var captureControl: some View {
@@ -221,9 +278,10 @@ struct TodayView: View {
           TodayEntryRow(
             entry: entry,
             highlightViewModel: highlightViewModel,
-            onPlay: entry.type == .voice ? {
-              Task { await voiceCaptureViewModel.play(entryID: entry.id) }
-            } : nil,
+            onPlay: entry.type == .voice
+              ? {
+                Task { await voiceCaptureViewModel.play(entryID: entry.id) }
+              } : nil,
             onOpen: { selectedEntry = entry },
             onDelete: { confirmDeletion(of: entry) }
           )
@@ -283,6 +341,7 @@ struct TodayView: View {
   }
 
   @Environment(\.echoVisualWorld) private var world
+  @Environment(CarryForwardViewModel.self) private var carryForwardViewModel
   @Environment(\.horizontalSizeClass) private var horizontalSizeClass
   @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
@@ -407,7 +466,9 @@ private struct TodayMemorySection: View {
           .foregroundStyle(world.accent)
 
         ForEach(lane.entries) { entry in
-          Button { onOpen(entry) } label: {
+          Button {
+            onOpen(entry)
+          } label: {
             VStack(alignment: .leading, spacing: EchoLayout.inlineSpacing) {
               Text(entry.rawText)
                 .font(EchoTypography.supporting)

@@ -297,6 +297,64 @@ struct TodayViewModelTests {
     #expect(await entries.allEntries().isEmpty)
     #expect(!FileManager.default.fileExists(atPath: directory.path))
   }
+
+  @Test("Carry forward replaces tomorrow's thought and preserves its source")
+  func carryingReflectionToTomorrow() async throws {
+    let now = try makeDate("2026-10-03T12:00:00Z")
+    let calendar = try makeGregorianCalendar(timeZone: "UTC")
+    let repository = CarryForwardRepositoryStub()
+    let viewModel = CarryForwardViewModel(
+      repository: repository,
+      calendar: calendar,
+      now: { now }
+    )
+    let sourceDay = EchoDayIdentifier(containing: now, calendar: calendar)
+
+    let saved = await viewModel.carryToTomorrow(
+      text: "  What would make this easier to begin?  ",
+      sourceKind: .dayReflectionQuestion,
+      sourceDay: sourceDay
+    )
+
+    let tomorrow = try #require(calendar.date(byAdding: .day, value: 1, to: now))
+    let stored = try #require(
+      await repository.carryForward(
+        for: EchoDayIdentifier(containing: tomorrow, calendar: calendar)
+      )
+    )
+    #expect(saved)
+    #expect(stored.text == "What would make this easier to begin?")
+    #expect(stored.sourceKind == .dayReflectionQuestion)
+    #expect(stored.sourceDay == sourceDay)
+    #expect(viewModel.actionState == .saved)
+  }
+
+  @Test("Today loads and releases a carried thought without touching its source")
+  func loadingAndReleasingCarryForward() async throws {
+    let now = try makeDate("2026-10-04T12:00:00Z")
+    let calendar = try makeGregorianCalendar(timeZone: "UTC")
+    let item = EchoCarryForward(
+      text: "A fictional thought worth returning to.",
+      sourceKind: .entry,
+      sourceEntryID: UUID(),
+      targetDay: EchoDayIdentifier(containing: now, calendar: calendar),
+      createdAt: try makeDate("2026-10-03T20:00:00Z")
+    )
+    let repository = CarryForwardRepositoryStub(items: [item])
+    let viewModel = CarryForwardViewModel(
+      repository: repository,
+      calendar: calendar,
+      now: { now }
+    )
+
+    await viewModel.loadToday()
+    #expect(viewModel.todayItem == item)
+
+    let released = await viewModel.releaseToday()
+    #expect(released)
+    #expect(viewModel.todayItem == nil)
+    #expect(await repository.allCarryForwards().isEmpty)
+  }
 }
 
 private actor TodayEntryRepositoryStub: EchoEntryRepository {
@@ -378,6 +436,34 @@ private actor TodayHighlightRepositoryStub: EchoHighlightRepository {
 
   func delete(id: UUID) {
     highlights.removeAll { $0.id == id }
+  }
+}
+
+private actor CarryForwardRepositoryStub: EchoCarryForwardRepository {
+  private var itemsByTargetDay: [EchoDayIdentifier: EchoCarryForward]
+
+  init(items: [EchoCarryForward] = []) {
+    itemsByTargetDay = Dictionary(uniqueKeysWithValues: items.map { ($0.targetDay, $0) })
+  }
+
+  func create(_ carryForward: EchoCarryForward) {
+    itemsByTargetDay[carryForward.targetDay] = carryForward
+  }
+
+  func replace(_ carryForward: EchoCarryForward) {
+    itemsByTargetDay[carryForward.targetDay] = carryForward
+  }
+
+  func carryForward(for targetDay: EchoDayIdentifier) -> EchoCarryForward? {
+    itemsByTargetDay[targetDay]
+  }
+
+  func allCarryForwards() -> [EchoCarryForward] {
+    Array(itemsByTargetDay.values)
+  }
+
+  func delete(id: UUID) {
+    itemsByTargetDay = itemsByTargetDay.filter { $0.value.id != id }
   }
 }
 
