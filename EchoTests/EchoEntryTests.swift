@@ -22,8 +22,12 @@ struct EchoEntryTests {
     #expect(entry.createdAt == createdAt)
     #expect(entry.modifiedAt == createdAt)
     #expect(entry.day == EchoDayIdentifier(containing: createdAt, calendar: calendar))
+    #expect(entry.originalText == "A fictional note about a paper moon.")
     #expect(entry.rawText == "A fictional note about a paper moon.")
     #expect(entry.polishedText == nil)
+    #expect(entry.preferredText == entry.rawText)
+    #expect(entry.refinementStatus == .notRequested)
+    #expect(entry.refinementProvenance == nil)
     #expect(entry.type == .text)
     #expect(entry.source == .user)
   }
@@ -45,10 +49,55 @@ struct EchoEntryTests {
     entry.editRawText("A fictional revised draft.", at: editedAt)
 
     #expect(entry.rawText == "A fictional revised draft.")
+    #expect(entry.originalText == "A fictional first draft.")
     #expect(entry.modifiedAt == editedAt)
     #expect(entry.id == id)
     #expect(entry.createdAt == createdAt)
     #expect(entry.day == originalDay)
+  }
+
+  @Test("Refinement preserves the original capture and becomes preferred reading text")
+  func refinementLifecycle() throws {
+    let createdAt = try makeDate("2026-09-29T14:15:00Z")
+    let refinedAt = try makeDate("2026-09-29T14:15:03Z")
+    let calendar = try makeGregorianCalendar(timeZone: "UTC")
+    let provenance = EchoEntryRefinementProvenance(
+      processorIdentifier: "echo.test.refiner",
+      modelIdentifier: "fictional-model",
+      generatedAt: refinedAt
+    )
+    var entry = EchoEntry(
+      createdAt: createdAt,
+      calendar: calendar,
+      rawText: "fictional meeting went good"
+    )
+
+    entry.beginRefinement(at: createdAt.addingTimeInterval(1))
+    #expect(entry.refinementStatus == .processing)
+    #expect(entry.preferredText == "fictional meeting went good")
+
+    entry.completeRefinement(
+      text: "The fictional meeting went well.",
+      provenance: provenance,
+      requiresReview: false,
+      at: refinedAt
+    )
+
+    #expect(entry.originalText == "fictional meeting went good")
+    #expect(entry.rawText == "fictional meeting went good")
+    #expect(entry.polishedText == "The fictional meeting went well.")
+    #expect(entry.preferredText == "The fictional meeting went well.")
+    #expect(entry.refinementStatus == .refined)
+    #expect(entry.refinementProvenance == provenance)
+
+    entry.editRawText(
+      "fictional meeting became clearer",
+      at: refinedAt.addingTimeInterval(1)
+    )
+    #expect(entry.originalText == "fictional meeting went good")
+    #expect(entry.preferredText == "fictional meeting became clearer")
+    #expect(entry.refinementStatus == .notRequested)
+    #expect(entry.refinementProvenance == nil)
   }
 
   @Test("Modification time never moves backward")
@@ -103,6 +152,32 @@ struct EchoEntryTests {
     let decoded = try JSONDecoder().decode(EchoEntry.self, from: encoded)
 
     #expect(decoded == entry)
+  }
+
+  @Test("Older serialized entries receive safe refinement defaults")
+  func legacyCodableDefaults() throws {
+    let createdAt = try makeDate("2026-09-29T14:15:00Z")
+    let calendar = try makeGregorianCalendar(timeZone: "UTC")
+    let entry = EchoEntry(
+      createdAt: createdAt,
+      calendar: calendar,
+      rawText: "A fictional legacy note.",
+      polishedText: "A fictional legacy note."
+    )
+    let encoded = try JSONEncoder().encode(entry)
+    var object = try #require(JSONSerialization.jsonObject(with: encoded) as? [String: Any])
+    object.removeValue(forKey: "originalText")
+    object.removeValue(forKey: "refinementStatus")
+    object.removeValue(forKey: "refinementProvenance")
+
+    let decoded = try JSONDecoder().decode(
+      EchoEntry.self,
+      from: JSONSerialization.data(withJSONObject: object)
+    )
+
+    #expect(decoded.originalText == entry.rawText)
+    #expect(decoded.preferredText == entry.polishedText)
+    #expect(decoded.refinementStatus == .refined)
   }
 }
 

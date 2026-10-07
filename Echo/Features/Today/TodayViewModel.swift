@@ -550,7 +550,17 @@ final class VoiceCaptureViewModel {
         if !transcript.isEmpty {
           attachment.setTranscript(transcript)
           try await attachmentRepository.update(attachment)
-          entry.editRawText(transcript, at: now())
+          entry = EchoEntry(
+            id: entry.id,
+            createdAt: entry.createdAt,
+            modifiedAt: now(),
+            day: entry.day,
+            rawText: transcript,
+            polishedText: nil,
+            originalText: transcript,
+            type: entry.type,
+            source: entry.source
+          )
           try await entryRepository.update(entry)
           statusMessage = "Saved with an on-device transcript."
         } else {

@@ -1,14 +1,54 @@
 import Foundation
 
+enum EchoEntryRefinementStatus: String, Codable, Hashable, Sendable {
+  case notRequested
+  case processing
+  case refined
+  case needsReview
+  case failed
+}
+
+struct EchoEntryRefinementProvenance: Codable, Hashable, Sendable {
+  let processorIdentifier: String
+  let modelIdentifier: String?
+  let generatedAt: Date
+}
+
 struct EchoEntry: Identifiable, Codable, Hashable, Sendable {
   let id: UUID
   let createdAt: Date
   private(set) var modifiedAt: Date
   let day: EchoDayIdentifier
+  let originalText: String
   private(set) var rawText: String
   private(set) var polishedText: String?
+  private(set) var refinementStatus: EchoEntryRefinementStatus
+  private(set) var refinementProvenance: EchoEntryRefinementProvenance?
   let type: EchoEntryType
   let source: EchoEntrySource
+
+  private enum CodingKeys: String, CodingKey {
+    case id
+    case createdAt
+    case modifiedAt
+    case day
+    case originalText
+    case rawText
+    case polishedText
+    case refinementStatus
+    case refinementProvenance
+    case type
+    case source
+  }
+
+  var preferredText: String {
+    guard let polishedText,
+      polishedText.contains(where: { !$0.isWhitespace })
+    else {
+      return rawText
+    }
+    return polishedText
+  }
 
   init(
     id: UUID,
@@ -17,6 +57,9 @@ struct EchoEntry: Identifiable, Codable, Hashable, Sendable {
     day: EchoDayIdentifier,
     rawText: String,
     polishedText: String?,
+    originalText: String? = nil,
+    refinementStatus: EchoEntryRefinementStatus? = nil,
+    refinementProvenance: EchoEntryRefinementProvenance? = nil,
     type: EchoEntryType,
     source: EchoEntrySource
   ) {
@@ -24,10 +67,51 @@ struct EchoEntry: Identifiable, Codable, Hashable, Sendable {
     self.createdAt = createdAt
     self.modifiedAt = max(createdAt, modifiedAt)
     self.day = day
+    self.originalText = originalText ?? rawText
     self.rawText = rawText
     self.polishedText = polishedText
+    self.refinementStatus = refinementStatus ?? (polishedText == nil ? .notRequested : .refined)
+    self.refinementProvenance = refinementProvenance
     self.type = type
     self.source = source
+  }
+
+  init(from decoder: any Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    id = try container.decode(UUID.self, forKey: .id)
+    createdAt = try container.decode(Date.self, forKey: .createdAt)
+    modifiedAt = max(
+      createdAt,
+      try container.decode(Date.self, forKey: .modifiedAt)
+    )
+    day = try container.decode(EchoDayIdentifier.self, forKey: .day)
+    rawText = try container.decode(String.self, forKey: .rawText)
+    originalText = try container.decodeIfPresent(String.self, forKey: .originalText) ?? rawText
+    polishedText = try container.decodeIfPresent(String.self, forKey: .polishedText)
+    refinementStatus =
+      try container.decodeIfPresent(EchoEntryRefinementStatus.self, forKey: .refinementStatus)
+      ?? (polishedText == nil ? .notRequested : .refined)
+    refinementProvenance = try container.decodeIfPresent(
+      EchoEntryRefinementProvenance.self,
+      forKey: .refinementProvenance
+    )
+    type = try container.decode(EchoEntryType.self, forKey: .type)
+    source = try container.decode(EchoEntrySource.self, forKey: .source)
+  }
+
+  func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(id, forKey: .id)
+    try container.encode(createdAt, forKey: .createdAt)
+    try container.encode(modifiedAt, forKey: .modifiedAt)
+    try container.encode(day, forKey: .day)
+    try container.encode(originalText, forKey: .originalText)
+    try container.encode(rawText, forKey: .rawText)
+    try container.encodeIfPresent(polishedText, forKey: .polishedText)
+    try container.encode(refinementStatus, forKey: .refinementStatus)
+    try container.encodeIfPresent(refinementProvenance, forKey: .refinementProvenance)
+    try container.encode(type, forKey: .type)
+    try container.encode(source, forKey: .source)
   }
 
   init(
@@ -37,6 +121,9 @@ struct EchoEntry: Identifiable, Codable, Hashable, Sendable {
     calendar: Calendar,
     rawText: String,
     polishedText: String? = nil,
+    originalText: String? = nil,
+    refinementStatus: EchoEntryRefinementStatus? = nil,
+    refinementProvenance: EchoEntryRefinementProvenance? = nil,
     type: EchoEntryType = .text,
     source: EchoEntrySource = .user
   ) {
@@ -44,20 +131,50 @@ struct EchoEntry: Identifiable, Codable, Hashable, Sendable {
     self.createdAt = createdAt
     self.modifiedAt = max(createdAt, modifiedAt ?? createdAt)
     self.day = EchoDayIdentifier(containing: createdAt, calendar: calendar)
+    self.originalText = originalText ?? rawText
     self.rawText = rawText
     self.polishedText = polishedText
+    self.refinementStatus = refinementStatus ?? (polishedText == nil ? .notRequested : .refined)
+    self.refinementProvenance = refinementProvenance
     self.type = type
     self.source = source
   }
 
   mutating func editRawText(_ text: String, at timestamp: Date) {
     rawText = text
+    polishedText = nil
+    refinementStatus = .notRequested
+    refinementProvenance = nil
     markModified(at: timestamp)
   }
 
   /// Stores assisted text separately; this operation never replaces `rawText`.
   mutating func setPolishedText(_ text: String?, at timestamp: Date) {
     polishedText = text
+    refinementStatus = text == nil ? .notRequested : .refined
+    refinementProvenance = nil
+    markModified(at: timestamp)
+  }
+
+  mutating func beginRefinement(at timestamp: Date) {
+    refinementStatus = .processing
+    markModified(at: timestamp)
+  }
+
+  mutating func completeRefinement(
+    text: String,
+    provenance: EchoEntryRefinementProvenance,
+    requiresReview: Bool,
+    at timestamp: Date
+  ) {
+    polishedText = text
+    refinementStatus = requiresReview ? .needsReview : .refined
+    refinementProvenance = provenance
+    markModified(at: timestamp)
+  }
+
+  mutating func failRefinement(at timestamp: Date) {
+    refinementStatus = .failed
     markModified(at: timestamp)
   }
 
