@@ -270,6 +270,7 @@ struct TodayViewModelTests {
     let attachment = try #require(await attachments.attachment(for: entry.id))
 
     #expect(entry.type == .voice)
+    #expect(entry.originalText == "A fictional spoken memory.")
     #expect(entry.rawText == "A fictional spoken memory.")
     #expect(attachment.transcript == "A fictional spoken memory.")
     #expect(viewModel.state == .ready)

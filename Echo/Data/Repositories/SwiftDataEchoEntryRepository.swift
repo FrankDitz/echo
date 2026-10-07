@@ -9,11 +9,16 @@ actor SwiftDataEchoEntryRepository: EchoEntryRepository {
     }
 
     modelContext.insert(try EchoPersistenceMapper.makeEntryRecord(from: entry))
+    modelContext.insert(try EchoPersistenceMapper.makeEntryRefinementRecord(from: entry))
     try modelContext.save()
   }
 
   func entry(id: UUID) async throws -> EchoEntry? {
-    try record(id: id).map(EchoPersistenceMapper.makeEntry)
+    guard let record = try record(id: id) else { return nil }
+    return try EchoPersistenceMapper.makeEntry(
+      from: record,
+      refinement: refinementRecord(entryID: id)
+    )
   }
 
   func entries(for day: EchoDayIdentifier) async throws -> [EchoEntry] {
@@ -21,13 +26,13 @@ actor SwiftDataEchoEntryRepository: EchoEntryRepository {
     let descriptor = FetchDescriptor<PersistentEchoEntry>(
       predicate: #Predicate { $0.dayKey == dayKey }
     )
-    let entries = try modelContext.fetch(descriptor).map(EchoPersistenceMapper.makeEntry)
+    let entries = try modelContext.fetch(descriptor).map(makeEntry)
     return EchoEntryOrdering.chronological(entries)
   }
 
   func allEntries() async throws -> [EchoEntry] {
     let entries = try modelContext.fetch(FetchDescriptor<PersistentEchoEntry>())
-      .map(EchoPersistenceMapper.makeEntry)
+      .map(makeEntry)
     return EchoEntryOrdering.chronological(entries)
   }
 
@@ -37,7 +42,7 @@ actor SwiftDataEchoEntryRepository: EchoEntryRepository {
     // Search remains inside the existing app-container store. Echo does not create
     // a second index, export journal text, or expose content to system search.
     let entries = try modelContext.fetch(FetchDescriptor<PersistentEchoEntry>())
-      .map(EchoPersistenceMapper.makeEntry)
+      .map(makeEntry)
       .filter(query.matches)
 
     return entries.sorted { lhs, rhs in
@@ -54,6 +59,11 @@ actor SwiftDataEchoEntryRepository: EchoEntryRepository {
     }
 
     try EchoPersistenceMapper.update(record, from: entry)
+    if let refinement = try refinementRecord(entryID: entry.id) {
+      try EchoPersistenceMapper.update(refinement, from: entry)
+    } else {
+      modelContext.insert(try EchoPersistenceMapper.makeEntryRefinementRecord(from: entry))
+    }
     try modelContext.save()
   }
 
@@ -63,6 +73,9 @@ actor SwiftDataEchoEntryRepository: EchoEntryRepository {
     }
 
     modelContext.delete(record)
+    if let refinement = try refinementRecord(entryID: id) {
+      modelContext.delete(refinement)
+    }
     try modelContext.save()
   }
 
@@ -72,6 +85,21 @@ actor SwiftDataEchoEntryRepository: EchoEntryRepository {
     )
     descriptor.fetchLimit = 1
     return try modelContext.fetch(descriptor).first
+  }
+
+  private func refinementRecord(entryID: UUID) throws -> PersistentEchoEntryRefinement? {
+    var descriptor = FetchDescriptor<PersistentEchoEntryRefinement>(
+      predicate: #Predicate { $0.entryID == entryID }
+    )
+    descriptor.fetchLimit = 1
+    return try modelContext.fetch(descriptor).first
+  }
+
+  private func makeEntry(from record: PersistentEchoEntry) throws -> EchoEntry {
+    try EchoPersistenceMapper.makeEntry(
+      from: record,
+      refinement: refinementRecord(entryID: record.id)
+    )
   }
 }
 
@@ -149,7 +177,8 @@ struct EchoVoiceFileStore: Sendable {
       create: true
     )
     return Self(
-      rootDirectory: base
+      rootDirectory:
+        base
         .appendingPathComponent("Echo", isDirectory: true)
         .appendingPathComponent("VoiceAttachments", isDirectory: true)
     )
@@ -169,7 +198,9 @@ struct EchoVoiceFileStore: Sendable {
   }
 
   func url(for attachment: EchoVoiceAttachment) throws -> URL {
-    guard attachment.relativeFileName == URL(fileURLWithPath: attachment.relativeFileName).lastPathComponent,
+    guard
+      attachment.relativeFileName
+        == URL(fileURLWithPath: attachment.relativeFileName).lastPathComponent,
       attachment.relativeFileName.lowercased().hasSuffix(".m4a")
     else {
       throw EchoVoiceFileStoreError.invalidFileName

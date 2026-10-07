@@ -1,4 +1,5 @@
 import Foundation
+import SwiftData
 import Testing
 
 @testable import Echo
@@ -24,6 +25,17 @@ struct SwiftDataEchoEntryRepositoryTests {
     entry.editRawText(
       "A fictional persistence revision.",
       at: try makeDate("2026-10-01T10:30:00Z")
+    )
+    let refinedAt = try makeDate("2026-10-01T10:31:00Z")
+    entry.completeRefinement(
+      text: "A refined fictional persistence revision.",
+      provenance: EchoEntryRefinementProvenance(
+        processorIdentifier: "echo.test.refiner",
+        modelIdentifier: "fictional-model",
+        generatedAt: refinedAt
+      ),
+      requiresReview: true,
+      at: refinedAt
     )
     try await repository.update(entry)
     #expect(try await repository.entry(id: id) == entry)
@@ -169,6 +181,41 @@ struct SwiftDataEchoEntryRepositoryTests {
     )
   }
 
+  @Test("Version six stores migrate with safe refinement defaults")
+  func versionSixMigration() async throws {
+    let location = try makeDisposableStoreLocation()
+    defer { try? FileManager.default.removeItem(at: location.directory) }
+
+    let calendar = try makeGregorianCalendar(timeZone: "UTC")
+    let entry = EchoEntry(
+      id: try makeUUID("00000000-0000-0000-0000-000000000411"),
+      createdAt: try makeDate("2026-10-01T09:00:00Z"),
+      calendar: calendar,
+      rawText: "A fictional entry from the previous schema."
+    )
+    try await persistVersionSix(entry, at: location.store)
+
+    let container = try EchoModelContainerFactory.makePersistent(at: location.store)
+    let repository = SwiftDataEchoEntryRepository(modelContainer: container)
+    var migrated = try #require(try await repository.entry(id: entry.id))
+    #expect(migrated.originalText == entry.rawText)
+    #expect(migrated.refinementStatus == .notRequested)
+
+    let refinedAt = try makeDate("2026-10-01T09:01:00Z")
+    migrated.completeRefinement(
+      text: "A refined fictional entry from the previous schema.",
+      provenance: EchoEntryRefinementProvenance(
+        processorIdentifier: "echo.test.refiner",
+        modelIdentifier: nil,
+        generatedAt: refinedAt
+      ),
+      requiresReview: false,
+      at: refinedAt
+    )
+    try await repository.update(migrated)
+    #expect(try await repository.entry(id: entry.id) == migrated)
+  }
+
   private func persist(_ entry: EchoEntry, at storeURL: URL) async throws {
     let container = try EchoModelContainerFactory.makePersistent(at: storeURL)
     let repository = SwiftDataEchoEntryRepository(modelContainer: container)
@@ -179,6 +226,20 @@ struct SwiftDataEchoEntryRepositoryTests {
     let container = try EchoModelContainerFactory.makePersistent(at: storeURL)
     let repository = SwiftDataEchoEntryRepository(modelContainer: container)
     return try await repository.entry(id: id)
+  }
+
+  @MainActor
+  private func persistVersionSix(_ entry: EchoEntry, at storeURL: URL) throws {
+    let schema = Schema(versionedSchema: EchoSchemaV6.self)
+    let configuration = ModelConfiguration(
+      "EchoVersionSixMigration",
+      schema: schema,
+      url: storeURL,
+      cloudKitDatabase: .none
+    )
+    let container = try ModelContainer(for: schema, configurations: [configuration])
+    container.mainContext.insert(try EchoPersistenceMapper.makeEntryRecord(from: entry))
+    try container.mainContext.save()
   }
 }
 

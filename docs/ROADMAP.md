@@ -74,7 +74,7 @@ Phase 8 begins only after the completed Phase 7 application has been reviewed to
 
 Every deliverable uses its own short-lived branch and pull request. Raw text, transcripts, recordings, refined writing, and provider credentials remain private runtime data and must never enter Git, fixtures, screenshots, or diagnostic logs.
 
-1. **Entry refinement foundation (in progress):** formally model an entry's immutable original capture, optional refined text, processing status, refinement provenance, and preferred reading text. Persist the new metadata through a versioned migration while keeping existing entries readable.
+1. **Entry refinement foundation (complete):** formally model an entry's immutable original capture, optional refined text, processing status, refinement provenance, and preferred reading text. Persist the new metadata through a versioned migration while keeping existing entries readable.
 2. **Unified capture pipeline:** route text and voice through one testable workflow that saves the original locally first, performs refinement second, and never loses a thought when transcription or refinement fails.
 3. **Private provider configuration:** add an explicit off/on choice, conservative cleanup instructions, cancellation and failure handling, and a provider boundary that supports on-device processing or a user-authorized remote provider without embedding credentials.
 4. **Automatic cleanup experience:** show Captured, Refining, Saved, Needs Review, and Retry states without blocking the next entry; allow automatic acceptance or review according to the user's setting.

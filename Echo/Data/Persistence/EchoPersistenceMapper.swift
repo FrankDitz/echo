@@ -28,7 +28,10 @@ enum EchoPersistenceMapper {
     record.sourceRawValue = entry.source.rawValue
   }
 
-  static func makeEntry(from record: PersistentEchoEntry) throws -> EchoEntry {
+  static func makeEntry(
+    from record: PersistentEchoEntry,
+    refinement: PersistentEchoEntryRefinement? = nil
+  ) throws -> EchoEntry {
     EchoEntry(
       id: record.id,
       createdAt: record.createdAt,
@@ -36,9 +39,36 @@ enum EchoPersistenceMapper {
       day: try decodeDay(record.dayPayload),
       rawText: record.rawText,
       polishedText: record.polishedText,
+      originalText: refinement?.originalText,
+      refinementStatus: (refinement?.statusRawValue).flatMap {
+        EchoEntryRefinementStatus(rawValue: $0)
+      },
+      refinementProvenance: try (refinement?.provenancePayload).map {
+        try JSONDecoder().decode(EchoEntryRefinementProvenance.self, from: $0)
+      },
       type: EchoEntryType(rawValue: record.typeRawValue),
       source: EchoEntrySource(rawValue: record.sourceRawValue)
     )
+  }
+
+  static func makeEntryRefinementRecord(
+    from entry: EchoEntry
+  ) throws -> PersistentEchoEntryRefinement {
+    PersistentEchoEntryRefinement(
+      entryID: entry.id,
+      originalText: entry.originalText,
+      statusRawValue: entry.refinementStatus.rawValue,
+      provenancePayload: try entry.refinementProvenance.map(JSONEncoder().encode)
+    )
+  }
+
+  static func update(
+    _ record: PersistentEchoEntryRefinement,
+    from entry: EchoEntry
+  ) throws {
+    record.originalText = entry.originalText
+    record.statusRawValue = entry.refinementStatus.rawValue
+    record.provenancePayload = try entry.refinementProvenance.map(JSONEncoder().encode)
   }
 
   static func makeVoiceAttachmentRecord(

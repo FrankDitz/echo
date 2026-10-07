@@ -37,6 +37,26 @@ final class PersistentEchoEntry {
 }
 
 @Model
+final class PersistentEchoEntryRefinement {
+  @Attribute(.unique) var entryID: UUID
+  var originalText: String
+  var statusRawValue: String
+  var provenancePayload: Data?
+
+  init(
+    entryID: UUID,
+    originalText: String,
+    statusRawValue: String,
+    provenancePayload: Data?
+  ) {
+    self.entryID = entryID
+    self.originalText = originalText
+    self.statusRawValue = statusRawValue
+    self.provenancePayload = provenancePayload
+  }
+}
+
+@Model
 final class PersistentEchoVoiceAttachment {
   @Attribute(.unique) var id: UUID
   @Attribute(.unique) var entryID: UUID
