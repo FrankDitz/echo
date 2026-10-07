@@ -43,6 +43,8 @@ struct EchoDataExportServiceTests {
     #expect(markdown.contains("A Fictional Clearer Evening"))
     #expect(markdown.contains("Saved"))
     #expect(markdown.contains("# Weekly reflections"))
+    #expect(markdown.contains("# Carried forward"))
+    #expect(markdown.contains("What fictional idea is worth carrying?"))
     #expect(try await fixture.entryRepository.allEntries().count == 1)
   }
 
@@ -68,6 +70,9 @@ struct EchoDataExportServiceTests {
     let sourceJournals = SwiftDataEchoOrganizedJournalRepository(modelContainer: sourceContainer)
     let sourceWeeks = SwiftDataEchoWeeklyReflectionRepository(modelContainer: sourceContainer)
     let sourceAttachments = SwiftDataEchoVoiceAttachmentRepository(
+      modelContainer: sourceContainer
+    )
+    let sourceCarryForwards = SwiftDataEchoCarryForwardRepository(
       modelContainer: sourceContainer
     )
     let sourceDirectory = FileManager.default.temporaryDirectory
@@ -123,11 +128,24 @@ struct EchoDataExportServiceTests {
       duration: 4.5,
       transcript: "A fictional recovery transcript."
     )
+    let carryForward = EchoCarryForward(
+      id: try makeUUID("00000000-0000-0000-0000-000000000516"),
+      text: "A fictional thought carried into tomorrow.",
+      sourceKind: .entry,
+      sourceDay: entry.day,
+      sourceEntryID: entry.id,
+      targetDay: EchoDayIdentifier(
+        containing: try makeDate("2026-10-03T12:00:00Z"),
+        calendar: calendar
+      ),
+      createdAt: createdAt
+    )
     try await sourceEntries.create(entry)
     try await sourceHighlights.create(highlight)
     try await sourceJournals.create(journal)
     try await sourceWeeks.create(week)
     try await sourceAttachments.create(attachment)
+    try await sourceCarryForwards.create(carryForward)
 
     let sourceService = EchoDataRecoveryService(
       entryRepository: sourceEntries,
@@ -135,6 +153,7 @@ struct EchoDataExportServiceTests {
       journalRepository: sourceJournals,
       weeklyRepository: sourceWeeks,
       voiceAttachmentRepository: sourceAttachments,
+      carryForwardRepository: sourceCarryForwards,
       voiceFileStore: sourceFiles
     )
     let archive = try await sourceService.makeRecoveryArchive(generatedAt: createdAt)
@@ -154,6 +173,9 @@ struct EchoDataExportServiceTests {
     let destinationAttachments = SwiftDataEchoVoiceAttachmentRepository(
       modelContainer: destinationContainer
     )
+    let destinationCarryForwards = SwiftDataEchoCarryForwardRepository(
+      modelContainer: destinationContainer
+    )
     let destinationFiles = EchoVoiceFileStore(rootDirectory: destinationDirectory)
     let destinationService = EchoDataRecoveryService(
       entryRepository: destinationEntries,
@@ -161,6 +183,7 @@ struct EchoDataExportServiceTests {
       journalRepository: destinationJournals,
       weeklyRepository: destinationWeeks,
       voiceAttachmentRepository: destinationAttachments,
+      carryForwardRepository: destinationCarryForwards,
       voiceFileStore: destinationFiles
     )
 
@@ -170,11 +193,16 @@ struct EchoDataExportServiceTests {
     #expect(firstRestore.addedJournals == 1)
     #expect(firstRestore.addedWeeklyReflections == 1)
     #expect(firstRestore.addedVoiceAttachments == 1)
+    #expect(firstRestore.addedCarryForwards == 1)
     #expect(firstRestore.skippedExistingItems == 0)
     #expect(try await destinationEntries.entry(id: entry.id) == entry)
     #expect(try await destinationHighlights.highlight(for: highlight.target) == highlight)
     #expect(try await destinationJournals.journal(for: journal.day) == journal)
     #expect(try await destinationWeeks.reflection(for: week.week) == week)
+    #expect(
+      try await destinationCarryForwards.carryForward(for: carryForward.targetDay)
+        == carryForward
+    )
     let restoredAttachment = try #require(
       try await destinationAttachments.attachment(for: entry.id)
     )
@@ -182,9 +210,17 @@ struct EchoDataExportServiceTests {
     #expect(try Data(contentsOf: destinationFiles.url(for: restoredAttachment)) == audio)
 
     let secondRestore = try await destinationService.restore(from: archive.data)
-    #expect(secondRestore.skippedExistingItems == 5)
+    #expect(secondRestore.skippedExistingItems == 6)
     #expect(secondRestore.addedEntries == 0)
     #expect(try await destinationEntries.allEntries().count == 1)
+
+    var legacyObject = try #require(
+      try JSONSerialization.jsonObject(with: archive.data) as? [String: Any]
+    )
+    legacyObject["carryForwards"] = nil
+    let legacyArchive = try JSONSerialization.data(withJSONObject: legacyObject)
+    let legacyRestore = try await destinationService.restore(from: legacyArchive)
+    #expect(legacyRestore.skippedExistingItems == 5)
   }
 
   private func makeFixture() async throws -> ExportFixture {
@@ -193,6 +229,7 @@ struct EchoDataExportServiceTests {
     let highlightRepository = SwiftDataEchoHighlightRepository(modelContainer: container)
     let journalRepository = SwiftDataEchoOrganizedJournalRepository(modelContainer: container)
     let weeklyRepository = SwiftDataEchoWeeklyReflectionRepository(modelContainer: container)
+    let carryForwardRepository = SwiftDataEchoCarryForwardRepository(modelContainer: container)
     let calendar = try makeGregorianCalendar(timeZone: "UTC")
     let createdAt = try makeDate("2026-10-01T21:00:00Z")
     let entry = EchoEntry(
@@ -229,18 +266,31 @@ struct EchoDataExportServiceTests {
       question: "What fictional step comes next?",
       generator: .deterministicLocal
     )
+    let carryForward = EchoCarryForward(
+      id: try makeUUID("00000000-0000-0000-0000-000000000505"),
+      text: "What fictional idea is worth carrying?",
+      sourceKind: .dayReflectionQuestion,
+      sourceDay: entry.day,
+      targetDay: EchoDayIdentifier(
+        containing: try makeDate("2026-10-02T12:00:00Z"),
+        calendar: calendar
+      ),
+      createdAt: createdAt
+    )
 
     try await entryRepository.create(entry)
     try await highlightRepository.create(highlight)
     try await journalRepository.create(journal)
     try await weeklyRepository.create(reflection)
+    try await carryForwardRepository.create(carryForward)
 
     return ExportFixture(
       service: EchoDataExportService(
         entryRepository: entryRepository,
         highlightRepository: highlightRepository,
         journalRepository: journalRepository,
-        weeklyRepository: weeklyRepository
+        weeklyRepository: weeklyRepository,
+        carryForwardRepository: carryForwardRepository
       ),
       entryRepository: entryRepository
     )

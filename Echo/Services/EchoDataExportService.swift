@@ -17,17 +17,20 @@ struct EchoDataExportService: Sendable {
   private let highlightRepository: any EchoHighlightRepository
   private let journalRepository: any EchoOrganizedJournalRepository
   private let weeklyRepository: any EchoWeeklyReflectionRepository
+  private let carryForwardRepository: any EchoCarryForwardRepository
 
   init(
     entryRepository: any EchoEntryRepository,
     highlightRepository: any EchoHighlightRepository,
     journalRepository: any EchoOrganizedJournalRepository,
-    weeklyRepository: any EchoWeeklyReflectionRepository
+    weeklyRepository: any EchoWeeklyReflectionRepository,
+    carryForwardRepository: any EchoCarryForwardRepository
   ) {
     self.entryRepository = entryRepository
     self.highlightRepository = highlightRepository
     self.journalRepository = journalRepository
     self.weeklyRepository = weeklyRepository
+    self.carryForwardRepository = carryForwardRepository
   }
 
   func makeExport(
@@ -39,6 +42,7 @@ struct EchoDataExportService: Sendable {
     async let highlights = highlightRepository.allHighlights()
     async let journals = journalRepository.allJournals()
     async let weeklyReflections = weeklyRepository.allReflections()
+    async let carryForwards = carryForwardRepository.allCarryForwards()
 
     let snapshot = EchoExportSnapshot(
       generatedAt: generatedAt,
@@ -46,7 +50,8 @@ struct EchoDataExportService: Sendable {
       entries: try await entries,
       highlights: try await highlights,
       journals: try await journals,
-      weeklyReflections: try await weeklyReflections
+      weeklyReflections: try await weeklyReflections,
+      carryForwards: try await carryForwards
     )
     let markdown = EchoMarkdownExportRenderer.render(snapshot)
     let dateStamp = Self.fileDateFormatter.string(from: generatedAt)
@@ -81,11 +86,13 @@ struct EchoRecoveryResult: Equatable, Sendable {
   let addedJournals: Int
   let addedWeeklyReflections: Int
   let addedVoiceAttachments: Int
+  let addedCarryForwards: Int
   let skippedExistingItems: Int
 
   var summary: String {
-    let added = addedEntries + addedHighlights + addedJournals
-      + addedWeeklyReflections + addedVoiceAttachments
+    let added =
+      addedEntries + addedHighlights + addedJournals
+      + addedWeeklyReflections + addedVoiceAttachments + addedCarryForwards
     return "Added \(added) items and kept \(skippedExistingItems) existing items unchanged."
   }
 }
@@ -110,6 +117,7 @@ struct EchoDataRecoveryService: Sendable {
   private let journalRepository: any EchoOrganizedJournalRepository
   private let weeklyRepository: any EchoWeeklyReflectionRepository
   private let voiceAttachmentRepository: any EchoVoiceAttachmentRepository
+  private let carryForwardRepository: any EchoCarryForwardRepository
   private let voiceFileStore: EchoVoiceFileStore
 
   init(
@@ -118,6 +126,7 @@ struct EchoDataRecoveryService: Sendable {
     journalRepository: any EchoOrganizedJournalRepository,
     weeklyRepository: any EchoWeeklyReflectionRepository,
     voiceAttachmentRepository: any EchoVoiceAttachmentRepository,
+    carryForwardRepository: any EchoCarryForwardRepository,
     voiceFileStore: EchoVoiceFileStore
   ) {
     self.entryRepository = entryRepository
@@ -125,6 +134,7 @@ struct EchoDataRecoveryService: Sendable {
     self.journalRepository = journalRepository
     self.weeklyRepository = weeklyRepository
     self.voiceAttachmentRepository = voiceAttachmentRepository
+    self.carryForwardRepository = carryForwardRepository
     self.voiceFileStore = voiceFileStore
   }
 
@@ -134,6 +144,7 @@ struct EchoDataRecoveryService: Sendable {
     async let journals = journalRepository.allJournals()
     async let weeklyReflections = weeklyRepository.allReflections()
     async let voiceAttachments = voiceAttachmentRepository.allAttachments()
+    async let carryForwards = carryForwardRepository.allCarryForwards()
 
     let attachments = try await voiceAttachments
     var voiceFiles: [EchoRecoveryVoiceFile] = []
@@ -154,6 +165,7 @@ struct EchoDataRecoveryService: Sendable {
       highlights: try await highlights,
       journals: try await journals,
       weeklyReflections: try await weeklyReflections,
+      carryForwards: try await carryForwards,
       voiceAttachments: attachments,
       voiceFiles: voiceFiles
     )
@@ -192,6 +204,7 @@ struct EchoDataRecoveryService: Sendable {
     var addedJournals = 0
     var addedWeeklyReflections = 0
     var addedVoiceAttachments = 0
+    var addedCarryForwards = 0
     var skipped = 0
 
     let currentEntryIDs = Set(currentEntries.map(\.id))
@@ -228,6 +241,15 @@ struct EchoDataRecoveryService: Sendable {
       } else {
         try await weeklyRepository.create(reflection)
         addedWeeklyReflections += 1
+      }
+    }
+
+    for carryForward in archive.carryForwards {
+      if try await carryForwardRepository.carryForward(for: carryForward.targetDay) != nil {
+        skipped += 1
+      } else {
+        try await carryForwardRepository.create(carryForward)
+        addedCarryForwards += 1
       }
     }
 
@@ -268,6 +290,7 @@ struct EchoDataRecoveryService: Sendable {
       addedJournals: addedJournals,
       addedWeeklyReflections: addedWeeklyReflections,
       addedVoiceAttachments: addedVoiceAttachments,
+      addedCarryForwards: addedCarryForwards,
       skippedExistingItems: skipped
     )
   }
@@ -280,12 +303,15 @@ struct EchoDataRecoveryService: Sendable {
     let journalDays = archive.journals.map(\.day)
     let weeklyIDs = archive.weeklyReflections.map(\.id)
     let weeks = archive.weeklyReflections.map(\.week)
+    let carryForwardIDs = archive.carryForwards.map(\.id)
+    let carryForwardDays = archive.carryForwards.map(\.targetDay)
     let attachmentIDs = archive.voiceAttachments.map(\.id)
     let attachmentEntryIDs = archive.voiceAttachments.map(\.entryID)
     let voiceFileIDs = archive.voiceFiles.map(\.attachmentID)
     guard isUnique(entryIDs), isUnique(highlightIDs), isUnique(highlightTargets),
       isUnique(journalIDs), isUnique(journalDays), isUnique(weeklyIDs), isUnique(weeks),
-      isUnique(attachmentIDs), isUnique(attachmentEntryIDs), isUnique(voiceFileIDs),
+      isUnique(carryForwardIDs), isUnique(carryForwardDays), isUnique(attachmentIDs),
+      isUnique(attachmentEntryIDs), isUnique(voiceFileIDs),
       Set(attachmentIDs) == Set(voiceFileIDs)
     else {
       throw EchoRecoveryError.invalidArchive
@@ -315,8 +341,59 @@ private struct EchoRecoveryArchive: Codable, Sendable {
   let highlights: [EchoHighlight]
   let journals: [EchoOrganizedJournal]
   let weeklyReflections: [EchoWeeklyReflection]
+  let carryForwards: [EchoCarryForward]
   let voiceAttachments: [EchoVoiceAttachment]
   let voiceFiles: [EchoRecoveryVoiceFile]
+
+  init(
+    formatVersion: Int,
+    createdAt: Date,
+    entries: [EchoEntry],
+    highlights: [EchoHighlight],
+    journals: [EchoOrganizedJournal],
+    weeklyReflections: [EchoWeeklyReflection],
+    carryForwards: [EchoCarryForward],
+    voiceAttachments: [EchoVoiceAttachment],
+    voiceFiles: [EchoRecoveryVoiceFile]
+  ) {
+    self.formatVersion = formatVersion
+    self.createdAt = createdAt
+    self.entries = entries
+    self.highlights = highlights
+    self.journals = journals
+    self.weeklyReflections = weeklyReflections
+    self.carryForwards = carryForwards
+    self.voiceAttachments = voiceAttachments
+    self.voiceFiles = voiceFiles
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case formatVersion, createdAt, entries, highlights, journals, weeklyReflections
+    case carryForwards, voiceAttachments, voiceFiles
+  }
+
+  init(from decoder: any Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    formatVersion = try container.decode(Int.self, forKey: .formatVersion)
+    createdAt = try container.decode(Date.self, forKey: .createdAt)
+    entries = try container.decode([EchoEntry].self, forKey: .entries)
+    highlights = try container.decode([EchoHighlight].self, forKey: .highlights)
+    journals = try container.decode([EchoOrganizedJournal].self, forKey: .journals)
+    weeklyReflections = try container.decode(
+      [EchoWeeklyReflection].self,
+      forKey: .weeklyReflections
+    )
+    carryForwards =
+      try container.decodeIfPresent(
+        [EchoCarryForward].self,
+        forKey: .carryForwards
+      ) ?? []
+    voiceAttachments = try container.decode(
+      [EchoVoiceAttachment].self,
+      forKey: .voiceAttachments
+    )
+    voiceFiles = try container.decode([EchoRecoveryVoiceFile].self, forKey: .voiceFiles)
+  }
 }
 
 private struct EchoRecoveryVoiceFile: Codable, Sendable {
@@ -331,6 +408,7 @@ private struct EchoExportSnapshot {
   let highlights: [EchoHighlight]
   let journals: [EchoOrganizedJournal]
   let weeklyReflections: [EchoWeeklyReflection]
+  let carryForwards: [EchoCarryForward]
 }
 
 private enum EchoMarkdownExportRenderer {
@@ -349,10 +427,10 @@ private enum EchoMarkdownExportRenderer {
       "# Echo Journal",
       "",
       "Private export created \(timestamp(snapshot.generatedAt, in: snapshot.timeZone)).",
-      ""
+      "",
     ]
 
-    if days.isEmpty && snapshot.weeklyReflections.isEmpty {
+    if days.isEmpty && snapshot.weeklyReflections.isEmpty && snapshot.carryForwards.isEmpty {
       sections.append("No journal content has been recorded yet.")
       return sections.joined(separator: "\n") + "\n"
     }
@@ -409,7 +487,8 @@ private enum EchoMarkdownExportRenderer {
       sections.append("# Weekly reflections")
       sections.append("")
       for reflection in snapshot.weeklyReflections.sorted(by: { $0.week < $1.week }) {
-        sections.append("## Week \(reflection.week.weekOfYear), \(reflection.week.yearForWeekOfYear)")
+        sections.append(
+          "## Week \(reflection.week.weekOfYear), \(reflection.week.yearForWeekOfYear)")
         sections.append("")
         sections.append(reflection.body)
         sections.append("")
@@ -421,6 +500,17 @@ private enum EchoMarkdownExportRenderer {
           sections.append("**Question for the coming week:** \(question)")
           sections.append("")
         }
+      }
+    }
+
+    if !snapshot.carryForwards.isEmpty {
+      sections.append("# Carried forward")
+      sections.append("")
+      for item in snapshot.carryForwards.sorted(by: { $0.targetDay < $1.targetDay }) {
+        sections.append("## For \(dayTitle(item.targetDay, in: snapshot.timeZone))")
+        sections.append("")
+        sections.append(item.text)
+        sections.append("")
       }
     }
 
@@ -468,7 +558,7 @@ private enum EchoPDFExportRenderer {
 
     let attributes: [NSAttributedString.Key: Any] = [
       .font: CTFontCreateWithName("Helvetica" as CFString, 11, nil),
-      .foregroundColor: CGColor(gray: 0.08, alpha: 1)
+      .foregroundColor: CGColor(gray: 0.08, alpha: 1),
     ]
     let attributedText = NSAttributedString(string: markdown, attributes: attributes)
     let framesetter = CTFramesetterCreateWithAttributedString(attributedText)
