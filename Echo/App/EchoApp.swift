@@ -60,7 +60,8 @@ struct EchoApp: App {
         entryRepository: entryRepository,
         highlightRepository: highlightRepository,
         journalRepository: journalRepository,
-        weeklyRepository: weeklyRepository
+        weeklyRepository: weeklyRepository,
+        carryForwardRepository: carryForwardRepository
       )
       dataRecoveryService = EchoDataRecoveryService(
         entryRepository: entryRepository,
@@ -68,6 +69,7 @@ struct EchoApp: App {
         journalRepository: journalRepository,
         weeklyRepository: weeklyRepository,
         voiceAttachmentRepository: voiceAttachmentRepository,
+        carryForwardRepository: carryForwardRepository,
         voiceFileStore: voiceFileStore
       )
       todayViewModel = TodayViewModel(
