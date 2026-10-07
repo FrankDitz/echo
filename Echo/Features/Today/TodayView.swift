@@ -71,8 +71,8 @@ struct TodayView: View {
       carryForwardCard
       captureControl
       voiceStatus
-      memorySection
       entrySection(isWide: false)
+      memorySection
     }
     .frame(maxWidth: EchoLayout.contentMaxWidth, alignment: .leading)
     .padding(.horizontal, EchoLayout.pageHorizontalPadding)
@@ -274,7 +274,7 @@ struct TodayView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(EchoLayout.surfacePadding)
       } else {
-        ForEach(viewModel.entries) { entry in
+        ForEach(Array(viewModel.entries.reversed())) { entry in
           TodayEntryRow(
             entry: entry,
             highlightViewModel: highlightViewModel,
@@ -286,7 +286,7 @@ struct TodayView: View {
             onDelete: { confirmDeletion(of: entry) }
           )
           .padding(.horizontal, EchoLayout.surfacePadding)
-          if entry.id != viewModel.entries.last?.id {
+          if entry.id != viewModel.entries.first?.id {
             Divider()
               .padding(.leading, EchoLayout.surfacePadding)
           }
@@ -636,8 +636,13 @@ private struct TodayEntryRow: View {
         .accessibilityLabel("Play voice entry")
       }
 
+      EntryHighlightButton(entryID: entry.id, viewModel: highlightViewModel)
+        .buttonStyle(.borderless)
+        .labelStyle(.iconOnly)
+        .font(.body)
+        .foregroundStyle(world.accent)
+
       Menu("Entry Actions", systemImage: "ellipsis") {
-        EntryHighlightButton(entryID: entry.id, viewModel: highlightViewModel)
         Button("Edit", systemImage: "pencil", action: onOpen)
         Button("Delete", systemImage: "trash", role: .destructive, action: onDelete)
       }
