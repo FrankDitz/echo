@@ -142,14 +142,12 @@ private struct WeeklyReflectionView: View {
 
                 VStack(alignment: .leading, spacing: EchoLayout.contentSpacing) {
                   sourceDays
-                  actionBar
                 }
                 .frame(maxWidth: 420, alignment: .topLeading)
               }
             } else {
               reflectionPanel(isWide: false)
               sourceDays
-              actionBar
             }
           }
           .frame(
@@ -161,6 +159,9 @@ private struct WeeklyReflectionView: View {
           .frame(maxWidth: .infinity)
         }
         .scrollIndicators(.hidden)
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+          reflectionDock { actionBar }
+        }
       }
     }
     .task { await viewModel.load() }
@@ -341,6 +342,22 @@ private struct WeeklyReflectionView: View {
     .opacity(viewModel.entries.isEmpty ? 0.48 : 1)
   }
 
+  private func reflectionDock<Content: View>(
+    @ViewBuilder content: () -> Content
+  ) -> some View {
+    content()
+      .frame(maxWidth: 520)
+      .frame(maxWidth: .infinity)
+      .padding(.horizontal, EchoLayout.pageHorizontalPadding)
+      .padding(.vertical, EchoLayout.tightSpacing)
+      .background(.ultraThinMaterial)
+      .overlay(alignment: .top) {
+        Rectangle()
+          .fill(world.separator)
+          .frame(height: EchoShape.hairlineWidth)
+      }
+  }
+
   private func weekButton(systemImage: String, offset: Int, disabled: Bool) -> some View {
     Button {
       Task { await viewModel.moveWeek(by: offset) }
@@ -409,7 +426,6 @@ struct DayDetailView: View {
                     sourceDay: day.id,
                     isCompact: false
                   )
-                  ReflectionActionBar(viewModel: organizationViewModel)
                 }
                 .frame(maxWidth: 610, alignment: .leading)
 
@@ -429,7 +445,6 @@ struct DayDetailView: View {
                   isCompact: true
                 )
                 entries
-                ReflectionActionBar(viewModel: organizationViewModel)
               }
               .frame(maxWidth: EchoLayout.contentMaxWidth, alignment: .leading)
               .padding(.horizontal, EchoLayout.pageHorizontalPadding)
@@ -438,6 +453,9 @@ struct DayDetailView: View {
             }
           }
           .scrollIndicators(.hidden)
+          .safeAreaInset(edge: .bottom, spacing: 0) {
+            reflectionActionDock
+          }
           .task {
             await highlightViewModel.load()
             await organizationViewModel.load()
@@ -455,6 +473,21 @@ struct DayDetailView: View {
       date: displayDate,
       entryCountLabel: entryCountLabel
     )
+  }
+
+  private var reflectionActionDock: some View {
+    ReflectionActionBar(viewModel: organizationViewModel)
+      .frame(maxWidth: 610)
+      .frame(maxWidth: .infinity)
+      .padding(.horizontal, EchoLayout.pageHorizontalPadding)
+      .padding(.top, EchoLayout.microSpacing)
+      .padding(.bottom, EchoLayout.tightSpacing)
+      .background(.ultraThinMaterial)
+      .overlay(alignment: .top) {
+        Rectangle()
+          .fill(world.separator)
+          .frame(height: EchoShape.hairlineWidth)
+      }
   }
 
   private var entries: some View {
