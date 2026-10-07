@@ -12,8 +12,9 @@ Each phase is implemented, built, tested where behavior exists, reviewed, commit
 - **Phase 5 — Highlights (complete):** highlight and unhighlight entries, browse a newest-highlighted-first curated collection, remove highlights, and navigate to the emphasized source entry within its complete day context.
 - **Phase 6 — AI architecture (complete):** provider-neutral cleanup, polish, and day-organization contracts; a deterministic offline implementation; separately persisted assisted text; versioned organized-journal storage; Day Detail generation and regeneration; and provenance, durability, failure, and immutability tests. No provider credential, network call, or real journal content enters the app bundle, fixtures, logs, or Git.
 - **Phase 7 — Visual worlds and presentation system (complete):** build a mature, reusable presentation architecture around the approved Mirror City direction, with Teal Immersion as the default visual world and optional Crimson Static, Sodium Fog, and Electric Blue Hour worlds. Theme choice changes presentation only; journal data and application behavior remain unchanged.
-- **Phase 8 — Memory, reflection, and continuity (in progress):** turn the functional journal into a product worth returning to through honest retrieval, richer private reflection, memory resurfacing, faster capture, and explicit personal-data controls. Each capability remains local-first, optional where appropriate, and independently reviewable.
-- **Phase 9 — MVP review:** full builds and tests, architecture and privacy review, naming cleanup, documentation refresh, staged-data scan, and full reachable-history scan.
+- **Phase 8 — Memory, reflection, and continuity (complete):** turn the functional journal into a product worth returning to through honest retrieval, richer private reflection, memory resurfacing, faster capture, and explicit personal-data controls. Each capability remains local-first, optional where appropriate, and independently reviewable.
+- **Phase 9 — Frictionless intelligent capture (in progress):** make writing or speaking a thought the shortest path through Echo, preserve every original capture, refine grammar and spoken cadence without changing meaning, and make important entries immediately recognizable.
+- **Phase 10 — MVP review:** full builds and tests, architecture and privacy review, naming cleanup, documentation refresh, staged-data scan, and full reachable-history scan.
 
 ## Phase 7 deliverables
 
@@ -67,9 +68,20 @@ Phase 8 begins only after the completed Phase 7 application has been reviewed to
     - **Capture-first Today (complete):** keep newly written entries next to the composer on compact layouts, present the newest writing first, and make saving an important thought a one-tap action.
     - **Reachable reflection actions (complete):** keep organization, regeneration, and carry-forward controls available without forcing long scrolls through source material.
     - **Populated cross-platform closeout (complete):** exercised capture, highlighting, Timeline, daily and weekly reflection, and Carry Forward against fictional populated journals on iPhone and Mac. Full platform test suites and tracked-history safety scanning pass; capture remains adjacent to current writing and reflection actions remain reachable outside long scrolling content.
-17. **Private synchronization design (deferred):** document encryption, CloudKit ownership, conflict resolution, deletion propagation, account changes, recovery, and opt-in consent only after the local journaling experience has been optimized.
-18. **Optional iCloud synchronization (deferred):** implement an approved design behind an explicit setting, preserve a fully local mode, and test migration and conflict behavior before enabling it by default anywhere.
-19. **Phase closeout:** validate daily and weekly value loops, privacy boundaries, cross-platform behavior, migration safety, exports, full builds and tests, and reachable Git history.
+17. **Phase closeout (complete):** validated daily and weekly value loops, privacy boundaries, cross-platform behavior, migration safety, exports, full builds and tests, and reachable Git history.
+
+## Phase 9 deliverables
+
+Every deliverable uses its own short-lived branch and pull request. Raw text, transcripts, recordings, refined writing, and provider credentials remain private runtime data and must never enter Git, fixtures, screenshots, or diagnostic logs.
+
+1. **Entry refinement foundation (in progress):** formally model an entry's immutable original capture, optional refined text, processing status, refinement provenance, and preferred reading text. Persist the new metadata through a versioned migration while keeping existing entries readable.
+2. **Unified capture pipeline:** route text and voice through one testable workflow that saves the original locally first, performs refinement second, and never loses a thought when transcription or refinement fails.
+3. **Private provider configuration:** add an explicit off/on choice, conservative cleanup instructions, cancellation and failure handling, and a provider boundary that supports on-device processing or a user-authorized remote provider without embedding credentials.
+4. **Automatic cleanup experience:** show Captured, Refining, Saved, Needs Review, and Retry states without blocking the next entry; allow automatic acceptance or review according to the user's setting.
+5. **Refined-text presentation:** use the preferred reading text consistently across Today, Timeline, Day Reflection, Highlights, search, and exports while keeping the original capture one action away.
+6. **Important-at-capture workflow:** allow a text or voice entry to be highlighted as it is captured, give highlighted entries a consistent visual signal, and keep the dedicated Highlights collection fast to scan.
+7. **Hub-ready event boundary:** define versioned, serialization-safe entry and highlight events with explicit redaction so journal text is excluded unless a future Hub permission grants it.
+8. **Real-use closeout:** validate rapid consecutive text and voice capture, offline and failed refinement, review and undo, highlighting, export, accessibility, and populated iPhone and Mac layouts before completing the phase.
 
 ## Near-term improvements
 
@@ -84,6 +96,7 @@ Phase 8 begins only after the completed Phase 7 application has been reviewed to
 - Export to Markdown and PDF
 - iCloud synchronization
 - Face ID or Touch ID app locking
+- Private synchronization design and optional iCloud synchronization
 
 ## Future experiences
 
