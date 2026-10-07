@@ -65,6 +65,22 @@ enum EchoSchemaV5: VersionedSchema {
   }
 }
 
+enum EchoSchemaV6: VersionedSchema {
+  static let versionIdentifier = Schema.Version(6, 0, 0)
+
+  static var models: [any PersistentModel.Type] {
+    [
+      PersistentEchoEntry.self,
+      PersistentEchoHighlight.self,
+      PersistentEchoOrganizedJournal.self,
+      PersistentEchoOrganizedJournalV3.self,
+      PersistentEchoWeeklyReflection.self,
+      PersistentEchoVoiceAttachment.self,
+      PersistentEchoCarryForward.self,
+    ]
+  }
+}
+
 enum EchoMigrationPlan: SchemaMigrationPlan {
   static var schemas: [any VersionedSchema.Type] {
     [
@@ -73,6 +89,7 @@ enum EchoMigrationPlan: SchemaMigrationPlan {
       EchoSchemaV3.self,
       EchoSchemaV4.self,
       EchoSchemaV5.self,
+      EchoSchemaV6.self,
     ]
   }
 
@@ -107,6 +124,7 @@ enum EchoMigrationPlan: SchemaMigrationPlan {
       ),
       .lightweight(fromVersion: EchoSchemaV3.self, toVersion: EchoSchemaV4.self),
       .lightweight(fromVersion: EchoSchemaV4.self, toVersion: EchoSchemaV5.self),
+      .lightweight(fromVersion: EchoSchemaV5.self, toVersion: EchoSchemaV6.self),
     ]
   }
 }

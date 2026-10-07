@@ -178,3 +178,42 @@ struct EchoWeeklyReflection: Identifiable, Codable, Hashable, Sendable {
     modifiedAt = max(modifiedAt, timestamp)
   }
 }
+
+/// Describes the reflective material a user intentionally brings into another day.
+/// This remains extensible so future sources can be restored without data loss.
+struct EchoCarryForwardSourceKind: RawRepresentable, Codable, Hashable, Sendable {
+  let rawValue: String
+
+  static let dayReflectionQuestion = Self(rawValue: "day-reflection-question")
+  static let dayReflectionKeyMoment = Self(rawValue: "day-reflection-key-moment")
+  static let weeklyReflectionQuestion = Self(rawValue: "weekly-reflection-question")
+  static let entry = Self(rawValue: "entry")
+}
+
+struct EchoCarryForward: Identifiable, Codable, Hashable, Sendable {
+  let id: UUID
+  let text: String
+  let sourceKind: EchoCarryForwardSourceKind
+  let sourceDay: EchoDayIdentifier?
+  let sourceEntryID: UUID?
+  let targetDay: EchoDayIdentifier
+  let createdAt: Date
+
+  init(
+    id: UUID = UUID(),
+    text: String,
+    sourceKind: EchoCarryForwardSourceKind,
+    sourceDay: EchoDayIdentifier? = nil,
+    sourceEntryID: UUID? = nil,
+    targetDay: EchoDayIdentifier,
+    createdAt: Date
+  ) {
+    self.id = id
+    self.text = text
+    self.sourceKind = sourceKind
+    self.sourceDay = sourceDay
+    self.sourceEntryID = sourceEntryID
+    self.targetDay = targetDay
+    self.createdAt = createdAt
+  }
+}

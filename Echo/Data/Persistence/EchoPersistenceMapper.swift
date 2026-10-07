@@ -220,6 +220,37 @@ enum EchoPersistenceMapper {
     )
   }
 
+  static func makeCarryForwardRecord(
+    from carryForward: EchoCarryForward
+  ) throws -> PersistentEchoCarryForward {
+    let targetDayPayload = try encodeDay(carryForward.targetDay)
+    let sourceDayPayload = try carryForward.sourceDay.map(encodeDay)
+    return PersistentEchoCarryForward(
+      id: carryForward.id,
+      targetDayKey: targetDayPayload.base64EncodedString(),
+      targetDayPayload: targetDayPayload,
+      text: carryForward.text,
+      sourceKindRawValue: carryForward.sourceKind.rawValue,
+      sourceDayPayload: sourceDayPayload,
+      sourceEntryID: carryForward.sourceEntryID,
+      createdAt: carryForward.createdAt
+    )
+  }
+
+  static func makeCarryForward(
+    from record: PersistentEchoCarryForward
+  ) throws -> EchoCarryForward {
+    EchoCarryForward(
+      id: record.id,
+      text: record.text,
+      sourceKind: EchoCarryForwardSourceKind(rawValue: record.sourceKindRawValue),
+      sourceDay: try record.sourceDayPayload.map(decodeDay),
+      sourceEntryID: record.sourceEntryID,
+      targetDay: try decodeDay(record.targetDayPayload),
+      createdAt: record.createdAt
+    )
+  }
+
   private static func encodeDay(_ day: EchoDayIdentifier) throws -> Data {
     let encoder = JSONEncoder()
     encoder.outputFormatting = [.sortedKeys]

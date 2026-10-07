@@ -242,3 +242,148 @@ struct SwiftDataEchoWeeklyReflectionRepositoryTests {
     #expect(try await reopened.allReflections() == [reflection])
   }
 }
+
+@Suite("SwiftData carry forward repository")
+struct SwiftDataEchoCarryForwardRepositoryTests {
+  @Test("Carry forwards persist, order, and delete by identity")
+  func persistenceOrderingAndDeletion() async throws {
+    let location = try makeDisposableStoreLocation()
+    defer { try? FileManager.default.removeItem(at: location.directory) }
+    let calendar = try makeGregorianCalendar(timeZone: "UTC")
+    let sourceDay = EchoDayIdentifier(
+      containing: try makeDate("2026-10-06T12:00:00Z"),
+      calendar: calendar
+    )
+    let firstTargetDay = EchoDayIdentifier(
+      containing: try makeDate("2026-10-07T12:00:00Z"),
+      calendar: calendar
+    )
+    let laterTargetDay = EchoDayIdentifier(
+      containing: try makeDate("2026-10-08T12:00:00Z"),
+      calendar: calendar
+    )
+    let first = EchoCarryForward(
+      id: try makeUUID("00000000-0000-0000-0000-000000000931"),
+      text: "What would make tomorrow feel deliberate rather than crowded?",
+      sourceKind: .dayReflectionQuestion,
+      sourceDay: sourceDay,
+      targetDay: firstTargetDay,
+      createdAt: try makeDate("2026-10-06T21:00:00Z")
+    )
+    let later = EchoCarryForward(
+      id: try makeUUID("00000000-0000-0000-0000-000000000932"),
+      text: "Keep the next useful step small.",
+      sourceKind: .dayReflectionKeyMoment,
+      sourceDay: sourceDay,
+      targetDay: laterTargetDay,
+      createdAt: try makeDate("2026-10-07T21:00:00Z")
+    )
+
+    do {
+      let repository = SwiftDataEchoCarryForwardRepository(
+        modelContainer: try EchoModelContainerFactory.makePersistent(at: location.store)
+      )
+      try await repository.create(first)
+      try await repository.create(later)
+    }
+
+    let reopened = SwiftDataEchoCarryForwardRepository(
+      modelContainer: try EchoModelContainerFactory.makePersistent(at: location.store)
+    )
+    #expect(try await reopened.carryForward(for: firstTargetDay) == first)
+    #expect(try await reopened.allCarryForwards() == [later, first])
+
+    try await reopened.delete(id: first.id)
+    #expect(try await reopened.carryForward(for: firstTargetDay) == nil)
+  }
+
+  @Test("Only one carry forward can target a day")
+  func uniqueness() async throws {
+    let calendar = try makeGregorianCalendar(timeZone: "UTC")
+    let targetDay = EchoDayIdentifier(
+      containing: try makeDate("2026-10-07T12:00:00Z"),
+      calendar: calendar
+    )
+    let repository = SwiftDataEchoCarryForwardRepository(
+      modelContainer: try EchoModelContainerFactory.makeInMemory()
+    )
+    let carryForward = EchoCarryForward(
+      id: try makeUUID("00000000-0000-0000-0000-000000000933"),
+      text: "A fictional thought worth carrying.",
+      sourceKind: .entry,
+      sourceEntryID: try makeUUID("00000000-0000-0000-0000-000000000934"),
+      targetDay: targetDay,
+      createdAt: try makeDate("2026-10-06T21:00:00Z")
+    )
+    let duplicateDay = EchoCarryForward(
+      id: try makeUUID("00000000-0000-0000-0000-000000000935"),
+      text: "A second fictional thought.",
+      sourceKind: .weeklyReflectionQuestion,
+      targetDay: targetDay,
+      createdAt: try makeDate("2026-10-06T22:00:00Z")
+    )
+
+    try await repository.create(carryForward)
+    await #expect(throws: EchoRepositoryError.duplicateCarryForward(carryForward.id)) {
+      try await repository.create(carryForward)
+    }
+    await #expect(
+      throws: EchoRepositoryError.duplicateCarryForwardTargetDay(targetDay)
+    ) {
+      try await repository.create(duplicateDay)
+    }
+    await #expect(
+      throws: EchoRepositoryError.carryForwardNotFound(duplicateDay.id)
+    ) {
+      try await repository.delete(id: duplicateDay.id)
+    }
+  }
+
+  @Test("Version five stores migrate and accept carry forwards")
+  func versionFiveMigration() async throws {
+    let location = try makeDisposableStoreLocation()
+    defer { try? FileManager.default.removeItem(at: location.directory) }
+    let calendar = try makeGregorianCalendar(timeZone: "UTC")
+    let entry = EchoEntry(
+      createdAt: try makeDate("2026-10-06T18:00:00Z"),
+      calendar: calendar,
+      rawText: "A fictional entry kept through the carry-forward migration."
+    )
+
+    do {
+      let schema = Schema(versionedSchema: EchoSchemaV5.self)
+      let configuration = ModelConfiguration(
+        "EchoVersionFiveMigrationTest",
+        schema: schema,
+        url: location.store,
+        cloudKitDatabase: .none
+      )
+      let container = try ModelContainer(for: schema, configurations: [configuration])
+      let context = ModelContext(container)
+      context.insert(try EchoPersistenceMapper.makeEntryRecord(from: entry))
+      try context.save()
+    }
+
+    let migratedContainer = try EchoModelContainerFactory.makePersistent(at: location.store)
+    let entryRepository = SwiftDataEchoEntryRepository(modelContainer: migratedContainer)
+    let carryRepository = SwiftDataEchoCarryForwardRepository(
+      modelContainer: migratedContainer
+    )
+    let targetDay = EchoDayIdentifier(
+      containing: try makeDate("2026-10-07T12:00:00Z"),
+      calendar: calendar
+    )
+    let carryForward = EchoCarryForward(
+      text: entry.rawText,
+      sourceKind: .entry,
+      sourceDay: entry.day,
+      sourceEntryID: entry.id,
+      targetDay: targetDay,
+      createdAt: try makeDate("2026-10-06T21:00:00Z")
+    )
+    try await carryRepository.create(carryForward)
+
+    #expect(try await entryRepository.entry(id: entry.id) == entry)
+    #expect(try await carryRepository.carryForward(for: targetDay) == carryForward)
+  }
+}
