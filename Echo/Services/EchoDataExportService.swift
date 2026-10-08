@@ -465,18 +465,18 @@ private enum EchoMarkdownExportRenderer {
 
       let dayEntries = EchoEntryOrdering.chronological(entriesByDay[day] ?? [])
       if !dayEntries.isEmpty {
-        sections.append("### Original entries")
+        sections.append("### Entries")
         sections.append("")
         for entry in dayEntries {
           let marker = highlightedEntryIDs.contains(entry.id) ? " · Saved" : ""
           sections.append("#### \(time(entry.createdAt, in: snapshot.timeZone))\(marker)")
           sections.append("")
-          sections.append(entry.rawText)
-          if let polishedText = entry.polishedText, !polishedText.isEmpty {
+          sections.append(entry.preferredText)
+          if entry.preferredText != entry.originalText {
             sections.append("")
-            sections.append("**Assisted version**")
+            sections.append("**Original capture**")
             sections.append("")
-            sections.append(polishedText)
+            sections.append(entry.originalText)
           }
           sections.append("")
         }

@@ -303,7 +303,7 @@ private struct WeeklyReflectionView: View {
                 format: .dateTime.weekday(.wide).month(.abbreviated).day()
               )
               .font(EchoTypography.body.weight(.semibold))
-              Text(day.entries.first?.rawText ?? "")
+              Text(day.entries.first?.preferredText ?? "")
                 .font(EchoTypography.supporting)
                 .foregroundStyle(.secondary)
                 .lineLimit(2)
@@ -493,7 +493,7 @@ struct DayDetailView: View {
   private var entries: some View {
     VStack(alignment: .leading, spacing: 0) {
       HStack(alignment: .firstTextBaseline) {
-        Text("Original entries")
+        Text("Source entries")
           .font(EchoTypography.contentTitle)
         Spacer()
         Text(day.entryCount, format: .number)
@@ -515,7 +515,7 @@ struct DayDetailView: View {
             == true,
           onCarryForward: {
             await carryForwardViewModel.carryToTomorrow(
-              text: entry.rawText,
+              text: entry.preferredText,
               sourceKind: .entry,
               sourceDay: day.id,
               sourceEntryID: entry.id
@@ -851,7 +851,7 @@ private struct DayDetailEntry: View {
           }
         }
 
-        Text(entry.rawText)
+        Text(entry.preferredText)
           .font(EchoTypography.body)
           .lineSpacing(4)
           .textSelection(.enabled)

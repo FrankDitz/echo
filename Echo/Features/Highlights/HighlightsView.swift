@@ -179,7 +179,7 @@ private struct HighlightedEntryRow: View {
     HStack(alignment: .top, spacing: EchoLayout.contentSpacing) {
       Button(action: onOpen) {
         VStack(alignment: .leading, spacing: EchoLayout.rowSpacing) {
-          Text(item.entry.rawText)
+          Text(item.entry.preferredText)
             .font(EchoTypography.body)
             .lineSpacing(4)
             .lineLimit(5)

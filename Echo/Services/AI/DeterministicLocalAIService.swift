@@ -23,7 +23,7 @@ struct DeterministicLocalAIService: EchoAIService {
     guard !day.entries.isEmpty else { throw EchoAIServiceError.emptyDay }
 
     let entries = EchoEntryOrdering.chronological(day.entries)
-    let paragraphs = entries.map { normalized($0.rawText) }
+    let paragraphs = entries.map { normalized($0.preferredText) }
     let themes = recurringThemes(in: paragraphs)
     return EchoOrganizedJournalDraft(
       day: day.id,
@@ -43,11 +43,13 @@ struct DeterministicLocalAIService: EchoAIService {
     guard !entries.isEmpty else { throw EchoAIServiceError.emptyDay }
 
     let ordered = EchoEntryOrdering.chronological(entries)
-    let paragraphs = ordered.map { normalized($0.rawText) }
+    let paragraphs = ordered.map { normalized($0.preferredText) }
     let themes = recurringThemes(in: paragraphs)
     let notableEntryIDs = ordered
       .sorted { lhs, rhs in
-        if lhs.rawText.count != rhs.rawText.count { return lhs.rawText.count > rhs.rawText.count }
+        if lhs.preferredText.count != rhs.preferredText.count {
+          return lhs.preferredText.count > rhs.preferredText.count
+        }
         return lhs.createdAt < rhs.createdAt
       }
       .prefix(3)

@@ -337,7 +337,7 @@ final class TodayViewModel {
   }
 
   private func isUnfinished(_ entry: EchoEntry) -> Bool {
-    let text = entry.rawText.lowercased()
+    let text = entry.preferredText.lowercased()
     return text.trimmingCharacters(in: .whitespacesAndNewlines).hasSuffix("?")
       || ["still thinking", "need to", "want to", "come back", "later"]
         .contains(where: text.contains)

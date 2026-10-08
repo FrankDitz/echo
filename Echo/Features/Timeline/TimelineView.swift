@@ -241,7 +241,7 @@ struct TimelineView: View {
         .tracking(1.1)
         .foregroundStyle(world.secondaryText)
 
-        Text(result.entry.rawText)
+        Text(result.entry.preferredText)
           .font(EchoTypography.body)
           .lineSpacing(4)
           .lineLimit(4)
@@ -693,7 +693,7 @@ private struct TimelineEntryRailRow: View {
           .foregroundStyle(world.secondaryText)
 
         HStack(alignment: .top, spacing: EchoLayout.inlineSpacing) {
-          Text(entry.rawText)
+          Text(entry.preferredText)
             .font(EchoTypography.body)
             .foregroundStyle(world.primaryText)
             .lineLimit(3)
