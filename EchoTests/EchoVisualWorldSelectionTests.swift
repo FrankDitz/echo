@@ -30,11 +30,11 @@ struct EchoVisualWorldSelectionTests {
     let store = InMemoryVisualWorldPreferenceStore(selectedID: .cornerstoneSignal)
     let selection = EchoVisualWorldSelection(preferenceStore: store)
 
-    selection.select(.electricBlueHour)
+    selection.select(.covenantBlue)
 
-    #expect(selection.selectedID == .electricBlueHour)
-    #expect(selection.selectedWorld.id == .electricBlueHour)
-    #expect(store.savedIDs == [.electricBlueHour])
+    #expect(selection.selectedID == .covenantBlue)
+    #expect(selection.selectedWorld.id == .covenantBlue)
+    #expect(store.savedIDs == [.covenantBlue])
   }
 
   @Test("Every shipped identifier resolves to its matching visual world")
@@ -53,12 +53,12 @@ struct EchoVisualWorldSelectionTests {
     defer { defaults.removePersistentDomain(forName: suiteName) }
     let store = UserDefaultsEchoVisualWorldPreferenceStore(userDefaults: defaults)
 
-    store.saveSelectedWorldID(.electricBlueHour)
+    store.saveSelectedWorldID(.covenantBlue)
 
     #expect(
       defaults.string(
         forKey: UserDefaultsEchoVisualWorldPreferenceStore.selectedWorldKey
-      ) == EchoVisualWorldID.electricBlueHour.rawValue
+      ) == EchoVisualWorldID.covenantBlue.rawValue
     )
     let persistedValues = try #require(
       defaults.persistentDomain(forName: suiteName)
