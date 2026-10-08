@@ -53,6 +53,8 @@
 		V10000000000000000000002 /* EchoEntryCapturePipelineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = V10000000000000000000022 /* EchoEntryCapturePipelineTests.swift */; };
 		W10000000000000000000001 /* EchoRefinementConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = W10000000000000000000021 /* EchoRefinementConfiguration.swift */; };
 		W10000000000000000000002 /* EchoRefinementConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = W10000000000000000000022 /* EchoRefinementConfigurationTests.swift */; };
+		X10000000000000000000001 /* EchoHubEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = X10000000000000000000021 /* EchoHubEvent.swift */; };
+		X10000000000000000000002 /* EchoHubEventTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = X10000000000000000000022 /* EchoHubEventTests.swift */; };
 		M10000000000000000000001 /* EchoOrganizedJournal.swift in Sources */ = {isa = PBXBuildFile; fileRef = M10000000000000000000021 /* EchoOrganizedJournal.swift */; };
 		M10000000000000000000002 /* EchoOrganizedJournalRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = M10000000000000000000022 /* EchoOrganizedJournalRepository.swift */; };
 		M10000000000000000000003 /* PersistentEchoOrganizedJournal.swift in Sources */ = {isa = PBXBuildFile; fileRef = M10000000000000000000023 /* PersistentEchoOrganizedJournal.swift */; };
@@ -137,6 +139,8 @@
 		V10000000000000000000022 /* EchoEntryCapturePipelineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoEntryCapturePipelineTests.swift; sourceTree = "<group>"; };
 		W10000000000000000000021 /* EchoRefinementConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoRefinementConfiguration.swift; sourceTree = "<group>"; };
 		W10000000000000000000022 /* EchoRefinementConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoRefinementConfigurationTests.swift; sourceTree = "<group>"; };
+		X10000000000000000000021 /* EchoHubEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoHubEvent.swift; sourceTree = "<group>"; };
+		X10000000000000000000022 /* EchoHubEventTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoHubEventTests.swift; sourceTree = "<group>"; };
 		M10000000000000000000021 /* EchoOrganizedJournal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoOrganizedJournal.swift; sourceTree = "<group>"; };
 		M10000000000000000000022 /* EchoOrganizedJournalRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoOrganizedJournalRepository.swift; sourceTree = "<group>"; };
 		M10000000000000000000023 /* PersistentEchoOrganizedJournal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistentEchoOrganizedJournal.swift; sourceTree = "<group>"; };
@@ -265,6 +269,7 @@
 		A10000000000000000000009 /* Hub */ = {
 			isa = PBXGroup;
 			children = (
+				X10000000000000000000021 /* EchoHubEvent.swift */,
 			);
 			path = Hub;
 			sourceTree = "<group>";
@@ -335,6 +340,7 @@
 				L10000000000000000000023 /* EchoAIServiceTests.swift */,
 				V10000000000000000000022 /* EchoEntryCapturePipelineTests.swift */,
 				W10000000000000000000022 /* EchoRefinementConfigurationTests.swift */,
+				X10000000000000000000022 /* EchoHubEventTests.swift */,
 				M10000000000000000000025 /* EchoOrganizedJournalTests.swift */,
 				M10000000000000000000026 /* SwiftDataEchoOrganizedJournalRepositoryTests.swift */,
 				N10000000000000000000022 /* DayOrganizationViewModelTests.swift */,
@@ -629,6 +635,7 @@
 				S10000000000000000000002 /* SettingsView.swift in Sources */,
 				T10000000000000000000001 /* EchoDataExportService.swift in Sources */,
 				U10000000000000000000001 /* EchoPrivacyLock.swift in Sources */,
+				X10000000000000000000001 /* EchoHubEvent.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -655,6 +662,7 @@
 				N10000000000000000000002 /* DayOrganizationViewModelTests.swift in Sources */,
 				S10000000000000000000003 /* EchoVisualWorldSelectionTests.swift in Sources */,
 				U10000000000000000000002 /* EchoPrivacyLockControllerTests.swift in Sources */,
+				X10000000000000000000002 /* EchoHubEventTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

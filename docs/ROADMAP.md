@@ -80,7 +80,7 @@ Every deliverable uses its own short-lived branch and pull request. Raw text, tr
 4. **Automatic cleanup experience (complete):** show Captured, Refining, Saved, Needs Review, and Retry states without blocking the next entry; allow automatic acceptance or review according to the user's setting.
 5. **Refined-text presentation (complete):** use the preferred reading text consistently across Today, Timeline, Day Reflection, Highlights, search, and exports while keeping the original capture one action away.
 6. **Important-at-capture workflow (complete):** allow a text or voice entry to be highlighted as it is captured, give highlighted entries a consistent visual signal, and keep the dedicated Highlights collection fast to scan.
-7. **Hub-ready event boundary:** define versioned, serialization-safe entry and highlight events with explicit redaction so journal text is excluded unless a future Hub permission grants it.
+7. **Hub-ready event boundary (complete):** define versioned, serialization-safe entry and highlight events with explicit redaction so journal text is excluded unless a future Hub permission grants it.
 8. **Real-use closeout:** validate rapid consecutive text and voice capture, offline and failed refinement, review and undo, highlighting, export, accessibility, and populated iPhone and Mac layouts before completing the phase.
 
 ## Near-term improvements
