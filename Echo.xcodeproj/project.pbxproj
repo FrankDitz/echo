@@ -51,6 +51,8 @@
 		L10000000000000000000003 /* EchoAIServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = L10000000000000000000023 /* EchoAIServiceTests.swift */; };
 		V10000000000000000000001 /* EchoEntryCapturePipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = V10000000000000000000021 /* EchoEntryCapturePipeline.swift */; };
 		V10000000000000000000002 /* EchoEntryCapturePipelineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = V10000000000000000000022 /* EchoEntryCapturePipelineTests.swift */; };
+		W10000000000000000000001 /* EchoRefinementConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = W10000000000000000000021 /* EchoRefinementConfiguration.swift */; };
+		W10000000000000000000002 /* EchoRefinementConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = W10000000000000000000022 /* EchoRefinementConfigurationTests.swift */; };
 		M10000000000000000000001 /* EchoOrganizedJournal.swift in Sources */ = {isa = PBXBuildFile; fileRef = M10000000000000000000021 /* EchoOrganizedJournal.swift */; };
 		M10000000000000000000002 /* EchoOrganizedJournalRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = M10000000000000000000022 /* EchoOrganizedJournalRepository.swift */; };
 		M10000000000000000000003 /* PersistentEchoOrganizedJournal.swift in Sources */ = {isa = PBXBuildFile; fileRef = M10000000000000000000023 /* PersistentEchoOrganizedJournal.swift */; };
@@ -133,6 +135,8 @@
 		L10000000000000000000023 /* EchoAIServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoAIServiceTests.swift; sourceTree = "<group>"; };
 		V10000000000000000000021 /* EchoEntryCapturePipeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoEntryCapturePipeline.swift; sourceTree = "<group>"; };
 		V10000000000000000000022 /* EchoEntryCapturePipelineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoEntryCapturePipelineTests.swift; sourceTree = "<group>"; };
+		W10000000000000000000021 /* EchoRefinementConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoRefinementConfiguration.swift; sourceTree = "<group>"; };
+		W10000000000000000000022 /* EchoRefinementConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoRefinementConfigurationTests.swift; sourceTree = "<group>"; };
 		M10000000000000000000021 /* EchoOrganizedJournal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoOrganizedJournal.swift; sourceTree = "<group>"; };
 		M10000000000000000000022 /* EchoOrganizedJournalRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoOrganizedJournalRepository.swift; sourceTree = "<group>"; };
 		M10000000000000000000023 /* PersistentEchoOrganizedJournal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistentEchoOrganizedJournal.swift; sourceTree = "<group>"; };
@@ -330,6 +334,7 @@
 				K10000000000000000000023 /* HighlightsViewModelTests.swift */,
 				L10000000000000000000023 /* EchoAIServiceTests.swift */,
 				V10000000000000000000022 /* EchoEntryCapturePipelineTests.swift */,
+				W10000000000000000000022 /* EchoRefinementConfigurationTests.swift */,
 				M10000000000000000000025 /* EchoOrganizedJournalTests.swift */,
 				M10000000000000000000026 /* SwiftDataEchoOrganizedJournalRepositoryTests.swift */,
 				N10000000000000000000022 /* DayOrganizationViewModelTests.swift */,
@@ -422,6 +427,7 @@
 				L10000000000000000000021 /* EchoAIService.swift */,
 				L10000000000000000000022 /* DeterministicLocalAIService.swift */,
 				V10000000000000000000021 /* EchoEntryCapturePipeline.swift */,
+				W10000000000000000000021 /* EchoRefinementConfiguration.swift */,
 			);
 			path = AI;
 			sourceTree = "<group>";
@@ -604,6 +610,7 @@
 				L10000000000000000000001 /* EchoAIService.swift in Sources */,
 				L10000000000000000000002 /* DeterministicLocalAIService.swift in Sources */,
 				V10000000000000000000001 /* EchoEntryCapturePipeline.swift in Sources */,
+				W10000000000000000000001 /* EchoRefinementConfiguration.swift in Sources */,
 				M10000000000000000000001 /* EchoOrganizedJournal.swift in Sources */,
 				M10000000000000000000002 /* EchoOrganizedJournalRepository.swift in Sources */,
 				M10000000000000000000003 /* PersistentEchoOrganizedJournal.swift in Sources */,
@@ -642,6 +649,7 @@
 				K10000000000000000000003 /* HighlightsViewModelTests.swift in Sources */,
 				L10000000000000000000003 /* EchoAIServiceTests.swift in Sources */,
 				V10000000000000000000002 /* EchoEntryCapturePipelineTests.swift in Sources */,
+				W10000000000000000000002 /* EchoRefinementConfigurationTests.swift in Sources */,
 				M10000000000000000000005 /* EchoOrganizedJournalTests.swift in Sources */,
 				M10000000000000000000006 /* SwiftDataEchoOrganizedJournalRepositoryTests.swift in Sources */,
 				N10000000000000000000002 /* DayOrganizationViewModelTests.swift in Sources */,

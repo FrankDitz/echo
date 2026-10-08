@@ -14,11 +14,21 @@ protocol EchoEntryCapturing: Sendable {
 
 struct EchoEntryCapturePipeline: EchoEntryCapturing {
   private let repository: any EchoEntryRepository
-  private let aiService: any EchoAIService
+  private let refiner: any EchoWritingRefiner
   private let calendar: Calendar
   private let now: @Sendable () -> Date
-  private let processorIdentifier: String
-  private let modelIdentifier: String?
+
+  init(
+    repository: any EchoEntryRepository,
+    refiner: any EchoWritingRefiner,
+    calendar: Calendar = .autoupdatingCurrent,
+    now: @escaping @Sendable () -> Date = Date.init
+  ) {
+    self.repository = repository
+    self.refiner = refiner
+    self.calendar = calendar
+    self.now = now
+  }
 
   init(
     repository: any EchoEntryRepository,
@@ -28,12 +38,16 @@ struct EchoEntryCapturePipeline: EchoEntryCapturing {
     processorIdentifier: String = "echo.deterministic-local",
     modelIdentifier: String? = nil
   ) {
-    self.repository = repository
-    self.aiService = aiService
-    self.calendar = calendar
-    self.now = now
-    self.processorIdentifier = processorIdentifier
-    self.modelIdentifier = modelIdentifier
+    self.init(
+      repository: repository,
+      refiner: EchoAIServiceWritingRefiner(
+        service: aiService,
+        processorIdentifier: processorIdentifier,
+        modelIdentifier: modelIdentifier
+      ),
+      calendar: calendar,
+      now: now
+    )
   }
 
   func preserve(
@@ -73,18 +87,20 @@ struct EchoEntryCapturePipeline: EchoEntryCapturing {
   }
 
   func refine(_ entry: EchoEntry) async -> EchoEntry {
+    guard refiner.isEnabled else { return entry }
+
     var processing = entry
     processing.beginRefinement(at: now())
 
     do {
       try await repository.update(processing)
-      let result = try await aiService.cleanUp(processing.rawText)
+      let result = try await refiner.refine(processing.rawText)
       let completedAt = now()
       processing.completeRefinement(
         text: result.text,
         provenance: EchoEntryRefinementProvenance(
-          processorIdentifier: processorIdentifier,
-          modelIdentifier: modelIdentifier,
+          processorIdentifier: refiner.processorIdentifier,
+          modelIdentifier: refiner.modelIdentifier,
           generatedAt: completedAt
         ),
         requiresReview: false,
