@@ -54,6 +54,42 @@ struct EchoRefinementConfigurationTests {
     #expect(result.refinementStatus == .notRequested)
     #expect(await repository.entry(id: entry.id) == entry)
   }
+
+  @Test("Known model prompt delimiters never enter the saved reading text")
+  func outputSanitization() throws {
+    #expect(
+      EchoRefinementOutputSanitizer.clean(
+        "<entry>\nA fictional corrected thought.\n</entry>"
+      ) == "A fictional corrected thought."
+    )
+    #expect(
+      EchoRefinementOutputSanitizer.clean(
+        "<entry>\nA fictional corrected thought."
+      ) == "A fictional corrected thought."
+    )
+    #expect(
+      EchoRefinementOutputSanitizer.clean("A fictional <entry> reference remains.")
+        == "A fictional <entry> reference remains."
+    )
+
+    let timestamp = Date(timeIntervalSince1970: 1_791_438_000)
+    var persistedEntry = EchoEntry(
+      createdAt: timestamp,
+      calendar: Calendar(identifier: .gregorian),
+      rawText: "A fictional original thought.",
+    )
+    persistedEntry.completeRefinement(
+      text: "<entry>\nA fictional corrected thought.\n</entry>",
+      provenance: EchoEntryRefinementProvenance(
+        processorIdentifier: "echo.test.refiner",
+        modelIdentifier: "fictional-model",
+        generatedAt: timestamp
+      ),
+      requiresReview: false,
+      at: timestamp
+    )
+    #expect(persistedEntry.preferredText == "A fictional corrected thought.")
+  }
 }
 
 private actor RefinementConfigurationEntryRepositoryStub: EchoEntryRepository {

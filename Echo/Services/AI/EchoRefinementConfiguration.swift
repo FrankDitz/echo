@@ -114,7 +114,7 @@ private struct AppleIntelligenceWritingRefiner: EchoWritingRefiner {
         let response = try await session.respond(
           to: "Correct only the journal entry between the delimiters.\n<entry>\n\(source)\n</entry>"
         )
-        let refined = response.content.trimmingCharacters(in: .whitespacesAndNewlines)
+        let refined = EchoRefinementOutputSanitizer.clean(response.content)
         guard !refined.isEmpty else { throw EchoWritingRefinementError.emptyResult }
         return EchoAssistedWriting(text: refined)
       }
