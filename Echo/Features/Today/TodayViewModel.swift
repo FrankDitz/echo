@@ -141,6 +141,7 @@ enum TodayEntrySaveState: Equatable {
 enum TodayJournalFailure: Equatable {
   case loadEntries
   case createEntry
+  case highlightEntry
   case updateEntry
   case deleteEntry
 }
@@ -352,7 +353,7 @@ final class TodayViewModel {
   }
 
   @discardableResult
-  func createEntry(rawText: String) async -> Bool {
+  func createEntry(rawText: String, markImportant shouldHighlight: Bool = false) async -> Bool {
     guard containsWriting(rawText) else { return false }
 
     let timestamp = now()
@@ -380,6 +381,10 @@ final class TodayViewModel {
       saveState = .saved
       failure = nil
 
+      if shouldHighlight {
+        await markImportant(entryID: entry.id)
+      }
+
       if let capturePipeline {
         let processing = await capturePipeline.beginRefinement(entry)
         replaceVisibleEntry(processing)
@@ -392,6 +397,23 @@ final class TodayViewModel {
     } catch {
       saveState = .failed
       failure = .createEntry
+      return false
+    }
+  }
+
+  @discardableResult
+  func markImportant(entryID: UUID) async -> Bool {
+    guard let highlightRepository else { return false }
+
+    do {
+      if try await highlightRepository.highlight(for: .entry(entryID)) == nil {
+        try await highlightRepository.create(
+          EchoHighlight(target: .entry(entryID), createdAt: now())
+        )
+      }
+      return true
+    } catch {
+      failure = .highlightEntry
       return false
     }
   }
