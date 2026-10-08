@@ -95,12 +95,12 @@ Feature screens consume semantic values. They must not switch on individual worl
 - Primary text uses a warm near-white while secondary text shifts toward pale dusty silver-red. The brighter ember accent is reserved for selection and action; saved and error colors remain visually distinct from it.
 - The background uses no teal, cyan, purple, or magenta, so the world reads as a deliberate environmental change rather than a recolored Teal Immersion screen.
 
-### Sodium Fog production treatment
+### Kingdom Green production treatment
 
-- `SodiumFogBackground.imageset` contains separate portrait and native 16:10 Mac compositions. Both depict an original fictional concrete waterfront with no people, text, logos, personal media, or embedded location details.
-- Monumental concrete, viaducts, and diffused fog stay concentrated around the skyline and outer edges. A calmer charcoal-olive water region supports journal controls and reading surfaces.
-- Primary text uses warm ivory, secondary text uses muted khaki, and sodium amber is reserved for selection and action. A restrained red signal remains available for errors without becoming the world's dominant color.
-- The world avoids teal, cyan, saturated blue, purple, and broad red washes, separating it from both Teal Immersion and Crimson Static rather than recoloring their artwork.
+- `KingdomGreenBackground.imageset` contains separate portrait and native 16:10 Mac compositions. Both use original generated journaling, worship, and concrete-church imagery with no people, readable text, logos, personal media, or embedded location details.
+- A blank journal, unbranded closed Bible, empty worship stage, ascending steps, and warm architectural light stay concentrated at the outer edges. A calmer emerald center supports journal controls and reading surfaces.
+- Primary text uses warm ivory, secondary text uses muted sage, and antique gold is reserved for selection and action. Mint distinguishes saved state while coral remains reserved for errors.
+- The world avoids oversized slogans and generic city scenery. Its quiet-strength character comes from saturated emerald surfaces, near-black structure, worship-space depth, and disciplined gold detail.
 
 ### Electric Blue Hour production treatment
 
