@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "teal-immersion-background.png",
+      "filename" : "cornerstone-signal-background.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
@@ -14,7 +14,7 @@
       "scale" : "3x"
     },
     {
-      "filename" : "teal-immersion-background-mac.png",
+      "filename" : "cornerstone-signal-background-mac.png",
       "idiom" : "mac",
       "scale" : "1x"
     },

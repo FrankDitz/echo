@@ -1,7 +1,9 @@
 import SwiftUI
 
 enum EchoVisualWorldID: String, CaseIterable, Codable {
-  case tealImmersion = "teal-immersion"
+  // The raw value remains stable so existing appearance preferences migrate
+  // without touching journal storage.
+  case cornerstoneSignal = "teal-immersion"
   case crimsonStatic = "crimson-static"
   case sodiumFog = "sodium-fog"
   case electricBlueHour = "electric-blue-hour"
@@ -26,22 +28,24 @@ struct EchoVisualWorld {
   let surfaceFill: Color
   let selectedFill: Color
   let contentShadow: Color
+  let preferredColorScheme: ColorScheme
 
-  static let tealImmersion = EchoVisualWorld(
-    id: .tealImmersion,
-    displayName: "Teal Immersion",
-    paletteDescription: "Petroleum teal, luminous aqua, and warm city light.",
-    backgroundAssetName: "TealImmersionBackground",
-    canvas: Color(red: 0.015, green: 0.11, blue: 0.13),
-    primaryText: Color(red: 0.94, green: 0.99, blue: 0.98),
-    secondaryText: Color(red: 0.68, green: 0.84, blue: 0.83),
-    accent: Color(red: 0.18, green: 0.94, blue: 0.9),
-    separator: Color(red: 0.35, green: 0.79, blue: 0.77).opacity(0.34),
-    error: Color(red: 1, green: 0.48, blue: 0.4),
-    saved: Color(red: 0.41, green: 0.93, blue: 0.7),
-    surfaceFill: Color(red: 0.02, green: 0.16, blue: 0.18).opacity(0.74),
-    selectedFill: Color(red: 0.08, green: 0.48, blue: 0.47).opacity(0.42),
-    contentShadow: Color.black.opacity(0.55)
+  static let cornerstoneSignal = EchoVisualWorld(
+    id: .cornerstoneSignal,
+    displayName: "Cornerstone Signal",
+    paletteDescription: "Warm newsprint, carbon, petrol teal, vermilion, and gold.",
+    backgroundAssetName: "CornerstoneSignalBackground",
+    canvas: Color(red: 0.91, green: 0.87, blue: 0.76),
+    primaryText: Color(red: 0.075, green: 0.07, blue: 0.06),
+    secondaryText: Color(red: 0.26, green: 0.25, blue: 0.21),
+    accent: Color(red: 0.76, green: 0.12, blue: 0.08),
+    separator: Color(red: 0.08, green: 0.28, blue: 0.28).opacity(0.38),
+    error: Color(red: 0.72, green: 0.06, blue: 0.04),
+    saved: Color(red: 0.02, green: 0.31, blue: 0.3),
+    surfaceFill: Color(red: 0.96, green: 0.93, blue: 0.84).opacity(0.92),
+    selectedFill: Color(red: 0.86, green: 0.68, blue: 0.2).opacity(0.5),
+    contentShadow: Color.black.opacity(0.24),
+    preferredColorScheme: .light
   )
 
   static let crimsonStatic = EchoVisualWorld(
@@ -58,7 +62,8 @@ struct EchoVisualWorld {
     saved: Color(red: 0.94, green: 0.82, blue: 0.77),
     surfaceFill: Color(red: 0.13, green: 0.025, blue: 0.035).opacity(0.79),
     selectedFill: Color(red: 0.56, green: 0.06, blue: 0.07).opacity(0.44),
-    contentShadow: Color.black.opacity(0.66)
+    contentShadow: Color.black.opacity(0.66),
+    preferredColorScheme: .dark
   )
 
   static let sodiumFog = EchoVisualWorld(
@@ -75,7 +80,8 @@ struct EchoVisualWorld {
     saved: Color(red: 0.76, green: 0.82, blue: 0.57),
     surfaceFill: Color(red: 0.11, green: 0.105, blue: 0.075).opacity(0.81),
     selectedFill: Color(red: 0.48, green: 0.31, blue: 0.07).opacity(0.48),
-    contentShadow: Color.black.opacity(0.7)
+    contentShadow: Color.black.opacity(0.7),
+    preferredColorScheme: .dark
   )
 
   static let electricBlueHour = EchoVisualWorld(
@@ -92,13 +98,14 @@ struct EchoVisualWorld {
     saved: Color(red: 0.31, green: 0.9, blue: 0.75),
     surfaceFill: Color(red: 0.02, green: 0.1, blue: 0.18).opacity(0.78),
     selectedFill: Color(red: 0.05, green: 0.32, blue: 0.62).opacity(0.46),
-    contentShadow: Color.black.opacity(0.68)
+    contentShadow: Color.black.opacity(0.68),
+    preferredColorScheme: .dark
   )
 
   static func resolve(_ id: EchoVisualWorldID) -> EchoVisualWorld {
     switch id {
-    case .tealImmersion:
-      .tealImmersion
+    case .cornerstoneSignal:
+      .cornerstoneSignal
     case .crimsonStatic:
       .crimsonStatic
     case .sodiumFog:
@@ -110,7 +117,7 @@ struct EchoVisualWorld {
 }
 
 private struct EchoVisualWorldKey: EnvironmentKey {
-  static let defaultValue = EchoVisualWorld.tealImmersion
+  static let defaultValue = EchoVisualWorld.cornerstoneSignal
 }
 
 extension EnvironmentValues {

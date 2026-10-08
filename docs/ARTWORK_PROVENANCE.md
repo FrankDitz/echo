@@ -2,6 +2,17 @@
 
 Echo's checked-in visual-world artwork must be safe for a public repository. It may not contain personal photos, journal-derived content, identifying metadata, third-party marks, or credentials.
 
+## Cornerstone Signal backgrounds
+
+- **Assets:** `Echo/Shared/Resources/Assets.xcassets/CornerstoneSignalBackground.imageset/cornerstone-signal-background.png` and `cornerstone-signal-background-mac.png`
+- **Created:** October 8, 2026
+- **Method:** OpenAI built-in image generation using the approved Cornerstone Signal concept board only as a visual-system reference; portrait and landscape were generated as independent native compositions
+- **Purpose:** Production artwork for the Phase 10 default visual world on iPhone, iPad, and Mac
+
+The generation brief requested a warm-newsprint urban Christian editorial canvas with fictional city architecture, a blank journal, an empty worship microphone, ascending steps, cross-shaped architectural light, and restrained crown, cornerstone, audio-wave, and ruled-paper motifs. It reserved calm ivory reading regions and prohibited people, faces, hands, readable writing, personal content, real locations, logos, brands, watermarks, screens, UI controls, and journal entries.
+
+Both outputs were reviewed before inclusion. They contain generated fictional content only, use independent portrait and wide compositions, and preserve readable central and lower regions for native interface content. The concept board remains documentation; it is not displayed by the application.
+
 ## Teal Immersion background
 
 - **Asset:** `Echo/Shared/Resources/Assets.xcassets/TealImmersionBackground.imageset/teal-immersion-background.png`
