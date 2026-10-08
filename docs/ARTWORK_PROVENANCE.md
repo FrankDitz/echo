@@ -24,6 +24,17 @@ The generation brief requested a deep-emerald modern Christian editorial environ
 
 Both outputs were reviewed before inclusion. They contain fictional generated content only, keep focal objects at the outer edges, reserve calm content regions, and use independent portrait and 16:10 compositions rather than stretching one asset across platforms.
 
+## Gold Standard backgrounds
+
+- **Assets:** `Echo/Shared/Resources/Assets.xcassets/GoldStandardBackground.imageset/gold-standard-background.png` and `gold-standard-background-mac.png`
+- **Created:** October 8, 2026
+- **Method:** OpenAI built-in image generation using the approved Gold Standard concept board only as a visual-system reference; portrait and landscape were generated as independent native compositions
+- **Purpose:** Production artwork replacing the legacy Crimson Static visual world on iPhone, iPad, and Mac
+
+The generation brief requested a bold mustard-gold modern Christian worship-journal environment with a blank journal, unbranded closed Bible without readable text, fountain pen, studio headphones, empty worship stage, microphone, instruments in silhouette, concrete steps, church-window light, and restrained crown, waveform, and ruled-paper geometry. It prohibited people, faces, hands, plants, slogans, readable scripture or personal writing, real locations, logos, brands, watermarks, screens, UI, and journal entries.
+
+Both outputs were reviewed before inclusion. They contain fictional generated content only, use gold as an environmental field rather than a thin accent, preserve calm reading areas, and use independent portrait and 16:10 compositions.
+
 ## Teal Immersion background
 
 - **Asset:** `Echo/Shared/Resources/Assets.xcassets/TealImmersionBackground.imageset/teal-immersion-background.png`
