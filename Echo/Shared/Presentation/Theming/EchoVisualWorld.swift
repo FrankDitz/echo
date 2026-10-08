@@ -139,7 +139,15 @@ struct EchoVisualWorld {
     id: .kingdomGreen,
     displayName: "Kingdom Green",
     paletteDescription: "Deep emerald, warm ivory, near-black, and quiet antique gold.",
-    artwork: EchoVisualWorldArtwork(shared: "KingdomGreenBackground"),
+    artwork: EchoVisualWorldArtwork(
+      today: "KingdomGreenBackground",
+      timeline: "KingdomGreenTimelineBackground",
+      reflection: "KingdomGreenReflectionBackground",
+      highlights: "KingdomGreenHighlightsBackground",
+      calendar: "KingdomGreenCalendarBackground",
+      editor: "KingdomGreenReflectionBackground",
+      settings: "KingdomGreenBackground"
+    ),
     canvas: Color(red: 0.008, green: 0.16, blue: 0.105),
     primaryText: Color(red: 0.98, green: 0.96, blue: 0.86),
     secondaryText: Color(red: 0.78, green: 0.82, blue: 0.68),

@@ -31,6 +31,15 @@ Both outputs were reviewed before inclusion. They contain generated fictional co
 
 The generation brief requested a deep-emerald modern Christian editorial environment with a blank journal, an unbranded closed Bible without readable text, an empty worship microphone and stage, concrete church architecture, ascending steps, warm ivory window light, and restrained crown, waveform, and ruled-paper geometry. It prohibited people, faces, hands, plants, slogans, readable scripture or personal writing, real locations, logos, brands, watermarks, screens, UI, and journal entries.
 
+### Screen-specific Kingdom Green artwork
+
+- **Assets:** `KingdomGreenTimelineBackground.imageset`, `KingdomGreenReflectionBackground.imageset`, `KingdomGreenHighlightsBackground.imageset`, and `KingdomGreenCalendarBackground.imageset`
+- **Created:** October 8, 2026
+- **Method:** OpenAI built-in image generation using the approved Kingdom Green board and production world as style references; every phone portrait and 16:10 Mac scene was independently composed
+- **Purpose:** Give every primary journal workflow its own emerald worship-and-reflection environment
+
+The screen briefs requested a journey rail and concrete ascent for Timeline, cross-lit sanctuary and blank journal for Reflection, curated worship/studio fragments for Highlights, and a restrained month grid for Calendar. Initial Timeline and Reflection results were edited to remove unintended botanical imagery. All final briefs prohibited people, readable writing, brands, personal content, app UI, and identifying locations.
+
 Both outputs were reviewed before inclusion. They contain fictional generated content only, keep focal objects at the outer edges, reserve calm content regions, and use independent portrait and 16:10 compositions rather than stretching one asset across platforms.
 
 ## Gold Standard backgrounds
