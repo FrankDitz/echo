@@ -3,6 +3,7 @@ import SwiftUI
 enum EchoPrimarySection: String, CaseIterable, Identifiable {
   case today = "Today"
   case timeline = "Timeline"
+  case calendar = "Calendar"
   case reflection = "Day Reflection"
   case highlights = "Highlights"
 
@@ -12,28 +13,42 @@ enum EchoPrimarySection: String, CaseIterable, Identifiable {
     switch self {
     case .today: "1"
     case .timeline: "2"
-    case .reflection: "3"
-    case .highlights: "4"
+    case .calendar: "3"
+    case .reflection: "4"
+    case .highlights: "5"
     }
+  }
+
+  var systemImage: String {
+    switch self {
+    case .today: "house.fill"
+    case .timeline: "list.bullet"
+    case .calendar: "calendar"
+    case .reflection: "chart.bar.fill"
+    case .highlights: "bookmark.fill"
+    }
+  }
+
+  var compactLabel: String {
+    self == .reflection ? "Reflect" : rawValue
   }
 }
 
 struct EchoPrimaryNavigation: View {
   @Binding var selection: EchoPrimarySection
-  let showSettings: () -> Void
 
   @Environment(\.echoVisualWorld) private var world
   @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
   var body: some View {
-    ViewThatFits(in: .horizontal) {
-      wideChrome
-        .fixedSize(horizontal: true, vertical: false)
-      compactChrome
+    HStack(spacing: EchoLayout.microSpacing) {
+      ForEach(EchoPrimarySection.allCases) { section in
+        navigationButton(section)
+      }
     }
-    .frame(maxWidth: EchoLayout.chromeMaxWidth)
-    .padding(.horizontal, EchoLayout.pageHorizontalPadding)
-    .padding(.vertical, EchoLayout.inlineSpacing)
+    .frame(maxWidth: 720)
+    .padding(.horizontal, EchoLayout.inlineSpacing)
+    .padding(.vertical, EchoLayout.tightSpacing)
     .frame(maxWidth: .infinity)
     .background {
       ZStack {
@@ -41,133 +56,92 @@ struct EchoPrimaryNavigation: View {
           .fill(.ultraThinMaterial)
 
         LinearGradient(
-          colors: [world.surfaceFill.opacity(0.94), world.surfaceFill.opacity(0.72)],
+          colors: [world.surfaceFill.opacity(0.98), world.surfaceFill.opacity(0.9)],
           startPoint: .top,
           endPoint: .bottom
         )
       }
     }
-    .overlay(alignment: .bottom) {
+    .overlay(alignment: .top) {
       Rectangle()
         .fill(world.separator)
         .frame(height: EchoShape.hairlineWidth)
     }
-  }
-
-  private var wideChrome: some View {
-    HStack(spacing: EchoLayout.sectionSpacing) {
-      wordmark
-      navigationItems
-      settingsButton
-    }
-  }
-
-  private var compactChrome: some View {
-    VStack(alignment: .leading, spacing: EchoLayout.microSpacing) {
-      HStack {
-        wordmark
-        Spacer(minLength: EchoLayout.contentSpacing)
-        compactSettingsButton
-      }
-
-      compactNavigationItems
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
-  }
-
-  private var wordmark: some View {
-    Text("Echo")
-      .font(EchoTypography.wordmark)
-      .foregroundStyle(world.primaryText)
-      .shadow(color: world.contentShadow, radius: 8, y: 2)
-      .accessibilityAddTraits(.isHeader)
-  }
-
-  private var navigationItems: some View {
-    HStack(spacing: EchoLayout.microSpacing) {
-      ForEach(EchoPrimarySection.allCases) { section in
-        Button {
-          withAnimation(EchoMotion.animation(reduceMotion: reduceMotion)) {
-            selection = section
-          }
-        } label: {
-          VStack(spacing: EchoLayout.tightSpacing) {
-            Text(section.rawValue)
-              .lineLimit(1)
-            Capsule()
-              .fill(selection == section ? world.accent : Color.clear)
-              .frame(width: 36, height: 2)
-          }
-          .font(EchoTypography.primaryNavigation)
-          .foregroundStyle(selection == section ? world.accent : world.secondaryText)
-          .padding(.horizontal, EchoLayout.inlineSpacing)
-          .padding(.top, EchoLayout.inlineSpacing)
-          .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .keyboardShortcut(section.keyboardShortcut, modifiers: [.command])
-        .accessibilityLabel(section.rawValue)
-        .accessibilityValue(selection == section ? "Selected" : "")
-      }
-    }
     .accessibilityElement(children: .contain)
     .accessibilityLabel("Primary navigation")
   }
 
-  private var compactNavigationItems: some View {
-    HStack(spacing: EchoLayout.microSpacing) {
-      ForEach(EchoPrimarySection.allCases) { section in
-        Button {
-          withAnimation(EchoMotion.animation(reduceMotion: reduceMotion)) {
-            selection = section
-          }
-        } label: {
-          VStack(spacing: EchoLayout.microSpacing) {
-            Text(section.rawValue)
-              .lineLimit(1)
-              .minimumScaleFactor(0.78)
-            Capsule()
-              .fill(selection == section ? world.accent : Color.clear)
-              .frame(width: 30, height: 2)
-          }
-          .font(.caption.weight(selection == section ? .semibold : .regular))
-          .foregroundStyle(selection == section ? world.accent : world.secondaryText)
-          .padding(.horizontal, EchoLayout.tightSpacing)
-          .padding(.top, EchoLayout.tightSpacing)
-          .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .keyboardShortcut(section.keyboardShortcut, modifiers: [.command])
-        .frame(maxWidth: .infinity)
-        .accessibilityLabel(section.rawValue)
-        .accessibilityValue(selection == section ? "Selected" : "")
+  private func navigationButton(_ section: EchoPrimarySection) -> some View {
+    Button {
+      withAnimation(EchoMotion.animation(reduceMotion: reduceMotion)) {
+        selection = section
       }
-    }
-    .accessibilityElement(children: .contain)
-    .accessibilityLabel("Primary navigation")
-  }
+    } label: {
+      VStack(spacing: EchoLayout.microSpacing) {
+        Image(systemName: section.systemImage)
+          .font(.system(size: 16, weight: selection == section ? .bold : .medium))
+          .frame(height: 19)
 
-  private var settingsButton: some View {
-    Button(action: showSettings) {
-      Image(systemName: EchoIcon.settings)
-        .font(.body.weight(.medium))
-        .foregroundStyle(world.secondaryText)
-        .frame(width: 40, height: 40)
+        Text(section.compactLabel)
+          .font(.caption2.weight(selection == section ? .bold : .medium))
+          .lineLimit(1)
+          .minimumScaleFactor(0.72)
+      }
+      .foregroundStyle(selection == section ? world.accent : world.secondaryText)
+      .frame(maxWidth: .infinity, minHeight: 44)
+      .background {
+        if selection == section {
+          RoundedRectangle(cornerRadius: 10)
+            .fill(world.selectedFill.opacity(0.54))
+        }
+      }
+      .contentShape(Rectangle())
     }
     .buttonStyle(.plain)
-    .keyboardShortcut(",", modifiers: [.command])
-    .accessibilityLabel("Settings")
+    .keyboardShortcut(section.keyboardShortcut, modifiers: [.command])
+    .accessibilityLabel(section.rawValue)
+    .accessibilityValue(selection == section ? "Selected" : "")
   }
+}
 
-  private var compactSettingsButton: some View {
-    Button(action: showSettings) {
-      Image(systemName: EchoIcon.settings)
-        .font(.subheadline.weight(.medium))
-        .foregroundStyle(world.secondaryText)
-        .frame(width: 36, height: 36)
+struct EchoBrandHeader: View {
+  let showSettings: () -> Void
+
+  @Environment(\.echoVisualWorld) private var world
+
+  var body: some View {
+    HStack(spacing: EchoLayout.contentSpacing) {
+      Text("Echo")
+        .font(EchoTypography.wordmark)
+        .foregroundStyle(world.primaryText)
+        .shadow(color: world.contentShadow, radius: 8, y: 2)
+        .accessibilityAddTraits(.isHeader)
+
+      Image(systemName: "crown.fill")
+        .font(.caption.weight(.bold))
+        .foregroundStyle(world.accent)
+        .offset(x: -14, y: -13)
+        .accessibilityHidden(true)
+
+      Spacer()
+
+      Button(action: showSettings) {
+        Image(systemName: EchoIcon.settings)
+          .font(.body.weight(.semibold))
+          .foregroundStyle(world.primaryText)
+          .frame(width: 42, height: 42)
+          .background(.ultraThinMaterial, in: Circle())
+          .overlay {
+            Circle().stroke(world.separator, lineWidth: EchoShape.hairlineWidth)
+          }
+      }
+      .buttonStyle(.plain)
+      .keyboardShortcut(",", modifiers: [.command])
+      .accessibilityLabel("Settings")
     }
-    .buttonStyle(.plain)
-    .keyboardShortcut(",", modifiers: [.command])
-    .accessibilityLabel("Settings")
+    .frame(maxWidth: EchoLayout.chromeMaxWidth)
+    .padding(.horizontal, EchoLayout.pageHorizontalPadding)
+    .padding(.vertical, EchoLayout.tightSpacing)
+    .frame(maxWidth: .infinity)
   }
 }

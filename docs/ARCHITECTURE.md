@@ -69,11 +69,11 @@ Shared/Presentation/
 
 Feature views may depend on Shared presentation code. Shared presentation code must not depend on a feature, repository implementation, SwiftData record, or concrete AI adapter. Visual worlds provide semantic presentation values and background artwork; they do not branch domain behavior or own journal state.
 
-The app composition root owns the observable visual-world selection and injects its resolved presentation values through the SwiftUI environment. The selection store persists only an `EchoVisualWorldID` raw value in `UserDefaults`; it has no dependency on the journal model container or repositories. Unknown or retired identifiers safely resolve to Teal Immersion without rewriting the stored value.
+The app composition root owns the observable visual-world selection and injects its resolved presentation values through the SwiftUI environment. The selection store persists only an `EchoVisualWorldID` raw value in `UserDefaults`; it has no dependency on the journal model container or repositories. The four replacement worlds retain the legacy raw identifiers so an existing selection migrates without touching journal data. Unknown identifiers safely fall back to Cornerstone Signal without rewriting the stored value.
 
 The project does not create empty folders or placeholder types to imitate this target tree. Each directory arrives with its first implementation. Existing feature files move only when ownership changes, keeping organizational work reviewable and avoiding project-file churn.
 
-See [Visual design](VISUAL_DESIGN.md) for the approved Phase 7 direction, visual-world contract, and screen-level constraints.
+See [Visual design](VISUAL_DESIGN.md) for the current urban Christian direction, visual-world contract, and screen-level constraints.
 
 ## Data and identity decisions
 

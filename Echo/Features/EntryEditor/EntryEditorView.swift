@@ -35,7 +35,7 @@ struct EntryEditorView: View {
   }
 
   var body: some View {
-    EchoWorldCanvas {
+    EchoWorldCanvas(screen: .editor) {
       GeometryReader { proxy in
         let isWide = proxy.size.width >= 760
 

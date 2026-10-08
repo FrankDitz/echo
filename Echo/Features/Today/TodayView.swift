@@ -14,7 +14,7 @@ struct TodayView: View {
   @FocusState private var isComposerFocused: Bool
 
   var body: some View {
-    EchoWorldCanvas {
+    EchoWorldCanvas(screen: .today) {
       GeometryReader { proxy in
         ScrollView {
           Group {
@@ -64,13 +64,11 @@ struct TodayView: View {
 
   private func compactContent(availableHeight: CGFloat) -> some View {
     LazyVStack(alignment: .leading, spacing: 20) {
-      Color.clear
-        .frame(height: heroOffset(for: availableHeight))
-        .accessibilityHidden(true)
-
+      todayHero(isWide: false)
       promptHeader(isWide: false)
       carryForwardCard
       captureControl
+      quickCaptureActions
       voiceStatus
       entrySection(isWide: false)
       memorySection
@@ -108,9 +106,11 @@ struct TodayView: View {
 
       HStack(alignment: .top, spacing: 72) {
         VStack(alignment: .leading, spacing: EchoLayout.contentSpacing) {
+          todayHero(isWide: true)
           promptHeader(isWide: true)
           carryForwardCard
           captureControl
+          quickCaptureActions
           voiceStatus
           memorySection
         }
@@ -133,6 +133,75 @@ struct TodayView: View {
       .font(isWide ? EchoTypography.wideEditorialPrompt : EchoTypography.editorialPrompt)
       .accessibilityAddTraits(.isHeader)
       .shadow(color: world.contentShadow, radius: 8, y: 2)
+  }
+
+  private func todayHero(isWide: Bool) -> some View {
+    VStack(alignment: .leading, spacing: EchoLayout.tightSpacing) {
+      Text(
+        viewModel.displayedDate.formatted(
+          .dateTime.month(.abbreviated).day().year().weekday(.abbreviated)
+        ).uppercased()
+      )
+      .font(EchoTypography.editorialEyebrow)
+      .tracking(1.8)
+      .foregroundStyle(world.accent)
+
+      Text("Today")
+        .font(
+          isWide
+            ? .system(size: 68, weight: .black, design: .serif)
+            : .system(size: 52, weight: .black, design: .serif)
+        )
+        .accessibilityAddTraits(.isHeader)
+
+      Text("BE WITH GOD. BE PRESENT. WRITE IT DOWN.")
+        .font(EchoTypography.editorialEyebrow)
+        .tracking(1.7)
+        .foregroundStyle(world.primaryText.opacity(0.86))
+    }
+    .shadow(color: world.contentShadow, radius: 10, y: 3)
+    .padding(.top, isWide ? 0 : 24)
+    .accessibilityElement(children: .combine)
+  }
+
+  private var quickCaptureActions: some View {
+    HStack(spacing: EchoLayout.inlineSpacing) {
+      quickCaptureButton("Write", systemImage: EchoIcon.write) {
+        isComposerFocused = true
+      }
+      quickCaptureButton(
+        voiceCaptureViewModel.state == .recording ? "Stop" : "Voice",
+        systemImage: voiceCaptureViewModel.state == .recording ? "stop.fill" : "waveform"
+      ) {
+        voiceAction()
+      }
+      quickCaptureButton(
+        marksNextEntryImportant ? "Important" : "Mark Important",
+        systemImage: marksNextEntryImportant ? "bookmark.fill" : "bookmark"
+      ) {
+        marksNextEntryImportant.toggle()
+      }
+    }
+  }
+
+  private func quickCaptureButton(
+    _ title: String,
+    systemImage: String,
+    action: @escaping () -> Void
+  ) -> some View {
+    Button(action: action) {
+      Label(title, systemImage: systemImage)
+        .font(EchoTypography.metadata.weight(.semibold))
+        .lineLimit(1)
+        .minimumScaleFactor(0.72)
+        .frame(maxWidth: .infinity, minHeight: 42)
+        .background(world.surfaceFill.opacity(0.88), in: RoundedRectangle(cornerRadius: 10))
+        .overlay {
+          RoundedRectangle(cornerRadius: 10)
+            .stroke(world.separator, lineWidth: EchoShape.hairlineWidth)
+        }
+    }
+    .buttonStyle(.plain)
   }
 
   @ViewBuilder
@@ -359,18 +428,6 @@ struct TodayView: View {
 
   @Environment(\.echoVisualWorld) private var world
   @Environment(CarryForwardViewModel.self) private var carryForwardViewModel
-  @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-  @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-
-  private func heroOffset(for availableHeight: CGFloat) -> CGFloat {
-    if dynamicTypeSize.isAccessibilitySize {
-      return 72
-    }
-    if horizontalSizeClass == .compact {
-      return min(max(availableHeight * 0.34, 140), 286)
-    }
-    return min(max(availableHeight * 0.27, 96), 230)
-  }
 
   private var failureMessage: String? {
     switch viewModel.failure {

@@ -21,7 +21,7 @@ struct SettingsView: View {
 
   var body: some View {
     NavigationStack {
-      EchoWorldCanvas {
+      EchoWorldCanvas(screen: .settings) {
         ScrollView {
           VStack(alignment: .leading, spacing: EchoLayout.sectionSpacing) {
             EchoScreenHeader(
@@ -433,7 +433,7 @@ private struct VisualWorldOption: View {
     Button(action: action) {
       EchoSurface {
         HStack(spacing: EchoLayout.contentSpacing) {
-          Image(world.backgroundAssetName)
+          Image(world.backgroundAssetName(for: .today))
             .resizable()
             .scaledToFill()
             .frame(width: 92, height: 68)

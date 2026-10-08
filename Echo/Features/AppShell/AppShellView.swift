@@ -22,6 +22,7 @@ struct AppShellView: View {
   let refinementPreferences: EchoRefinementPreferences
 
   @State private var selection: EchoPrimarySection = .today
+  @State private var selectedTimelineDayID: EchoDayIdentifier?
   @State private var isShowingSettings = false
   @Environment(\.accessibilityReduceMotion) private var reduceMotion
   @Environment(\.scenePhase) private var scenePhase
@@ -29,21 +30,17 @@ struct AppShellView: View {
   var body: some View {
     ZStack {
       NavigationStack {
-        if selection == .today {
-          selectedContent
-            .id(selection)
-            .transition(.opacity)
-            .overlay(alignment: .top) {
-              primaryNavigation
+        selectedContent
+          .id(selection)
+          .transition(.opacity)
+          .safeAreaInset(edge: .top, spacing: 0) {
+            EchoBrandHeader {
+              isShowingSettings = true
             }
-        } else {
-          selectedContent
-            .id(selection)
-            .transition(.opacity)
-            .safeAreaInset(edge: .top, spacing: 0) {
-              primaryNavigation
-            }
-        }
+          }
+          .safeAreaInset(edge: .bottom, spacing: 0) {
+            primaryNavigation
+          }
       }
       .accessibilityHidden(isPrivacyShieldVisible)
       if !privacyLockController.isApplicationActive || privacyLockController.isLocked {
@@ -93,9 +90,7 @@ struct AppShellView: View {
   }
 
   private var primaryNavigation: some View {
-    EchoPrimaryNavigation(selection: $selection) {
-      isShowingSettings = true
-    }
+    EchoPrimaryNavigation(selection: $selection)
   }
 
   @ViewBuilder
@@ -111,10 +106,23 @@ struct AppShellView: View {
     case .timeline:
       TimelineView(
         viewModel: timelineViewModel,
+        selectedDayID: $selectedTimelineDayID,
         highlightViewModel: highlightViewModel,
         aiService: aiService,
         journalRepository: journalRepository
       )
+    case .calendar:
+      LifeCalendarView(
+        days: timelineViewModel.days,
+        selectedDayID: $selectedTimelineDayID,
+        initialDate: timelineViewModel.mostRecentTimelineDate,
+        showsDismissButton: false
+      ) {
+        selection = .timeline
+      }
+      .task {
+        await timelineViewModel.load()
+      }
     case .reflection:
       DayReflectionView(
         todayViewModel: todayViewModel,

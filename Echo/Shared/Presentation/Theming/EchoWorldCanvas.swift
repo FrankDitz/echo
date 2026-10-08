@@ -6,8 +6,13 @@ struct EchoWorldCanvas<Content: View>: View {
   @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
 
   private let content: Content
+  private let screen: EchoScreenRole
 
-  init(@ViewBuilder content: () -> Content) {
+  init(
+    screen: EchoScreenRole = .utility,
+    @ViewBuilder content: () -> Content
+  ) {
+    self.screen = screen
     self.content = content()
   }
 
@@ -18,7 +23,7 @@ struct EchoWorldCanvas<Content: View>: View {
         let canvasHeight = max(proxy.size.height, 0)
 
         ZStack {
-          Image(world.backgroundAssetName)
+          Image(world.backgroundAssetName(for: screen))
             .resizable()
             .scaledToFill()
             .frame(width: canvasWidth, height: canvasHeight, alignment: .top)

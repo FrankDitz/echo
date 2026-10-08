@@ -9,6 +9,67 @@ enum EchoVisualWorldID: String, CaseIterable, Codable {
   case covenantBlue = "electric-blue-hour"
 }
 
+enum EchoScreenRole: Hashable {
+  case today
+  case timeline
+  case reflection
+  case highlights
+  case calendar
+  case editor
+  case settings
+  case utility
+}
+
+struct EchoVisualWorldArtwork {
+  let today: String
+  let timeline: String
+  let reflection: String
+  let highlights: String
+  let calendar: String
+  let editor: String
+  let settings: String
+
+  init(
+    today: String,
+    timeline: String,
+    reflection: String,
+    highlights: String,
+    calendar: String,
+    editor: String,
+    settings: String
+  ) {
+    self.today = today
+    self.timeline = timeline
+    self.reflection = reflection
+    self.highlights = highlights
+    self.calendar = calendar
+    self.editor = editor
+    self.settings = settings
+  }
+
+  init(shared assetName: String) {
+    today = assetName
+    timeline = assetName
+    reflection = assetName
+    highlights = assetName
+    calendar = assetName
+    editor = assetName
+    settings = assetName
+  }
+
+  func assetName(for screen: EchoScreenRole) -> String {
+    switch screen {
+    case .today: today
+    case .timeline: timeline
+    case .reflection: reflection
+    case .highlights: highlights
+    case .calendar: calendar
+    case .editor: editor
+    case .settings, .utility: settings
+    }
+  }
+}
+
 extension EchoVisualWorldID: Identifiable {
   var id: Self { self }
 }
@@ -17,7 +78,7 @@ struct EchoVisualWorld {
   let id: EchoVisualWorldID
   let displayName: String
   let paletteDescription: String
-  let backgroundAssetName: String
+  let artwork: EchoVisualWorldArtwork
   let canvas: Color
   let primaryText: Color
   let secondaryText: Color
@@ -34,7 +95,7 @@ struct EchoVisualWorld {
     id: .cornerstoneSignal,
     displayName: "Cornerstone Signal",
     paletteDescription: "Warm newsprint, carbon, petrol teal, vermilion, and gold.",
-    backgroundAssetName: "CornerstoneSignalBackground",
+    artwork: EchoVisualWorldArtwork(shared: "CornerstoneSignalBackground"),
     canvas: Color(red: 0.91, green: 0.87, blue: 0.76),
     primaryText: Color(red: 0.075, green: 0.07, blue: 0.06),
     secondaryText: Color(red: 0.26, green: 0.25, blue: 0.21),
@@ -52,7 +113,7 @@ struct EchoVisualWorld {
     id: .goldStandard,
     displayName: "Gold Standard",
     paletteDescription: "Mustard gold, charcoal, warm cream, and burnished light.",
-    backgroundAssetName: "GoldStandardBackground",
+    artwork: EchoVisualWorldArtwork(shared: "GoldStandardBackground"),
     canvas: Color(red: 0.94, green: 0.63, blue: 0.06),
     primaryText: Color(red: 0.07, green: 0.06, blue: 0.045),
     secondaryText: Color(red: 0.17, green: 0.13, blue: 0.065),
@@ -70,7 +131,7 @@ struct EchoVisualWorld {
     id: .kingdomGreen,
     displayName: "Kingdom Green",
     paletteDescription: "Deep emerald, warm ivory, near-black, and quiet antique gold.",
-    backgroundAssetName: "KingdomGreenBackground",
+    artwork: EchoVisualWorldArtwork(shared: "KingdomGreenBackground"),
     canvas: Color(red: 0.008, green: 0.16, blue: 0.105),
     primaryText: Color(red: 0.98, green: 0.96, blue: 0.86),
     secondaryText: Color(red: 0.78, green: 0.82, blue: 0.68),
@@ -88,7 +149,7 @@ struct EchoVisualWorld {
     id: .covenantBlue,
     displayName: "Covenant Blue",
     paletteDescription: "Covenant cobalt, midnight navy, warm white, and pale silver.",
-    backgroundAssetName: "CovenantBlueBackground",
+    artwork: EchoVisualWorldArtwork(shared: "CovenantBlueBackground"),
     canvas: Color(red: 0.015, green: 0.075, blue: 0.22),
     primaryText: Color(red: 0.97, green: 0.975, blue: 0.94),
     secondaryText: Color(red: 0.7, green: 0.81, blue: 0.94),
@@ -113,6 +174,10 @@ struct EchoVisualWorld {
     case .covenantBlue:
       .covenantBlue
     }
+  }
+
+  func backgroundAssetName(for screen: EchoScreenRole) -> String {
+    artwork.assetName(for: screen)
   }
 }
 

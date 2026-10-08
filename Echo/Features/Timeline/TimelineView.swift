@@ -2,11 +2,11 @@ import SwiftUI
 
 struct TimelineView: View {
   let viewModel: TimelineViewModel
+  @Binding var selectedDayID: EchoDayIdentifier?
   let highlightViewModel: EntryHighlightViewModel
   let aiService: any EchoAIService
   let journalRepository: any EchoOrganizedJournalRepository
 
-  @State private var selectedDayID: EchoDayIdentifier?
   @State private var searchQuery = ""
   @State private var isShowingCalendar = false
   @FocusState private var isSearchFocused: Bool
@@ -17,7 +17,7 @@ struct TimelineView: View {
   @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
   var body: some View {
-    EchoWorldCanvas {
+    EchoWorldCanvas(screen: .timeline) {
       GeometryReader { proxy in
         ScrollView {
           let isWide = proxy.size.width >= EchoLayout.wideLayoutBreakpoint
@@ -38,6 +38,7 @@ struct TimelineView: View {
               }
             } else {
               LazyVStack(alignment: .leading, spacing: EchoLayout.compactSectionSpacing) {
+                timelineHeader
                 searchControl
                 timelineContent(isWide: false)
               }
@@ -62,10 +63,11 @@ struct TimelineView: View {
       await viewModel.load()
     }
     .sheet(isPresented: $isShowingCalendar) {
-      TimelineCalendarBrowser(
+      LifeCalendarView(
         days: viewModel.days,
         selectedDayID: $selectedDayID,
-        initialDate: stripAnchorDate
+        initialDate: stripAnchorDate,
+        showsDismissButton: true
       )
       .echoPrivacyProtected()
     }
@@ -450,9 +452,11 @@ struct TimelineView: View {
   }
 }
 
-private struct TimelineCalendarBrowser: View {
+struct LifeCalendarView: View {
   let days: [EchoDay]
   @Binding var selectedDayID: EchoDayIdentifier?
+  let showsDismissButton: Bool
+  let onSelectDay: (() -> Void)?
 
   @Environment(\.dismiss) private var dismiss
   @Environment(\.calendar) private var calendar
@@ -463,19 +467,29 @@ private struct TimelineCalendarBrowser: View {
   init(
     days: [EchoDay],
     selectedDayID: Binding<EchoDayIdentifier?>,
-    initialDate: Date
+    initialDate: Date,
+    showsDismissButton: Bool,
+    onSelectDay: (() -> Void)? = nil
   ) {
     self.days = days
     _selectedDayID = selectedDayID
+    self.showsDismissButton = showsDismissButton
+    self.onSelectDay = onSelectDay
     _displayedMonth = State(initialValue: initialDate)
   }
 
   var body: some View {
-    EchoWorldCanvas {
-      VStack(spacing: EchoLayout.contentSpacing) {
+    EchoWorldCanvas(screen: .calendar) {
+      ScrollView {
+        VStack(alignment: .leading, spacing: EchoLayout.contentSpacing) {
+          Text("Life Calendar")
+            .font(.system(size: 46, weight: .black, design: .serif))
+            .foregroundStyle(world.primaryText)
+            .accessibilityAddTraits(.isHeader)
+
         HStack {
           VStack(alignment: .leading, spacing: EchoLayout.microSpacing) {
-            Text("JOURNAL CALENDAR")
+            Text("A MONTH IN PERSPECTIVE")
               .font(EchoTypography.editorialEyebrow)
               .tracking(1.4)
               .foregroundStyle(world.accent)
@@ -488,10 +502,12 @@ private struct TimelineCalendarBrowser: View {
           monthButton(systemImage: "chevron.left", offset: -1)
           monthButton(systemImage: "chevron.right", offset: 1)
 
-          Button("Done") { dismiss() }
-            .buttonStyle(.borderedProminent)
-            .tint(world.accent)
-            .foregroundStyle(world.canvas)
+          if showsDismissButton {
+            Button("Done") { dismiss() }
+              .buttonStyle(.borderedProminent)
+              .tint(world.accent)
+              .foregroundStyle(world.canvas)
+          }
         }
 
         EchoReadabilityPanel {
@@ -517,14 +533,16 @@ private struct TimelineCalendarBrowser: View {
           }
         }
 
-        Text("Choose any day containing journal entries, including today.")
-          .font(EchoTypography.supporting)
-          .foregroundStyle(world.secondaryText)
-          .frame(maxWidth: .infinity, alignment: .leading)
+          Text("Choose any day containing journal entries, including today.")
+            .font(EchoTypography.supporting)
+            .foregroundStyle(world.secondaryText)
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .frame(maxWidth: 620, alignment: .topLeading)
+        .padding(EchoLayout.pageHorizontalPadding)
+        .frame(maxWidth: .infinity, alignment: .top)
       }
-      .frame(maxWidth: 620, alignment: .topLeading)
-      .padding(EchoLayout.pageHorizontalPadding)
-      .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+      .scrollIndicators(.hidden)
     }
     .frame(minWidth: 360, minHeight: 520)
   }
@@ -566,7 +584,11 @@ private struct TimelineCalendarBrowser: View {
 
     return Button {
       selectedDayID = identifier
-      dismiss()
+      if showsDismissButton {
+        dismiss()
+      } else {
+        onSelectDay?()
+      }
     } label: {
       VStack(spacing: EchoLayout.microSpacing) {
         Text(date, format: .dateTime.day())

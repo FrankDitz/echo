@@ -1,6 +1,6 @@
 # Visual design
 
-Status: Phase 7 implemented direction, October 2, 2026
+Status: Phase 10 screen-specific implementation in progress, October 8, 2026
 
 ## Product intent
 
@@ -10,13 +10,14 @@ The visual system follows the same discipline as Ambition while preserving an in
 
 ## Approved direction
 
-The approved direction grows from Mirror City. Its signature is a nocturnal city reflected or inverted across water, glass, rain, or fog. Teal Immersion is the default visual world: layered petroleum teal, oxidized blue-green, luminous aqua, restrained graphite, and sparse warm city light.
+The approved direction is modern urban Christian: tactile editorial imagery, confident environmental color, worship and studio spaces, journaling objects, architectural light, and restrained faith symbols. It should feel fresh and personal without becoming a church flyer, a generic productivity dashboard, or a collection of slogan cards.
 
-The initial optional worlds are:
+The shipped worlds are:
 
-- **Crimson Static:** oxblood, black cherry, ember red, and silver city rain.
-- **Sodium Fog:** concrete, olive-gray fog, sodium amber, and a restrained red signal.
-- **Electric Blue Hour:** storm blue, peacock teal, cyan reflection, and warm window light.
+- **Cornerstone Signal (default):** warm newsprint, carbon, petrol teal, vermilion, and gold; an editorial street-and-studio collage centered on reflection and rebuilding.
+- **Kingdom Green:** saturated emerald, near-black, warm ivory, and antique gold; a quiet-strength worship and journaling environment without oversized slogans.
+- **Gold Standard:** mustard gold, charcoal, and warm cream; bold worship-notes imagery with color filling the environment rather than appearing as a thin accent.
+- **Covenant Blue:** covenant cobalt, midnight navy, warm white, and pale silver; a clear worship, studio, journal, and concrete-church environment without a generic city backdrop.
 
 These are presentation choices, not product modes. Every world exposes the same content, navigation, actions, accessibility semantics, and privacy behavior.
 
@@ -81,12 +82,12 @@ Feature screens consume semantic values. They must not switch on individual worl
 - Assets are reviewed at the smallest and largest supported phone sizes before shipping.
 - Theme assets may be public repository content; personal runtime photos and journal-derived imagery may never become theme assets.
 
-### Teal Immersion production treatment
+### Cornerstone Signal production treatment
 
-- The production artwork uses `TealImmersionBackground.imageset/teal-immersion-background.png` on iPhone and iPad and the native landscape `teal-immersion-background-mac.png` on Mac. Both depict an original generated fictional city with no people, text, logos, personal media, or embedded location details.
-- Phone presentation uses a portrait `scaledToFill` crop anchored to the top. The luminous skyline occupies the upper third while the quieter petroleum-teal center and lower region support capture, entries, and long-form writing.
-- Wider iPad windows retain the top focal anchor and allow the outer city edges to crop. Mac uses a dedicated 16:10 composition to preserve detail and reflections across large windows. Semantic surface fills and the world overlay protect readability where either background becomes more detailed.
-- The asset-generation prompt and provenance are recorded in `ARTWORK_PROVENANCE.md` so future variants can be reviewed against the same privacy and originality boundary.
+- `CornerstoneSignalBackground.imageset` contains separate portrait and native 16:10 Mac compositions. Both use original generated editorial, journaling, worship, and urban-architecture imagery with no people, readable text, logos, personal media, or embedded location details.
+- Warm newsprint reading fields occupy the central content regions while carbon, petrol teal, vermilion, gold, and photographic detail build structure at the edges.
+- Primary text uses carbon, vermilion communicates action, petrol teal distinguishes saved state, and warm cream surfaces protect long-form readability. Cornerstone Signal intentionally uses a light system appearance.
+- The background and semantic palette establish the default visual language; optional worlds retain the same content, behavior, accessibility semantics, and privacy boundary.
 
 ### Gold Standard production treatment
 
@@ -120,4 +121,4 @@ Feature screens consume semantic values. They must not switch on individual worl
 
 ## Acceptance boundary
 
-Phase 7 is complete only when all current workflows remain functional in every shipped world, selection persists without touching journal storage, supported platforms remain readable and accessible, and repository-safety checks confirm that no personal content or credentials were introduced with the artwork.
+Phase 10 is complete only when all current workflows remain functional in every shipped world, legacy selections migrate without touching journal storage, supported platforms remain readable and accessible, and repository-safety checks confirm that no personal content or credentials were introduced with the artwork.

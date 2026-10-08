@@ -7,9 +7,10 @@ struct HighlightsView: View {
   let journalRepository: any EchoOrganizedJournalRepository
 
   @State private var selectedItem: HighlightedEntry?
+  @State private var selectedFilter: HighlightFilter = .saved
 
   var body: some View {
-    EchoWorldCanvas {
+    EchoWorldCanvas(screen: .highlights) {
       GeometryReader { geometry in
         ScrollView {
           if geometry.size.width >= EchoLayout.wideLayoutBreakpoint {
@@ -89,7 +90,16 @@ struct HighlightsView: View {
       VStack(alignment: .leading, spacing: EchoLayout.contentSpacing) {
         filterRibbon
 
-        if isWide {
+        if filteredItems.isEmpty {
+          EchoSurface {
+            EchoEmptyState(
+              title: "No \(selectedFilter.title.lowercased()) highlights",
+              systemImage: selectedFilter.systemImage,
+              description: "Choose another filter or save a matching entry.",
+              minHeight: EchoLayout.compactStateHeight
+            )
+          }
+        } else if isWide {
           LazyVGrid(
             columns: [
               GridItem(.flexible(), spacing: EchoLayout.contentSpacing, alignment: .top),
@@ -98,7 +108,7 @@ struct HighlightsView: View {
             alignment: .leading,
             spacing: EchoLayout.contentSpacing
           ) {
-            ForEach(viewModel.items) { item in
+            ForEach(filteredItems) { item in
               EchoReadabilityPanel(padding: 0) {
                 HighlightedEntryRow(
                   item: item,
@@ -115,7 +125,7 @@ struct HighlightsView: View {
         } else {
           EchoReadabilityPanel(padding: 0) {
             VStack(alignment: .leading, spacing: 0) {
-              ForEach(viewModel.items) { item in
+              ForEach(filteredItems) { item in
                 HighlightedEntryRow(
                   item: item,
                   onOpen: { selectedItem = item },
@@ -126,7 +136,7 @@ struct HighlightsView: View {
                   }
                 )
 
-                if item.id != viewModel.items.last?.id {
+                if item.id != filteredItems.last?.id {
                   Divider()
                     .overlay(world.separator.opacity(0.7))
                 }
@@ -143,18 +153,64 @@ struct HighlightsView: View {
   }
 
   private var filterRibbon: some View {
-    Label(
-      "\(viewModel.items.count) saved \(viewModel.items.count == 1 ? "moment" : "moments")",
-      systemImage: "bookmark.fill"
-    )
-    .font(EchoTypography.metadata.weight(.semibold))
-    .foregroundStyle(world.primaryText)
+    ScrollView(.horizontal) {
+      HStack(spacing: EchoLayout.inlineSpacing) {
+        ForEach(HighlightFilter.allCases) { filter in
+          Button {
+            selectedFilter = filter
+          } label: {
+            Label(filter.title, systemImage: filter.systemImage)
+              .font(EchoTypography.metadata.weight(.semibold))
+              .foregroundStyle(selectedFilter == filter ? world.canvas : world.primaryText)
+              .padding(.horizontal, EchoLayout.contentSpacing)
+              .padding(.vertical, EchoLayout.inlineSpacing)
+              .background(
+                selectedFilter == filter ? world.accent : world.surfaceFill.opacity(0.82),
+                in: Capsule()
+              )
+              .overlay {
+                Capsule().stroke(world.separator, lineWidth: EchoShape.hairlineWidth)
+              }
+          }
+          .buttonStyle(.plain)
+        }
+      }
+    }
+    .scrollIndicators(.hidden)
     .accessibilityLabel(
       "\(viewModel.items.count) saved \(viewModel.items.count == 1 ? "entry" : "entries")"
     )
   }
 
   @Environment(\.echoVisualWorld) private var world
+
+  private var filteredItems: [HighlightedEntry] {
+    switch selectedFilter {
+    case .saved:
+      viewModel.items
+    case .text:
+      viewModel.items.filter { $0.entry.type != .voice }
+    case .voice:
+      viewModel.items.filter { $0.entry.type == .voice }
+    }
+  }
+
+  private enum HighlightFilter: String, CaseIterable, Identifiable {
+    case saved
+    case text
+    case voice
+
+    var id: String { rawValue }
+    var title: String { rawValue.capitalized }
+
+    var systemImage: String {
+      switch self {
+      case .saved: "bookmark.fill"
+      case .text: "text.alignleft"
+      case .voice: "waveform"
+      }
+    }
+  }
 
   private var failureMessage: String? {
     switch viewModel.failure {
