@@ -14,9 +14,11 @@ struct EchoRefinementConfigurationTests {
     let preferences = EchoRefinementPreferences(defaults: defaults)
     #expect(preferences.provider == .onDevice)
     preferences.provider = .disabled
+    preferences.reviewBeforeUsing = true
 
     let restored = EchoRefinementPreferences(defaults: defaults)
     #expect(restored.provider == .disabled)
+    #expect(restored.reviewBeforeUsing)
     #expect(
       defaults.dictionaryRepresentation().values.allSatisfy { value in
         (value as? String) != "A fictional private journal entry."

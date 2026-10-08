@@ -381,9 +381,11 @@ final class TodayViewModel {
       failure = nil
 
       if let capturePipeline {
-        let refined = await capturePipeline.refine(entry)
-        if let index = entries.firstIndex(where: { $0.id == refined.id }) {
-          entries[index] = refined
+        let processing = await capturePipeline.beginRefinement(entry)
+        replaceVisibleEntry(processing)
+        Task { [weak self] in
+          let refined = await capturePipeline.finishRefinement(processing)
+          self?.replaceVisibleEntry(refined)
         }
       }
       return true
@@ -440,6 +442,29 @@ final class TodayViewModel {
     saveState = .idle
   }
 
+  func retryRefinement(entryID: UUID) {
+    guard let capturePipeline,
+      let entry = entries.first(where: { $0.id == entryID })
+    else { return }
+
+    Task { [weak self] in
+      let processing = await capturePipeline.beginRefinement(entry)
+      self?.replaceVisibleEntry(processing)
+      let refined = await capturePipeline.finishRefinement(processing)
+      self?.replaceVisibleEntry(refined)
+    }
+  }
+
+  @discardableResult
+  func acceptRefinement(entryID: UUID) async -> Bool {
+    await updateRefinementDecision(entryID: entryID, accepts: true)
+  }
+
+  @discardableResult
+  func discardRefinement(entryID: UUID) async -> Bool {
+    await updateRefinementDecision(entryID: entryID, accepts: false)
+  }
+
   @discardableResult
   func saveAssistedText(entryID: UUID, text: String) async -> Bool {
     guard containsWriting(text),
@@ -464,6 +489,29 @@ final class TodayViewModel {
 
   private func containsWriting(_ text: String) -> Bool {
     text.contains(where: { !$0.isWhitespace })
+  }
+
+  private func replaceVisibleEntry(_ entry: EchoEntry) {
+    guard let index = entries.firstIndex(where: { $0.id == entry.id }) else { return }
+    entries[index] = entry
+  }
+
+  private func updateRefinementDecision(entryID: UUID, accepts: Bool) async -> Bool {
+    guard let index = entries.firstIndex(where: { $0.id == entryID }) else { return false }
+    var entry = entries[index]
+    if accepts {
+      entry.acceptRefinement(at: now())
+    } else {
+      entry.discardRefinement(at: now())
+    }
+    do {
+      try await repository.update(entry)
+      entries[index] = entry
+      return true
+    } catch {
+      failure = .updateEntry
+      return false
+    }
   }
 }
 
@@ -490,6 +538,7 @@ final class VoiceCaptureViewModel {
   private let now: () -> Date
   private var pendingAttachmentID: UUID?
   private var pendingURL: URL?
+  private var refinementTask: Task<EchoEntry, Never>?
 
   private(set) var state: VoiceCaptureState = .idle
   private(set) var statusMessage: String?
@@ -586,7 +635,11 @@ final class VoiceCaptureViewModel {
           try await attachmentRepository.update(attachment)
           if let capturePipeline {
             entry = try await capturePipeline.replaceOriginalText(transcript, for: entry)
-            entry = await capturePipeline.refine(entry)
+            entry = await capturePipeline.beginRefinement(entry)
+            let processingEntry = entry
+            refinementTask = Task {
+              await capturePipeline.finishRefinement(processingEntry)
+            }
           } else {
             entry = EchoEntry(
               id: entry.id,
@@ -601,7 +654,10 @@ final class VoiceCaptureViewModel {
             )
             try await entryRepository.update(entry)
           }
-          statusMessage = "Saved with an on-device transcript."
+          statusMessage =
+            capturePipeline == nil
+            ? "Saved with an on-device transcript."
+            : "Captured. Cleanup is continuing in the background."
         } else {
           statusMessage = "Saved audio. No speech was detected for transcription."
         }
@@ -635,6 +691,17 @@ final class VoiceCaptureViewModel {
       state = .failed
       statusMessage = "The recording could not be played."
     }
+  }
+
+  func awaitPendingRefinement() async -> EchoEntry? {
+    guard let refinementTask else { return nil }
+    let entry = await refinementTask.value
+    self.refinementTask = nil
+    statusMessage =
+      entry.refinementStatus == .failed
+      ? "Saved. Cleanup can be retried from the entry."
+      : "Saved with an on-device transcript."
+    return entry
   }
 
   func resetStatus() {

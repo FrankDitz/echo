@@ -43,6 +43,7 @@ struct EchoEntry: Identifiable, Codable, Hashable, Sendable {
 
   var preferredText: String {
     guard let polishedText,
+      refinementStatus == .refined,
       polishedText.contains(where: { !$0.isWhitespace })
     else {
       return rawText
@@ -175,6 +176,19 @@ struct EchoEntry: Identifiable, Codable, Hashable, Sendable {
 
   mutating func failRefinement(at timestamp: Date) {
     refinementStatus = .failed
+    markModified(at: timestamp)
+  }
+
+  mutating func acceptRefinement(at timestamp: Date) {
+    guard polishedText?.contains(where: { !$0.isWhitespace }) == true else { return }
+    refinementStatus = .refined
+    markModified(at: timestamp)
+  }
+
+  mutating func discardRefinement(at timestamp: Date) {
+    polishedText = nil
+    refinementStatus = .notRequested
+    refinementProvenance = nil
     markModified(at: timestamp)
   }
 

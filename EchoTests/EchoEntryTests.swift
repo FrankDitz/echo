@@ -100,6 +100,36 @@ struct EchoEntryTests {
     #expect(entry.refinementProvenance == nil)
   }
 
+  @Test("Review keeps original text preferred until the cleanup is accepted")
+  func refinementReview() throws {
+    let timestamp = try makeDate("2026-09-29T14:15:00Z")
+    var entry = EchoEntry(
+      createdAt: timestamp,
+      calendar: try makeGregorianCalendar(timeZone: "UTC"),
+      rawText: "fictional rough wording"
+    )
+    entry.completeRefinement(
+      text: "Fictional rough wording.",
+      provenance: EchoEntryRefinementProvenance(
+        processorIdentifier: "echo.test.refiner",
+        modelIdentifier: nil,
+        generatedAt: timestamp
+      ),
+      requiresReview: true,
+      at: timestamp
+    )
+
+    #expect(entry.refinementStatus == .needsReview)
+    #expect(entry.preferredText == entry.rawText)
+    entry.acceptRefinement(at: timestamp.addingTimeInterval(1))
+    #expect(entry.preferredText == "Fictional rough wording.")
+
+    entry.discardRefinement(at: timestamp.addingTimeInterval(2))
+    #expect(entry.polishedText == nil)
+    #expect(entry.preferredText == entry.rawText)
+    #expect(entry.refinementStatus == .notRequested)
+  }
+
   @Test("Modification time never moves backward")
   func modificationTimeIsMonotonic() throws {
     let createdAt = try makeDate("2026-09-29T14:15:00Z")

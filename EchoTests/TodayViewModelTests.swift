@@ -274,7 +274,9 @@ struct TodayViewModelTests {
 
     await viewModel.start()
     #expect(viewModel.state == .recording)
-    let entry = try #require(await viewModel.stopAndSave())
+    let captured = try #require(await viewModel.stopAndSave())
+    #expect(captured.refinementStatus == .processing)
+    let entry = try #require(await viewModel.awaitPendingRefinement())
     let attachment = try #require(await attachments.attachment(for: entry.id))
 
     #expect(entry.type == .voice)
