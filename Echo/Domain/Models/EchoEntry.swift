@@ -48,7 +48,7 @@ struct EchoEntry: Identifiable, Codable, Hashable, Sendable {
     else {
       return rawText
     }
-    return polishedText
+    return EchoRefinementOutputSanitizer.clean(polishedText)
   }
 
   init(
@@ -194,6 +194,23 @@ struct EchoEntry: Identifiable, Codable, Hashable, Sendable {
 
   private mutating func markModified(at timestamp: Date) {
     modifiedAt = max(modifiedAt, timestamp)
+  }
+}
+
+enum EchoRefinementOutputSanitizer {
+  static func clean(_ output: String) -> String {
+    var cleaned = output.trimmingCharacters(in: .whitespacesAndNewlines)
+
+    if cleaned.hasPrefix("<entry>") {
+      cleaned.removeFirst("<entry>".count)
+      cleaned = cleaned.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+    if cleaned.hasSuffix("</entry>") {
+      cleaned.removeLast("</entry>".count)
+      cleaned = cleaned.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    return cleaned
   }
 }
 
