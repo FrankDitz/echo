@@ -84,10 +84,11 @@ Feature screens consume semantic values. They must not switch on individual worl
 
 ### Cornerstone Signal production treatment
 
-- `CornerstoneSignalBackground.imageset` contains separate portrait and native 16:10 Mac compositions. Both use original generated editorial, journaling, worship, and urban-architecture imagery with no people, readable text, logos, personal media, or embedded location details.
+- Cornerstone uses five scene-specific artwork sets rather than repeating one wallpaper: `CornerstoneSignalBackground` for Today, plus `CornerstoneSignalTimelineBackground`, `CornerstoneSignalReflectionBackground`, `CornerstoneSignalHighlightsBackground`, and `CornerstoneSignalCalendarBackground`. Each contains an independently composed phone portrait and native 16:10 Mac image.
+- The scenes reinforce each screen's job: Today centers journaling, Timeline supplies an architectural journey rail, Reflection reserves a cross-lit editorial field, Highlights frames saved thoughts with worship and journal fragments, and Calendar integrates a restrained month-grid texture. None contains people, readable text, logos, personal media, or embedded location details.
 - Warm newsprint reading fields occupy the central content regions while carbon, petrol teal, vermilion, gold, and photographic detail build structure at the edges.
 - Primary text uses carbon, vermilion communicates action, petrol teal distinguishes saved state, and warm cream surfaces protect long-form readability. Cornerstone Signal intentionally uses a light system appearance.
-- The background and semantic palette establish the default visual language; optional worlds retain the same content, behavior, accessibility semantics, and privacy boundary.
+- Screen-specific artwork and shared concept-faithful components establish the default visual language; optional worlds retain the same screen jobs, behavior, accessibility semantics, and privacy boundary.
 
 ### Gold Standard production treatment
 

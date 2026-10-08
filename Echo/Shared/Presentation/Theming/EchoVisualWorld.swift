@@ -95,7 +95,15 @@ struct EchoVisualWorld {
     id: .cornerstoneSignal,
     displayName: "Cornerstone Signal",
     paletteDescription: "Warm newsprint, carbon, petrol teal, vermilion, and gold.",
-    artwork: EchoVisualWorldArtwork(shared: "CornerstoneSignalBackground"),
+    artwork: EchoVisualWorldArtwork(
+      today: "CornerstoneSignalBackground",
+      timeline: "CornerstoneSignalTimelineBackground",
+      reflection: "CornerstoneSignalReflectionBackground",
+      highlights: "CornerstoneSignalHighlightsBackground",
+      calendar: "CornerstoneSignalCalendarBackground",
+      editor: "CornerstoneSignalReflectionBackground",
+      settings: "CornerstoneSignalBackground"
+    ),
     canvas: Color(red: 0.91, green: 0.87, blue: 0.76),
     primaryText: Color(red: 0.075, green: 0.07, blue: 0.06),
     secondaryText: Color(red: 0.26, green: 0.25, blue: 0.21),
