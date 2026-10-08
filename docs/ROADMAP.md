@@ -13,8 +13,9 @@ Each phase is implemented, built, tested where behavior exists, reviewed, commit
 - **Phase 6 — AI architecture (complete):** provider-neutral cleanup, polish, and day-organization contracts; a deterministic offline implementation; separately persisted assisted text; versioned organized-journal storage; Day Detail generation and regeneration; and provenance, durability, failure, and immutability tests. No provider credential, network call, or real journal content enters the app bundle, fixtures, logs, or Git.
 - **Phase 7 — Visual worlds and presentation system (complete):** build a mature, reusable presentation architecture around the approved Mirror City direction, with Teal Immersion as the default visual world and optional Crimson Static, Sodium Fog, and Electric Blue Hour worlds. Theme choice changes presentation only; journal data and application behavior remain unchanged.
 - **Phase 8 — Memory, reflection, and continuity (complete):** turn the functional journal into a product worth returning to through honest retrieval, richer private reflection, memory resurfacing, faster capture, and explicit personal-data controls. Each capability remains local-first, optional where appropriate, and independently reviewable.
-- **Phase 9 — Frictionless intelligent capture (in progress):** make writing or speaking a thought the shortest path through Echo, preserve every original capture, refine grammar and spoken cadence without changing meaning, and make important entries immediately recognizable.
-- **Phase 10 — MVP review:** full builds and tests, architecture and privacy review, naming cleanup, documentation refresh, staged-data scan, and full reachable-history scan.
+- **Phase 9 — Frictionless intelligent capture (complete):** make writing or speaking a thought the shortest path through Echo, preserve every original capture, refine grammar and spoken cadence without changing meaning, and make important entries immediately recognizable.
+- **Phase 10 — Urban Christian visual system (in progress):** replace the original city worlds with the approved Cornerstone Signal, Kingdom Green, Gold Standard, and Covenant Blue directions while preserving private journal data, stable theme preferences, accessibility, and cross-platform behavior.
+- **Phase 11 — MVP review:** full builds and tests, architecture and privacy review, naming cleanup, documentation refresh, staged-data scan, and full reachable-history scan.
 
 ## Phase 7 deliverables
 
@@ -82,6 +83,17 @@ Every deliverable uses its own short-lived branch and pull request. Raw text, tr
 6. **Important-at-capture workflow (complete):** allow a text or voice entry to be highlighted as it is captured, give highlighted entries a consistent visual signal, and keep the dedicated Highlights collection fast to scan.
 7. **Hub-ready event boundary (complete):** define versioned, serialization-safe entry and highlight events with explicit redaction so journal text is excluded unless a future Hub permission grants it.
 8. **Real-use closeout (complete):** validated rapid text and voice capture, offline and failed refinement, review and undo, highlighting, export, accessibility, and fictional populated-state layouts on iPhone and Mac. Full platform test suites and tracked-history safety scanning pass; visual inspection also caught and corrected model prompt delimiters in new and previously persisted refined text.
+
+## Phase 10 deliverables
+
+Every deliverable uses its own short-lived branch and pull request. Theme changes are presentation-only: they must not alter, derive artwork from, log, export, or otherwise expose private journal content. Existing visual-world preferences migrate without touching SwiftData.
+
+1. **Approved direction and migration plan (complete):** preserve the four approved concept boards, document the shared urban Christian design principles, and define how legacy visual-world identifiers will resolve to the replacement themes without touching journal storage.
+2. **Cornerstone Signal default world (next):** replace Teal Immersion with the primary warm-newsprint, carbon, teal, vermilion, and gold editorial system; add original iPhone and Mac artwork; and validate Today, Timeline, Day Reflection, Highlights, Life Calendar, entry editing, and Settings.
+3. **Kingdom Green world:** replace Sodium Fog with the emerald, ivory, and near-black quiet-strength system; use journaling, worship, reflection, and growth imagery; and avoid oversized slogan typography in the product UI.
+4. **Gold Standard world:** replace Crimson Static with the mustard-gold, charcoal, and cream worship-notes system; apply the palette to substantial surfaces rather than edge accents; and keep long-form writing calm and readable.
+5. **Covenant Blue world:** replace Electric Blue Hour with the cobalt, midnight, and warm-white clarity system; use journaling, worship-stage, scripture, studio, and architectural imagery without reverting to a generic city background.
+6. **Cross-platform closeout:** exercise all four worlds with fictional populated data on supported iPhone and Mac layouts; verify selection migration, contrast, Dynamic Type, reduced transparency, repository safety, full builds, and tests; then refresh visual-design and artwork-provenance documentation.
 
 ## Near-term improvements
 
