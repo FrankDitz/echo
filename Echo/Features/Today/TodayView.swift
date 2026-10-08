@@ -7,6 +7,7 @@ struct TodayView: View {
   let voiceCaptureViewModel: VoiceCaptureViewModel
 
   @State private var draft = ""
+  @State private var marksNextEntryImportant = false
   @State private var selectedEntry: EchoEntry?
   @State private var entryPendingDeletion: EchoEntry?
   @State private var isConfirmingDeletion = false
@@ -191,6 +192,7 @@ struct TodayView: View {
   private var captureControl: some View {
     TodayCaptureControl(
       draft: $draft,
+      markImportant: $marksNextEntryImportant,
       isFocused: $isComposerFocused,
       saveState: viewModel.saveState,
       onSubmit: submitDraft,
@@ -226,8 +228,13 @@ struct TodayView: View {
   private func voiceAction() {
     Task {
       if voiceCaptureViewModel.state == .recording {
-        if await voiceCaptureViewModel.stopAndSave() != nil {
+        if let entry = await voiceCaptureViewModel.stopAndSave() {
           await viewModel.load()
+          if marksNextEntryImportant {
+            await viewModel.markImportant(entryID: entry.id)
+          }
+          marksNextEntryImportant = false
+          await highlightViewModel.load()
           if await voiceCaptureViewModel.awaitPendingRefinement() != nil {
             await viewModel.load()
           }
@@ -371,6 +378,8 @@ struct TodayView: View {
       "Today’s entries could not be loaded."
     case .createEntry:
       "This entry could not be saved. Your draft is still here."
+    case .highlightEntry:
+      "The entry was saved, but it could not be marked important."
     case .updateEntry:
       "The entry could not be updated."
     case .deleteEntry:
@@ -383,8 +392,13 @@ struct TodayView: View {
   private func submitDraft() {
     let text = draft
     Task {
-      if await viewModel.createEntry(rawText: text) {
+      if await viewModel.createEntry(
+        rawText: text,
+        markImportant: marksNextEntryImportant
+      ) {
         draft = ""
+        marksNextEntryImportant = false
+        await highlightViewModel.load()
         isComposerFocused = true
       }
     }
@@ -514,6 +528,7 @@ private struct TodayCaptureControl: View {
   @Environment(\.echoVisualWorld) private var world
 
   @Binding var draft: String
+  @Binding var markImportant: Bool
   let isFocused: FocusState<Bool>.Binding
   let saveState: TodayEntrySaveState
   let onSubmit: () -> Void
@@ -539,6 +554,28 @@ private struct TodayCaptureControl: View {
           .textFieldStyle(.plain)
           .font(EchoTypography.body)
           .accessibilityLabel("New journal entry")
+
+        Button {
+          markImportant.toggle()
+        } label: {
+          Image(systemName: markImportant ? "bookmark.fill" : "bookmark")
+            .font(.subheadline.weight(.semibold))
+            .foregroundStyle(markImportant ? world.canvas : world.accent)
+            .frame(width: 38, height: 38)
+            .background(
+              markImportant ? world.accent : world.canvas.opacity(0.18),
+              in: Circle()
+            )
+            .overlay {
+              Circle().stroke(world.separator, lineWidth: EchoShape.hairlineWidth)
+            }
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(
+          markImportant ? "Remove important marker from next entry" : "Mark next entry important"
+        )
+        .accessibilityValue(markImportant ? "On" : "Off")
+        .help("Mark this thought important")
 
         Button(action: onSubmit) {
           Image(systemName: "arrow.up")
@@ -668,6 +705,22 @@ private struct TodayEntryRow: View {
       .accessibilityLabel("Entry actions")
     }
     .padding(.vertical, EchoLayout.contentSpacing)
+    .padding(.horizontal, highlightViewModel.isHighlighted(entry.id) ? EchoLayout.tightSpacing : 0)
+    .background {
+      if highlightViewModel.isHighlighted(entry.id) {
+        RoundedRectangle(cornerRadius: 10)
+          .fill(world.accent.opacity(0.09))
+      }
+    }
+    .overlay(alignment: .leading) {
+      if highlightViewModel.isHighlighted(entry.id) {
+        Capsule()
+          .fill(world.accent)
+          .frame(width: 3)
+          .padding(.vertical, EchoLayout.tightSpacing)
+          .accessibilityHidden(true)
+      }
+    }
     .contextMenu {
       EntryHighlightButton(entryID: entry.id, viewModel: highlightViewModel)
       Button("Edit", systemImage: "pencil", action: onOpen)

@@ -56,6 +56,33 @@ struct TodayViewModelTests {
     #expect(viewModel.saveState == .saved)
   }
 
+  @Test("Creating can mark an entry important in the same capture workflow")
+  func creatingImportantEntry() async throws {
+    let date = try makeDate("2026-10-03T15:30:00Z")
+    let calendar = try makeGregorianCalendar(timeZone: "UTC")
+    let entries = TodayEntryRepositoryStub()
+    let highlights = TodayHighlightRepositoryStub(highlights: [])
+    let viewModel = TodayViewModel(
+      repository: entries,
+      highlightRepository: highlights,
+      calendar: calendar,
+      now: { date }
+    )
+
+    let created = await viewModel.createEntry(
+      rawText: "A fictional thought worth remembering.",
+      markImportant: true
+    )
+
+    let entry = try #require(await entries.allEntries().first)
+    let highlight = try #require(await highlights.highlight(for: .entry(entry.id)))
+    #expect(created)
+    #expect(highlight.target == .entry(entry.id))
+    #expect(highlight.createdAt == date)
+    #expect(viewModel.saveState == .saved)
+    #expect(viewModel.failure == nil)
+  }
+
   @Test("Blank writing is not persisted")
   func rejectingBlankEntry() async {
     let repository = TodayEntryRepositoryStub()
