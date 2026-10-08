@@ -313,7 +313,8 @@ struct TodayViewModelTests {
     #expect(attachment.transcript == "A fictional spoken memory.")
     #expect(viewModel.state == .ready)
     await viewModel.play(entryID: entry.id)
-    #expect(viewModel.state == .playing)
+    #expect(viewModel.state == .ready)
+    #expect(viewModel.statusMessage == "Finished playing the private recording.")
     #expect(service.playedURL?.lastPathComponent == attachment.relativeFileName)
   }
 
@@ -551,7 +552,10 @@ private final class VoiceCaptureServiceStub: EchoVoiceCaptureService {
 
   func stopRecording() throws -> TimeInterval { 8.25 }
 
-  func play(url: URL) throws { playedURL = url }
+  func play(url: URL) throws -> TimeInterval {
+    playedURL = url
+    return 0
+  }
 
   func transcribeOnDevice(url: URL) async throws -> String { transcript }
 }
