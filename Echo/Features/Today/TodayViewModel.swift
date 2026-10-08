@@ -15,7 +15,7 @@ protocol EchoVoiceCaptureService: AnyObject {
   func requestRecordingPermission() async -> Bool
   func startRecording(to url: URL) throws
   func stopRecording() throws -> TimeInterval
-  func play(url: URL) throws
+  func play(url: URL) throws -> TimeInterval
   func transcribeOnDevice(url: URL) async throws -> String
 }
 
@@ -66,10 +66,11 @@ final class SystemEchoVoiceCaptureService: NSObject, EchoVoiceCaptureService {
     return duration
   }
 
-  func play(url: URL) throws {
+  func play(url: URL) throws -> TimeInterval {
     let player = try AVAudioPlayer(contentsOf: url)
     guard player.play() else { throw EchoVoiceCaptureError.recordingUnavailable }
     self.player = player
+    return player.duration
   }
 
   func transcribeOnDevice(url: URL) async throws -> String {
@@ -706,9 +707,14 @@ final class VoiceCaptureViewModel {
       guard let attachment = try await attachmentRepository.attachment(for: entryID) else {
         throw EchoVoiceCaptureError.noRecording
       }
-      try service.play(url: fileStore.url(for: attachment))
+      let duration = try service.play(url: fileStore.url(for: attachment))
       state = .playing
       statusMessage = "Playing the private recording."
+      let boundedDuration = min(max(duration, 0), 86_400)
+      try? await Task.sleep(nanoseconds: UInt64(boundedDuration * 1_000_000_000))
+      guard state == .playing else { return }
+      state = .ready
+      statusMessage = "Finished playing the private recording."
     } catch {
       state = .failed
       statusMessage = "The recording could not be played."
