@@ -1,4 +1,5 @@
 import SwiftUI
+
 #if os(macOS)
   import AppKit
 #else
@@ -18,6 +19,7 @@ struct AppShellView: View {
   let dataRecoveryService: EchoDataRecoveryService
   let visualWorldSelection: EchoVisualWorldSelection
   let privacyLockController: EchoPrivacyLockController
+  let refinementPreferences: EchoRefinementPreferences
 
   @State private var selection: EchoPrimarySection = .today
   @State private var isShowingSettings = false
@@ -58,7 +60,8 @@ struct AppShellView: View {
         visualWorldSelection: visualWorldSelection,
         dataExportService: dataExportService,
         dataRecoveryService: dataRecoveryService,
-        privacyLockController: privacyLockController
+        privacyLockController: privacyLockController,
+        refinementPreferences: refinementPreferences
       )
     }
     .onChange(of: scenePhase, initial: true) { _, phase in

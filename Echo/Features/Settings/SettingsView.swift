@@ -7,6 +7,7 @@ struct SettingsView: View {
   let dataExportService: EchoDataExportService
   let dataRecoveryService: EchoDataRecoveryService
   let privacyLockController: EchoPrivacyLockController
+  @Bindable var refinementPreferences: EchoRefinementPreferences
 
   @State private var exportDocument: EchoExportDocument?
   @State private var exportContentType = UTType.plainText
@@ -36,6 +37,38 @@ struct SettingsView: View {
                 ) {
                   visualWorldSelection.select(id)
                 }
+              }
+            }
+
+            EchoScreenHeader(
+              title: "Writing Assistance",
+              subtitle: "Choose whether Echo cleans up new entries after preserving the original."
+            )
+
+            EchoSurface {
+              VStack(alignment: .leading, spacing: EchoLayout.contentSpacing) {
+                Picker("Automatic cleanup", selection: $refinementPreferences.provider) {
+                  ForEach(EchoRefinementProvider.allCases) { provider in
+                    Text(provider.title).tag(provider)
+                  }
+                }
+                .pickerStyle(.segmented)
+
+                Label(
+                  refinementPreferences.provider == .onDevice
+                    ? "Journal text is processed by Apple's on-device system language model. The original capture is always preserved first."
+                    : "New entries are saved exactly as captured. You can enable on-device cleanup at any time.",
+                  systemImage: refinementPreferences.provider == .onDevice
+                    ? "apple.intelligence" : "text.badge.xmark"
+                )
+                .font(EchoTypography.supporting)
+                .foregroundStyle(visualWorldSelection.selectedWorld.secondaryText)
+
+                Text(
+                  "Automatic cleanup corrects grammar, punctuation, capitalization, and speech-to-text sentence boundaries without summarizing or changing your meaning."
+                )
+                .font(EchoTypography.status)
+                .foregroundStyle(visualWorldSelection.selectedWorld.secondaryText)
               }
             }
 
@@ -323,9 +356,9 @@ struct SettingsView: View {
   }
 }
 
-private extension View {
+extension View {
   @ViewBuilder
-  func echoSettingsMinimumSize() -> some View {
+  fileprivate func echoSettingsMinimumSize() -> some View {
     #if os(macOS)
       frame(minWidth: 620, minHeight: 720)
     #else
@@ -376,12 +409,13 @@ private struct EchoExportDocument: FileDocument {
   }
 }
 
-private extension UTType {
-  static let echoMarkdown = UTType("net.daringfireball.markdown") ?? .plainText
-  static let echoRecoveryArchive = UTType(
-    filenameExtension: "echobackup",
-    conformingTo: .data
-  ) ?? .data
+extension UTType {
+  fileprivate static let echoMarkdown = UTType("net.daringfireball.markdown") ?? .plainText
+  fileprivate static let echoRecoveryArchive =
+    UTType(
+      filenameExtension: "echobackup",
+      conformingTo: .data
+    ) ?? .data
 }
 
 private struct VisualWorldOption: View {

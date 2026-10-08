@@ -4,7 +4,7 @@ Journal content can be among the most sensitive data a person keeps. Echo treats
 
 ## Current behavior
 
-Journal data and assisted output remain in the application's local sandbox. The application has no account system, networking, analytics, advertising, external AI provider, cloud sync, or third-party dependency. Phase 6 uses a deterministic in-process stand-in that performs no inference, credential lookup, network request, or content logging. SwiftData explicitly disables CloudKit and the application requests no protected-system permissions.
+Journal data and assisted output remain in the application's local sandbox. The application has no account system, networking, analytics, advertising, external AI provider, cloud sync, or third-party dependency. Daily and weekly reflection generation continues to use a deterministic in-process stand-in. When automatic entry cleanup is enabled on supported systems, Echo uses Apple's system-provided on-device language model after saving the original capture locally; Echo does not supply a remote credential or implement a network fallback. SwiftData explicitly disables CloudKit.
 
 The source repository is public. It must never contain real journal content, credentials, API keys, tokens, private exports, local database files, personal media, or screenshots of personal entries. Application code must not log entry text. Tests, previews, demos, and documentation use fictional data only.
 
@@ -18,7 +18,7 @@ The initial schema establishes an explicit migration boundary, and CRUD plus per
 
 ## AI processing
 
-The first AI service is local and deterministic. Before any remote provider is introduced, Echo must document:
+Entry cleanup can use Apple's on-device system language model when it is available and explicitly selected in Settings. The original capture is persisted before inference, model unavailability leaves that capture intact, and cleanup instructions require meaning, facts, emotional tone, vocabulary, and formality to remain unchanged. Other reflection assistance remains local and deterministic. Before any remote provider is introduced, Echo must document:
 
 - what content is sent and for which user-initiated operation
 - provider retention and training policies

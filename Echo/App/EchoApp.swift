@@ -5,6 +5,7 @@ import SwiftUI
 struct EchoApp: App {
   @State private var visualWorldSelection = EchoVisualWorldSelection()
   @State private var privacyLockController = EchoPrivacyLockController()
+  @State private var refinementPreferences: EchoRefinementPreferences
 
   private let modelContainer: ModelContainer
   private let todayViewModel: TodayViewModel
@@ -20,6 +21,8 @@ struct EchoApp: App {
   private let carryForwardViewModel: CarryForwardViewModel
 
   init() {
+    let refinementPreferences = EchoRefinementPreferences()
+    _refinementPreferences = State(initialValue: refinementPreferences)
     do {
       let container = try EchoModelContainerFactory.makePersistent()
       let entryRepository = SwiftDataEchoEntryRepository(modelContainer: container)
@@ -27,7 +30,7 @@ struct EchoApp: App {
       let aiService = DeterministicLocalAIService()
       let capturePipeline = EchoEntryCapturePipeline(
         repository: entryRepository,
-        aiService: aiService
+        refiner: ConfiguredEchoWritingRefiner(preferences: refinementPreferences)
       )
       let journalRepository = SwiftDataEchoOrganizedJournalRepository(
         modelContainer: container
@@ -110,7 +113,8 @@ struct EchoApp: App {
         dataExportService: dataExportService,
         dataRecoveryService: dataRecoveryService,
         visualWorldSelection: visualWorldSelection,
-        privacyLockController: privacyLockController
+        privacyLockController: privacyLockController,
+        refinementPreferences: refinementPreferences
       )
       .environment(\.echoVisualWorld, visualWorldSelection.selectedWorld)
       .environment(privacyLockController)
