@@ -13,6 +13,17 @@ The generation brief requested a warm-newsprint urban Christian editorial canvas
 
 Both outputs were reviewed before inclusion. They contain generated fictional content only, use independent portrait and wide compositions, and preserve readable central and lower regions for native interface content. The concept board remains documentation; it is not displayed by the application.
 
+## Kingdom Green backgrounds
+
+- **Assets:** `Echo/Shared/Resources/Assets.xcassets/KingdomGreenBackground.imageset/kingdom-green-background.png` and `kingdom-green-background-mac.png`
+- **Created:** October 8, 2026
+- **Method:** OpenAI built-in image generation using the approved Kingdom Green concept board only as a visual-system reference; portrait and landscape were generated as independent native compositions
+- **Purpose:** Production artwork replacing the legacy Sodium Fog visual world on iPhone, iPad, and Mac
+
+The generation brief requested a deep-emerald modern Christian editorial environment with a blank journal, an unbranded closed Bible without readable text, an empty worship microphone and stage, concrete church architecture, ascending steps, warm ivory window light, and restrained crown, waveform, and ruled-paper geometry. It prohibited people, faces, hands, plants, slogans, readable scripture or personal writing, real locations, logos, brands, watermarks, screens, UI, and journal entries.
+
+Both outputs were reviewed before inclusion. They contain fictional generated content only, keep focal objects at the outer edges, reserve calm content regions, and use independent portrait and 16:10 compositions rather than stretching one asset across platforms.
+
 ## Teal Immersion background
 
 - **Asset:** `Echo/Shared/Resources/Assets.xcassets/TealImmersionBackground.imageset/teal-immersion-background.png`

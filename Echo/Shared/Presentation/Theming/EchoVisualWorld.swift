@@ -5,7 +5,7 @@ enum EchoVisualWorldID: String, CaseIterable, Codable {
   // without touching journal storage.
   case cornerstoneSignal = "teal-immersion"
   case crimsonStatic = "crimson-static"
-  case sodiumFog = "sodium-fog"
+  case kingdomGreen = "sodium-fog"
   case electricBlueHour = "electric-blue-hour"
 }
 
@@ -66,21 +66,21 @@ struct EchoVisualWorld {
     preferredColorScheme: .dark
   )
 
-  static let sodiumFog = EchoVisualWorld(
-    id: .sodiumFog,
-    displayName: "Sodium Fog",
-    paletteDescription: "Concrete, olive-gray fog, sodium amber, and red signal light.",
-    backgroundAssetName: "SodiumFogBackground",
-    canvas: Color(red: 0.075, green: 0.07, blue: 0.05),
-    primaryText: Color(red: 1, green: 0.97, blue: 0.87),
-    secondaryText: Color(red: 0.82, green: 0.78, blue: 0.64),
-    accent: Color(red: 1, green: 0.62, blue: 0.12),
-    separator: Color(red: 0.88, green: 0.69, blue: 0.34).opacity(0.38),
-    error: Color(red: 1, green: 0.29, blue: 0.22),
-    saved: Color(red: 0.76, green: 0.82, blue: 0.57),
-    surfaceFill: Color(red: 0.11, green: 0.105, blue: 0.075).opacity(0.81),
-    selectedFill: Color(red: 0.48, green: 0.31, blue: 0.07).opacity(0.48),
-    contentShadow: Color.black.opacity(0.7),
+  static let kingdomGreen = EchoVisualWorld(
+    id: .kingdomGreen,
+    displayName: "Kingdom Green",
+    paletteDescription: "Deep emerald, warm ivory, near-black, and quiet antique gold.",
+    backgroundAssetName: "KingdomGreenBackground",
+    canvas: Color(red: 0.008, green: 0.16, blue: 0.105),
+    primaryText: Color(red: 0.98, green: 0.96, blue: 0.86),
+    secondaryText: Color(red: 0.78, green: 0.82, blue: 0.68),
+    accent: Color(red: 0.91, green: 0.75, blue: 0.26),
+    separator: Color(red: 0.78, green: 0.7, blue: 0.38).opacity(0.38),
+    error: Color(red: 0.98, green: 0.39, blue: 0.28),
+    saved: Color(red: 0.45, green: 0.9, blue: 0.64),
+    surfaceFill: Color(red: 0.015, green: 0.22, blue: 0.14).opacity(0.86),
+    selectedFill: Color(red: 0.39, green: 0.48, blue: 0.13).opacity(0.52),
+    contentShadow: Color.black.opacity(0.58),
     preferredColorScheme: .dark
   )
 
@@ -108,8 +108,8 @@ struct EchoVisualWorld {
       .cornerstoneSignal
     case .crimsonStatic:
       .crimsonStatic
-    case .sodiumFog:
-      .sodiumFog
+    case .kingdomGreen:
+      .kingdomGreen
     case .electricBlueHour:
       .electricBlueHour
     }

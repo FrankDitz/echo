@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "sodium-fog-background.png",
+      "filename" : "kingdom-green-background.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
@@ -14,7 +14,7 @@
       "scale" : "3x"
     },
     {
-      "filename" : "sodium-fog-background-mac.png",
+      "filename" : "kingdom-green-background-mac.png",
       "idiom" : "mac",
       "scale" : "1x"
     },
