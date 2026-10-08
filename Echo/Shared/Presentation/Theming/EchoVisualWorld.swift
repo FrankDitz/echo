@@ -6,7 +6,7 @@ enum EchoVisualWorldID: String, CaseIterable, Codable {
   case cornerstoneSignal = "teal-immersion"
   case goldStandard = "crimson-static"
   case kingdomGreen = "sodium-fog"
-  case electricBlueHour = "electric-blue-hour"
+  case covenantBlue = "electric-blue-hour"
 }
 
 extension EchoVisualWorldID: Identifiable {
@@ -84,21 +84,21 @@ struct EchoVisualWorld {
     preferredColorScheme: .dark
   )
 
-  static let electricBlueHour = EchoVisualWorld(
-    id: .electricBlueHour,
-    displayName: "Electric Blue Hour",
-    paletteDescription: "Storm blue, peacock teal, electric cyan, and warm window light.",
-    backgroundAssetName: "ElectricBlueHourBackground",
-    canvas: Color(red: 0.015, green: 0.07, blue: 0.14),
-    primaryText: Color(red: 0.93, green: 0.98, blue: 1),
-    secondaryText: Color(red: 0.64, green: 0.82, blue: 0.9),
-    accent: Color(red: 0.16, green: 0.75, blue: 1),
-    separator: Color(red: 0.3, green: 0.7, blue: 0.9).opacity(0.38),
-    error: Color(red: 0.98, green: 0.36, blue: 0.3),
-    saved: Color(red: 0.31, green: 0.9, blue: 0.75),
-    surfaceFill: Color(red: 0.02, green: 0.1, blue: 0.18).opacity(0.78),
-    selectedFill: Color(red: 0.05, green: 0.32, blue: 0.62).opacity(0.46),
-    contentShadow: Color.black.opacity(0.68),
+  static let covenantBlue = EchoVisualWorld(
+    id: .covenantBlue,
+    displayName: "Covenant Blue",
+    paletteDescription: "Covenant cobalt, midnight navy, warm white, and pale silver.",
+    backgroundAssetName: "CovenantBlueBackground",
+    canvas: Color(red: 0.015, green: 0.075, blue: 0.22),
+    primaryText: Color(red: 0.97, green: 0.975, blue: 0.94),
+    secondaryText: Color(red: 0.7, green: 0.81, blue: 0.94),
+    accent: Color(red: 0.25, green: 0.58, blue: 1),
+    separator: Color(red: 0.52, green: 0.7, blue: 0.94).opacity(0.42),
+    error: Color(red: 1, green: 0.4, blue: 0.32),
+    saved: Color(red: 0.52, green: 0.9, blue: 0.78),
+    surfaceFill: Color(red: 0.025, green: 0.12, blue: 0.31).opacity(0.86),
+    selectedFill: Color(red: 0.08, green: 0.3, blue: 0.72).opacity(0.58),
+    contentShadow: Color.black.opacity(0.62),
     preferredColorScheme: .dark
   )
 
@@ -110,8 +110,8 @@ struct EchoVisualWorld {
       .goldStandard
     case .kingdomGreen:
       .kingdomGreen
-    case .electricBlueHour:
-      .electricBlueHour
+    case .covenantBlue:
+      .covenantBlue
     }
   }
 }

@@ -35,6 +35,17 @@ The generation brief requested a bold mustard-gold modern Christian worship-jour
 
 Both outputs were reviewed before inclusion. They contain fictional generated content only, use gold as an environmental field rather than a thin accent, preserve calm reading areas, and use independent portrait and 16:10 compositions.
 
+## Covenant Blue backgrounds
+
+- **Assets:** `Echo/Shared/Resources/Assets.xcassets/CovenantBlueBackground.imageset/covenant-blue-background.png` and `covenant-blue-background-mac.png`
+- **Created:** October 8, 2026
+- **Method:** OpenAI built-in image generation using the approved Covenant Blue concept board only as a visual-system reference; portrait and landscape were generated as independent native compositions, followed by a narrow edit removing an unintended plant from the landscape result
+- **Purpose:** Production artwork replacing the legacy Electric Blue Hour visual world on iPhone, iPad, and Mac
+
+The generation brief requested a cobalt and midnight modern Christian worship-and-reflection environment with a blank journal, unbranded closed Bible without readable text, studio microphone, empty worship stage, concrete church stairs, cross-shaped architectural light, and restrained waveform, ruled-paper, and cornerstone geometry. It prohibited people, faces, hands, plants, slogans, readable scripture or personal writing, real locations, logos, brands, watermarks, screens, UI, and city skylines.
+
+Both outputs were reviewed before inclusion. They contain fictional generated content only, preserve broad calm blue content regions, avoid generic cyberpunk or city imagery, and use independent portrait and 16:10 compositions.
+
 ## Teal Immersion background
 
 - **Asset:** `Echo/Shared/Resources/Assets.xcassets/TealImmersionBackground.imageset/teal-immersion-background.png`

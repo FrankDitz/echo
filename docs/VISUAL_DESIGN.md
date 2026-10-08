@@ -102,12 +102,12 @@ Feature screens consume semantic values. They must not switch on individual worl
 - Primary text uses warm ivory, secondary text uses muted sage, and antique gold is reserved for selection and action. Mint distinguishes saved state while coral remains reserved for errors.
 - The world avoids oversized slogans and generic city scenery. Its quiet-strength character comes from saturated emerald surfaces, near-black structure, worship-space depth, and disciplined gold detail.
 
-### Electric Blue Hour production treatment
+### Covenant Blue production treatment
 
-- `ElectricBlueHourBackground.imageset` contains separate portrait and native 16:10 Mac compositions. Both depict an original fictional steel-and-glass waterfront with no people, text, logos, personal media, or embedded location details.
-- Storm clouds, sharper architectural silhouettes, and controlled electric detail stay concentrated around the upper third and outer edges. A calmer deep-cobalt canal region supports journal controls and reading surfaces.
-- Primary text uses an icy near-white, secondary text uses muted steel blue, and electric cyan is reserved for selection and action. Peacock green distinguishes saved state while coral remains reserved for errors.
-- The clearer blue-hour horizon, colder glass-and-steel geometry, and limited fog keep this world distinct from Teal Immersion rather than presenting a brighter recolor.
+- `CovenantBlueBackground.imageset` contains separate portrait and native 16:10 Mac compositions. Both use original generated journaling, worship-stage, studio, and concrete-church imagery with no people, plants, readable text, logos, personal media, or embedded location details.
+- A blank journal, unbranded closed Bible, studio microphone, stage, stairs, and cross-shaped architectural light stay near the outer edges. Broad cobalt and midnight fields support journal controls and reading surfaces.
+- Primary text uses warm near-white, secondary text uses pale silver-blue, and clear cobalt is reserved for selection and action. Mint distinguishes saved state while coral remains reserved for errors.
+- The world avoids waterfront skylines and generic cyberpunk light. Its visual identity comes from worship-space depth, disciplined blue fields, studio objects, and warm architectural light.
 
 ## Accessibility and platform rules
 

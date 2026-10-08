@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "electric-blue-hour-background.png",
+      "filename" : "covenant-blue-background.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
@@ -14,7 +14,7 @@
       "scale" : "3x"
     },
     {
-      "filename" : "electric-blue-hour-background-mac.png",
+      "filename" : "covenant-blue-background-mac.png",
       "idiom" : "mac",
       "scale" : "1x"
     },
