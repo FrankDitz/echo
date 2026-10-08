@@ -46,6 +46,14 @@ struct EchoVisualWorldSelectionTests {
     }
   }
 
+  @Test("Replacement worlds preserve legacy preference identifiers")
+  func preservingLegacyPreferenceIdentifiers() {
+    #expect(EchoVisualWorldID.cornerstoneSignal.rawValue == "teal-immersion")
+    #expect(EchoVisualWorldID.goldStandard.rawValue == "crimson-static")
+    #expect(EchoVisualWorldID.kingdomGreen.rawValue == "sodium-fog")
+    #expect(EchoVisualWorldID.covenantBlue.rawValue == "electric-blue-hour")
+  }
+
   @Test("UserDefaults stores only the selected world's stable identifier")
   func userDefaultsPersistence() throws {
     let suiteName = "EchoVisualWorldSelectionTests.\(UUID().uuidString)"

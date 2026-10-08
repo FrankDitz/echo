@@ -127,7 +127,7 @@ private struct WeeklyReflectionView: View {
   @Environment(\.timeZone) private var timeZone
 
   var body: some View {
-    EchoWorldCanvas {
+    EchoWorldCanvas(screen: .reflection) {
       GeometryReader { geometry in
         ScrollView {
           let isWide = geometry.size.width >= EchoLayout.wideLayoutBreakpoint
@@ -413,7 +413,7 @@ struct DayDetailView: View {
   @Environment(\.timeZone) private var timeZone
 
   var body: some View {
-    EchoWorldCanvas {
+    EchoWorldCanvas(screen: .reflection) {
       GeometryReader { geometry in
         ScrollViewReader { proxy in
           ScrollView {

@@ -2,7 +2,7 @@
 
 Echo is a private, low-friction journal and life archive for iPhone and Mac. It is designed to feel like a quiet conversation with yourself: write once at the end of a day, capture several small moments, or simply leave the day alone.
 
-> **Status:** Phase 7 — the functional MVP and approved Mirror City presentation system are complete. Echo supports local writing, historical browsing, highlights, deterministic assisted drafts, organized daily journals, four selectable visual worlds, and responsive iPhone, iPad, and Mac presentation without contacting an external AI provider.
+> **Status:** Phase 10 — the functional MVP is complete and the approved urban Christian presentation system is being implemented screen by screen. Echo supports local writing, historical browsing, highlights, deterministic assisted drafts, organized daily and weekly reflection, four selectable visual worlds, and responsive iPhone, iPad, and Mac presentation without contacting an external AI provider.
 
 ## Foundation
 

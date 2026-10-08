@@ -53,7 +53,7 @@ struct EchoSurface<Content: View>: View {
   private var fill: AnyShapeStyle {
     switch style {
     case .standard:
-      AnyShapeStyle(world.canvas.opacity(0.18))
+      AnyShapeStyle(world.surfaceFill.opacity(0.82))
     case .accent(let opacity):
       AnyShapeStyle(world.accent.opacity(max(opacity, 0.12)))
     }
