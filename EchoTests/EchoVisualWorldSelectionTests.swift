@@ -18,11 +18,11 @@ struct EchoVisualWorldSelectionTests {
 
   @Test("A stable identifier is restored from application preferences")
   func restoringSelection() {
-    let store = InMemoryVisualWorldPreferenceStore(selectedID: .crimsonStatic)
+    let store = InMemoryVisualWorldPreferenceStore(selectedID: .goldStandard)
     let selection = EchoVisualWorldSelection(preferenceStore: store)
 
-    #expect(selection.selectedID == .crimsonStatic)
-    #expect(selection.selectedWorld.id == .crimsonStatic)
+    #expect(selection.selectedID == .goldStandard)
+    #expect(selection.selectedWorld.id == .goldStandard)
   }
 
   @Test("Selecting a world updates presentation and persists its stable identifier")

@@ -23,7 +23,7 @@ Echo is a private, low-friction journal and life archive for iPhone and Mac. It 
 - A newest-highlighted-first collection with navigation back to the source day and entry
 - Offline deterministic cleanup and polish drafts that never replace raw writing
 - Persisted organized daily journals with complete source-entry provenance
-- Cornerstone Signal, Crimson Static, Kingdom Green, and Electric Blue Hour visual worlds
+- Cornerstone Signal, Gold Standard, Kingdom Green, and Electric Blue Hour visual worlds
 - Responsive wide-window journal and reflection workspaces on Mac
 - Reduce Motion, Reduce Transparency, Dynamic Type, keyboard, and VoiceOver-aware presentation
 - Fictional-data domain and persistence tests using Swift Testing

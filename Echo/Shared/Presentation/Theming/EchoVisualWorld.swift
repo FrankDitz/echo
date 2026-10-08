@@ -4,7 +4,7 @@ enum EchoVisualWorldID: String, CaseIterable, Codable {
   // The raw value remains stable so existing appearance preferences migrate
   // without touching journal storage.
   case cornerstoneSignal = "teal-immersion"
-  case crimsonStatic = "crimson-static"
+  case goldStandard = "crimson-static"
   case kingdomGreen = "sodium-fog"
   case electricBlueHour = "electric-blue-hour"
 }
@@ -48,22 +48,22 @@ struct EchoVisualWorld {
     preferredColorScheme: .light
   )
 
-  static let crimsonStatic = EchoVisualWorld(
-    id: .crimsonStatic,
-    displayName: "Crimson Static",
-    paletteDescription: "Oxblood, ember red, wet silver, and black-cherry rain.",
-    backgroundAssetName: "CrimsonStaticBackground",
-    canvas: Color(red: 0.09, green: 0.015, blue: 0.025),
-    primaryText: Color(red: 1, green: 0.96, blue: 0.95),
-    secondaryText: Color(red: 0.89, green: 0.72, blue: 0.71),
-    accent: Color(red: 1, green: 0.28, blue: 0.23),
-    separator: Color(red: 0.91, green: 0.45, blue: 0.43).opacity(0.38),
-    error: Color(red: 1, green: 0.69, blue: 0.32),
-    saved: Color(red: 0.94, green: 0.82, blue: 0.77),
-    surfaceFill: Color(red: 0.13, green: 0.025, blue: 0.035).opacity(0.79),
-    selectedFill: Color(red: 0.56, green: 0.06, blue: 0.07).opacity(0.44),
-    contentShadow: Color.black.opacity(0.66),
-    preferredColorScheme: .dark
+  static let goldStandard = EchoVisualWorld(
+    id: .goldStandard,
+    displayName: "Gold Standard",
+    paletteDescription: "Mustard gold, charcoal, warm cream, and burnished light.",
+    backgroundAssetName: "GoldStandardBackground",
+    canvas: Color(red: 0.94, green: 0.63, blue: 0.06),
+    primaryText: Color(red: 0.07, green: 0.06, blue: 0.045),
+    secondaryText: Color(red: 0.17, green: 0.13, blue: 0.065),
+    accent: Color(red: 0.08, green: 0.075, blue: 0.06),
+    separator: Color(red: 0.25, green: 0.19, blue: 0.07).opacity(0.4),
+    error: Color(red: 0.68, green: 0.09, blue: 0.045),
+    saved: Color(red: 0.13, green: 0.33, blue: 0.2),
+    surfaceFill: Color(red: 1, green: 0.94, blue: 0.76).opacity(0.91),
+    selectedFill: Color(red: 0.98, green: 0.72, blue: 0.13).opacity(0.7),
+    contentShadow: Color.black.opacity(0.25),
+    preferredColorScheme: .light
   )
 
   static let kingdomGreen = EchoVisualWorld(
@@ -106,8 +106,8 @@ struct EchoVisualWorld {
     switch id {
     case .cornerstoneSignal:
       .cornerstoneSignal
-    case .crimsonStatic:
-      .crimsonStatic
+    case .goldStandard:
+      .goldStandard
     case .kingdomGreen:
       .kingdomGreen
     case .electricBlueHour:

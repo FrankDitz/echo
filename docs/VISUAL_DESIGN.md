@@ -88,12 +88,12 @@ Feature screens consume semantic values. They must not switch on individual worl
 - Wider iPad windows retain the top focal anchor and allow the outer city edges to crop. Mac uses a dedicated 16:10 composition to preserve detail and reflections across large windows. Semantic surface fills and the world overlay protect readability where either background becomes more detailed.
 - The asset-generation prompt and provenance are recorded in `ARTWORK_PROVENANCE.md` so future variants can be reviewed against the same privacy and originality boundary.
 
-### Crimson Static production treatment
+### Gold Standard production treatment
 
-- `CrimsonStaticBackground.imageset` contains separate portrait and native 16:10 Mac compositions. Both use an original fictional city and contain no people, text, logos, personal media, or embedded location details.
-- Oxblood and ember-red city light stays concentrated around the upper third and outer edges. A calmer black-cherry center and lower region supports journal controls and reading surfaces.
-- Primary text uses a warm near-white while secondary text shifts toward pale dusty silver-red. The brighter ember accent is reserved for selection and action; saved and error colors remain visually distinct from it.
-- The background uses no teal, cyan, purple, or magenta, so the world reads as a deliberate environmental change rather than a recolored Teal Immersion screen.
+- `GoldStandardBackground.imageset` contains separate portrait and native 16:10 Mac compositions. Both use original generated journaling and worship imagery with no people, readable text, logos, personal media, or embedded location details.
+- A blank journal, studio headphones, unbranded closed Bible, worship stage, and concrete steps stay near the outer edges. A broad mustard-gold field supports journal controls and reading surfaces.
+- Primary text uses near-black charcoal, secondary text uses warm umber, and charcoal is the principal action accent against gold. Deep green distinguishes saved state while oxblood remains reserved for errors.
+- Gold fills the environment and selected surfaces rather than appearing only as an outline. Warm cream panels preserve long-form readability without making the world feel like a generic white theme.
 
 ### Kingdom Green production treatment
 

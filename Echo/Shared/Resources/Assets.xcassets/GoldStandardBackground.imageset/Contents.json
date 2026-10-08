@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "crimson-static-background.png",
+      "filename" : "gold-standard-background.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
@@ -14,7 +14,7 @@
       "scale" : "3x"
     },
     {
-      "filename" : "crimson-static-background-mac.png",
+      "filename" : "gold-standard-background-mac.png",
       "idiom" : "mac",
       "scale" : "1x"
     },
