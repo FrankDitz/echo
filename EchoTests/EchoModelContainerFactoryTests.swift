@@ -40,6 +40,12 @@ struct EchoDataExportServiceTests {
     #expect(export.suggestedFileName == "Echo Journal 2026-10-05")
     #expect(markdown.contains("# Echo Journal"))
     #expect(markdown.contains("A fictional walk through the rain."))
+    #expect(markdown.contains("fictional walk thru rain"))
+    #expect(markdown.contains("**Original capture**"))
+    let preferredIndex = try #require(
+      markdown.range(of: "A fictional walk through the rain.")?.lowerBound)
+    let originalIndex = try #require(markdown.range(of: "fictional walk thru rain")?.lowerBound)
+    #expect(preferredIndex < originalIndex)
     #expect(markdown.contains("A Fictional Clearer Evening"))
     #expect(markdown.contains("Saved"))
     #expect(markdown.contains("# Weekly reflections"))
@@ -236,7 +242,8 @@ struct EchoDataExportServiceTests {
       id: try makeUUID("00000000-0000-0000-0000-000000000501"),
       createdAt: createdAt,
       calendar: calendar,
-      rawText: "A fictional walk through the rain."
+      rawText: "fictional walk thru rain",
+      polishedText: "A fictional walk through the rain."
     )
     let highlight = EchoHighlight(
       id: try makeUUID("00000000-0000-0000-0000-000000000502"),

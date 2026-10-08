@@ -241,7 +241,7 @@ struct TodayView: View {
   private func entrySection(isWide: Bool) -> some View {
     VStack(alignment: .leading, spacing: 0) {
       HStack {
-        Text("Raw entries")
+        Text("Entries")
           .font(.headline.weight(.semibold))
 
         Spacer()
@@ -480,7 +480,7 @@ private struct TodayMemorySection: View {
             onOpen(entry)
           } label: {
             VStack(alignment: .leading, spacing: EchoLayout.inlineSpacing) {
-              Text(entry.rawText)
+              Text(entry.preferredText)
                 .font(EchoTypography.supporting)
                 .lineLimit(3)
                 .multilineTextAlignment(.leading)
@@ -629,7 +629,7 @@ private struct TodayEntryRow: View {
 
       VStack(alignment: .leading, spacing: EchoLayout.microSpacing) {
         Button(action: onOpen) {
-          Text(entry.rawText)
+          Text(entry.preferredText)
             .font(EchoTypography.body)
             .lineSpacing(4)
             .lineLimit(3)

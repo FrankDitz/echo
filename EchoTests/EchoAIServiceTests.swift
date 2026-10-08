@@ -63,6 +63,25 @@ struct EchoAIServiceTests {
     #expect(day.entries == [morning, evening])
   }
 
+  @Test("Day organization reads accepted refined text while preserving source identity")
+  func organizeDayWithPreferredText() async throws {
+    let calendar = try makeGregorianCalendar(timeZone: "UTC")
+    let entry = EchoEntry(
+      id: try makeUUID("00000000-0000-0000-0000-000000000805"),
+      createdAt: try makeDate("2026-10-05T08:00:00Z"),
+      calendar: calendar,
+      rawText: "fictional meeting went good",
+      polishedText: "The fictional meeting went well."
+    )
+    let day = try #require(EchoDay.grouping([entry]).first)
+
+    let result = try await service.organize(day)
+
+    #expect(result.body == "The fictional meeting went well.")
+    #expect(result.sourceEntryIDs == [entry.id])
+    #expect(entry.originalText == "fictional meeting went good")
+  }
+
   @Test("Weekly organization keeps complete provenance and selects notable entries")
   func organizeWeek() async throws {
     let calendar = try makeGregorianCalendar(timeZone: "UTC")
