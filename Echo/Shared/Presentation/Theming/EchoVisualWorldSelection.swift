@@ -42,7 +42,7 @@ final class EchoVisualWorldSelection {
   init(
     preferenceStore: any EchoVisualWorldPreferenceStore =
       UserDefaultsEchoVisualWorldPreferenceStore(),
-    defaultID: EchoVisualWorldID = .tealImmersion
+    defaultID: EchoVisualWorldID = .cornerstoneSignal
   ) {
     self.preferenceStore = preferenceStore
     selectedID = preferenceStore.loadSelectedWorldID() ?? defaultID

@@ -36,11 +36,16 @@ struct EchoPrimaryNavigation: View {
     .padding(.vertical, EchoLayout.inlineSpacing)
     .frame(maxWidth: .infinity)
     .background {
-      LinearGradient(
-        colors: [world.canvas.opacity(0.32), world.canvas.opacity(0.08)],
-        startPoint: .top,
-        endPoint: .bottom
-      )
+      ZStack {
+        Rectangle()
+          .fill(.ultraThinMaterial)
+
+        LinearGradient(
+          colors: [world.surfaceFill.opacity(0.94), world.surfaceFill.opacity(0.72)],
+          startPoint: .top,
+          endPoint: .bottom
+        )
+      }
     }
     .overlay(alignment: .bottom) {
       Rectangle()

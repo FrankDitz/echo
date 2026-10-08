@@ -11,8 +11,8 @@ struct EchoVisualWorldSelectionTests {
     let store = InMemoryVisualWorldPreferenceStore()
     let selection = EchoVisualWorldSelection(preferenceStore: store)
 
-    #expect(selection.selectedID == .tealImmersion)
-    #expect(selection.selectedWorld.id == .tealImmersion)
+    #expect(selection.selectedID == .cornerstoneSignal)
+    #expect(selection.selectedWorld.id == .cornerstoneSignal)
     #expect(store.savedIDs.isEmpty)
   }
 
@@ -27,7 +27,7 @@ struct EchoVisualWorldSelectionTests {
 
   @Test("Selecting a world updates presentation and persists its stable identifier")
   func selectingWorld() {
-    let store = InMemoryVisualWorldPreferenceStore(selectedID: .tealImmersion)
+    let store = InMemoryVisualWorldPreferenceStore(selectedID: .cornerstoneSignal)
     let selection = EchoVisualWorldSelection(preferenceStore: store)
 
     selection.select(.electricBlueHour)
@@ -85,7 +85,7 @@ struct EchoVisualWorldSelectionTests {
       )
     )
 
-    #expect(selection.selectedID == .tealImmersion)
+    #expect(selection.selectedID == .cornerstoneSignal)
     #expect(
       defaults.string(
         forKey: UserDefaultsEchoVisualWorldPreferenceStore.selectedWorldKey

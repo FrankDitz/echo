@@ -120,7 +120,7 @@ struct EchoApp: App {
       .environment(privacyLockController)
       .environment(carryForwardViewModel)
       .tint(visualWorldSelection.selectedWorld.accent)
-      .preferredColorScheme(.dark)
+      .preferredColorScheme(visualWorldSelection.selectedWorld.preferredColorScheme)
     }
     .modelContainer(modelContainer)
   }
