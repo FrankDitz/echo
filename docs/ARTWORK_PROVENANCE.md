@@ -11,6 +11,15 @@ Echo's checked-in visual-world artwork must be safe for a public repository. It 
 
 The generation brief requested a warm-newsprint urban Christian editorial canvas with fictional city architecture, a blank journal, an empty worship microphone, ascending steps, cross-shaped architectural light, and restrained crown, cornerstone, audio-wave, and ruled-paper motifs. It reserved calm ivory reading regions and prohibited people, faces, hands, readable writing, personal content, real locations, logos, brands, watermarks, screens, UI controls, and journal entries.
 
+### Screen-specific Cornerstone artwork
+
+- **Assets:** `CornerstoneSignalTimelineBackground.imageset`, `CornerstoneSignalReflectionBackground.imageset`, `CornerstoneSignalHighlightsBackground.imageset`, and `CornerstoneSignalCalendarBackground.imageset`
+- **Created:** October 8, 2026
+- **Method:** OpenAI built-in image generation using the approved Cornerstone Signal concept board and the original production world as style references; every phone portrait and 16:10 Mac composition was generated independently
+- **Purpose:** Give Timeline, Day Reflection, Highlights, and Life Calendar distinct functional scenes instead of reusing the Today background
+
+The Timeline brief requested a chronological signal rail and ascending city transit; Reflection requested a calm long-form field with architectural cross light; Highlights requested restrained worship, journal, and stair fragments around a quiet card region; Calendar requested a subtle month grid with crown, cross, sunrise, waveform, and growth marks. All briefs prohibited app UI, readable writing, personal content, real people, brands, and identifying locations.
+
 Both outputs were reviewed before inclusion. They contain generated fictional content only, use independent portrait and wide compositions, and preserve readable central and lower regions for native interface content. The concept board remains documentation; it is not displayed by the application.
 
 ## Kingdom Green backgrounds
