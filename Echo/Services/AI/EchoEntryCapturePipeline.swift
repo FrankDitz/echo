@@ -9,6 +9,8 @@ protocol EchoEntryCapturing: Sendable {
     source: EchoEntrySource
   ) async throws -> EchoEntry
   func replaceOriginalText(_ text: String, for entry: EchoEntry) async throws -> EchoEntry
+  func beginRefinement(_ entry: EchoEntry) async -> EchoEntry
+  func finishRefinement(_ entry: EchoEntry) async -> EchoEntry
   func refine(_ entry: EchoEntry) async -> EchoEntry
 }
 
@@ -89,11 +91,30 @@ struct EchoEntryCapturePipeline: EchoEntryCapturing {
   func refine(_ entry: EchoEntry) async -> EchoEntry {
     guard refiner.isEnabled else { return entry }
 
+    let processing = await beginRefinement(entry)
+    return await finishRefinement(processing)
+  }
+
+  func beginRefinement(_ entry: EchoEntry) async -> EchoEntry {
+    guard refiner.isEnabled else { return entry }
     var processing = entry
     processing.beginRefinement(at: now())
 
     do {
       try await repository.update(processing)
+      return processing
+    } catch {
+      processing.failRefinement(at: now())
+      try? await repository.update(processing)
+      return processing
+    }
+  }
+
+  func finishRefinement(_ entry: EchoEntry) async -> EchoEntry {
+    guard refiner.isEnabled, entry.refinementStatus == .processing else { return entry }
+    var processing = entry
+
+    do {
       let result = try await refiner.refine(processing.rawText)
       let completedAt = now()
       processing.completeRefinement(
@@ -103,7 +124,7 @@ struct EchoEntryCapturePipeline: EchoEntryCapturing {
           modelIdentifier: refiner.modelIdentifier,
           generatedAt: completedAt
         ),
-        requiresReview: false,
+        requiresReview: refiner.requiresReview,
         at: completedAt
       )
       try await repository.update(processing)

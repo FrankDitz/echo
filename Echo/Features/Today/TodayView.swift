@@ -228,6 +228,9 @@ struct TodayView: View {
       if voiceCaptureViewModel.state == .recording {
         if await voiceCaptureViewModel.stopAndSave() != nil {
           await viewModel.load()
+          if await voiceCaptureViewModel.awaitPendingRefinement() != nil {
+            await viewModel.load()
+          }
         }
       } else {
         await voiceCaptureViewModel.start()
@@ -283,7 +286,14 @@ struct TodayView: View {
                 Task { await voiceCaptureViewModel.play(entryID: entry.id) }
               } : nil,
             onOpen: { selectedEntry = entry },
-            onDelete: { confirmDeletion(of: entry) }
+            onDelete: { confirmDeletion(of: entry) },
+            onRetryRefinement: { viewModel.retryRefinement(entryID: entry.id) },
+            onAcceptRefinement: {
+              Task { await viewModel.acceptRefinement(entryID: entry.id) }
+            },
+            onDiscardRefinement: {
+              Task { await viewModel.discardRefinement(entryID: entry.id) }
+            }
           )
           .padding(.horizontal, EchoLayout.surfacePadding)
           if entry.id != viewModel.entries.first?.id {
@@ -606,6 +616,9 @@ private struct TodayEntryRow: View {
   let onPlay: (() -> Void)?
   let onOpen: () -> Void
   let onDelete: () -> Void
+  let onRetryRefinement: () -> Void
+  let onAcceptRefinement: () -> Void
+  let onDiscardRefinement: () -> Void
 
   var body: some View {
     HStack(alignment: .top, spacing: EchoLayout.rowSpacing) {
@@ -614,17 +627,22 @@ private struct TodayEntryRow: View {
         .foregroundStyle(.secondary)
         .frame(width: 70, alignment: .leading)
 
-      Button(action: onOpen) {
-        Text(entry.rawText)
-          .font(EchoTypography.body)
-          .lineSpacing(4)
-          .lineLimit(3)
-          .multilineTextAlignment(.leading)
-          .frame(maxWidth: .infinity, alignment: .leading)
-          .contentShape(Rectangle())
+      VStack(alignment: .leading, spacing: EchoLayout.microSpacing) {
+        Button(action: onOpen) {
+          Text(entry.rawText)
+            .font(EchoTypography.body)
+            .lineSpacing(4)
+            .lineLimit(3)
+            .multilineTextAlignment(.leading)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityHint("Opens the entry editor")
+
+        refinementStatus
       }
-      .buttonStyle(.plain)
-      .accessibilityHint("Opens the entry editor")
+      .frame(maxWidth: .infinity, alignment: .leading)
 
       if let onPlay {
         Button(action: onPlay) {
@@ -654,6 +672,32 @@ private struct TodayEntryRow: View {
       EntryHighlightButton(entryID: entry.id, viewModel: highlightViewModel)
       Button("Edit", systemImage: "pencil", action: onOpen)
       Button("Delete", systemImage: "trash", role: .destructive, action: onDelete)
+    }
+  }
+
+  @ViewBuilder
+  private var refinementStatus: some View {
+    switch entry.refinementStatus {
+    case .notRequested:
+      EmptyView()
+    case .processing:
+      Label("Refining…", systemImage: "sparkles")
+        .foregroundStyle(world.accent)
+    case .refined:
+      Label("Cleaned up", systemImage: "checkmark.circle")
+        .foregroundStyle(world.secondaryText)
+    case .needsReview:
+      HStack(spacing: EchoLayout.inlineSpacing) {
+        Button("Review", action: onOpen)
+        Button("Use", action: onAcceptRefinement)
+        Button("Keep Original", action: onDiscardRefinement)
+      }
+      .buttonStyle(.borderless)
+      .foregroundStyle(world.accent)
+    case .failed:
+      Button("Retry cleanup", systemImage: "arrow.clockwise", action: onRetryRefinement)
+        .buttonStyle(.borderless)
+        .foregroundStyle(world.error)
     }
   }
 

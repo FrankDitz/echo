@@ -54,6 +54,12 @@ struct SettingsView: View {
                 }
                 .pickerStyle(.segmented)
 
+                Toggle(
+                  "Review cleanup before using it",
+                  isOn: $refinementPreferences.reviewBeforeUsing
+                )
+                .disabled(refinementPreferences.provider == .disabled)
+
                 Label(
                   refinementPreferences.provider == .onDevice
                     ? "Journal text is processed by Apple's on-device system language model. The original capture is always preserved first."

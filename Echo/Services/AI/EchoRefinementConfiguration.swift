@@ -23,6 +23,7 @@ enum EchoRefinementProvider: String, CaseIterable, Identifiable, Sendable {
 final class EchoRefinementPreferences: @unchecked Sendable {
   private enum Key {
     static let provider = "echo.refinement.provider"
+    static let reviewBeforeUsing = "echo.refinement.review-before-using"
   }
 
   private let defaults: UserDefaults
@@ -31,11 +32,16 @@ final class EchoRefinementPreferences: @unchecked Sendable {
     didSet { defaults.set(provider.rawValue, forKey: Key.provider) }
   }
 
+  var reviewBeforeUsing: Bool {
+    didSet { defaults.set(reviewBeforeUsing, forKey: Key.reviewBeforeUsing) }
+  }
+
   init(defaults: UserDefaults = .standard) {
     self.defaults = defaults
     provider =
       defaults.string(forKey: Key.provider)
       .flatMap(EchoRefinementProvider.init(rawValue:)) ?? .onDevice
+    reviewBeforeUsing = defaults.bool(forKey: Key.reviewBeforeUsing)
   }
 }
 
@@ -49,6 +55,7 @@ protocol EchoWritingRefiner: Sendable {
   var isEnabled: Bool { get }
   var processorIdentifier: String { get }
   var modelIdentifier: String? { get }
+  var requiresReview: Bool { get }
   func refine(_ originalText: String) async throws -> EchoAssistedWriting
 }
 
@@ -57,6 +64,7 @@ struct EchoAIServiceWritingRefiner: EchoWritingRefiner {
   let processorIdentifier: String
   let modelIdentifier: String?
   var isEnabled = true
+  var requiresReview = false
 
   func refine(_ originalText: String) async throws -> EchoAssistedWriting {
     try await service.cleanUp(originalText)
@@ -69,6 +77,7 @@ struct ConfiguredEchoWritingRefiner: EchoWritingRefiner {
   var isEnabled: Bool { preferences.provider != .disabled }
   var processorIdentifier: String { "echo.apple-foundation-model" }
   var modelIdentifier: String? { "system-language-model" }
+  var requiresReview: Bool { preferences.reviewBeforeUsing }
 
   func refine(_ originalText: String) async throws -> EchoAssistedWriting {
     guard preferences.provider != .disabled else {
@@ -82,6 +91,7 @@ private struct AppleIntelligenceWritingRefiner: EchoWritingRefiner {
   var isEnabled: Bool { true }
   var processorIdentifier: String { "echo.apple-foundation-model" }
   var modelIdentifier: String? { "system-language-model" }
+  var requiresReview: Bool { false }
 
   func refine(_ originalText: String) async throws -> EchoAssistedWriting {
     let source = originalText.trimmingCharacters(in: .whitespacesAndNewlines)
