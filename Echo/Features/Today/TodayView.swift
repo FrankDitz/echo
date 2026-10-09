@@ -139,6 +139,7 @@ struct TodayView: View {
     }
     .padding(.horizontal, 20)
     .frame(maxWidth: .infinity, minHeight: 176, alignment: .leading)
+    .background { EchoArtworkTitleScrim() }
     .shadow(color: world.contentShadow, radius: 8, y: 2)
     .accessibilityElement(children: .combine)
   }

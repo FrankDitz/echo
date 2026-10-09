@@ -660,6 +660,7 @@ private struct CompactDayReflectionReader: View {
     .padding(.horizontal, 18)
     .padding(.bottom, 14)
     .frame(maxWidth: .infinity, minHeight: 92, alignment: .bottomLeading)
+    .background { EchoArtworkTitleScrim() }
   }
 
   private var editorialPage: some View {

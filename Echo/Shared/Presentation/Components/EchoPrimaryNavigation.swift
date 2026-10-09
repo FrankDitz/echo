@@ -62,6 +62,7 @@ struct EchoPrimaryNavigation: View {
       Rectangle()
         .fill(world.surfaceFill.opacity(0.98))
         .background(.ultraThinMaterial)
+        .ignoresSafeArea(edges: .bottom)
     }
     .overlay(alignment: .top) {
       Rectangle()

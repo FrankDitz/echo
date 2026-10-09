@@ -147,6 +147,8 @@ struct TimelineView: View {
     }
     .padding(.top, 10)
     .padding(.bottom, 4)
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .background { EchoArtworkTitleScrim() }
     .shadow(color: world.contentShadow, radius: 8, y: 2)
     .accessibilityElement(children: .combine)
   }
@@ -847,11 +849,13 @@ struct LifeCalendarView: View {
     .padding(.horizontal, 18)
     .padding(.bottom, 14)
     .frame(maxWidth: .infinity, minHeight: 116, alignment: .bottomLeading)
+    .background { EchoArtworkTitleScrim() }
   }
 
   private var compactCalendarContent: some View {
     VStack(alignment: .leading, spacing: 10) {
       compactMonthBar
+      compactSelectedDateBanner
       compactMonthGrid
       compactMonthSummary
       compactWritingSignals
@@ -879,7 +883,7 @@ struct LifeCalendarView: View {
       compactMonthButton(systemImage: "chevron.right", offset: 1)
 
       Button("Today") {
-        displayedMonth = .now
+        selectToday()
       }
       .font(.caption.weight(.bold))
       .padding(.horizontal, 10)
@@ -899,6 +903,34 @@ struct LifeCalendarView: View {
     .padding(.horizontal, 10)
     .padding(.vertical, 7)
     .background(compactBarFill, in: RoundedRectangle(cornerRadius: 10))
+  }
+
+  private var compactSelectedDateBanner: some View {
+    HStack(spacing: 7) {
+      Image(systemName: isSelectedDateToday ? "crown.fill" : "calendar")
+        .foregroundStyle(world.accent)
+
+      Text(selectedDateContextLabel)
+        .font(.system(size: 9, weight: .black))
+        .tracking(1.25)
+        .foregroundStyle(world.accent)
+
+      Text(selectedDisplayDate, format: .dateTime.weekday(.wide).month(.wide).day().year())
+        .font(.caption.weight(.semibold))
+        .foregroundStyle(world.primaryText)
+        .lineLimit(1)
+        .minimumScaleFactor(0.76)
+
+      Spacer(minLength: 0)
+    }
+    .padding(.horizontal, 10)
+    .frame(minHeight: 28)
+    .background(world.surfaceFill.opacity(0.64), in: RoundedRectangle(cornerRadius: 8))
+    .overlay {
+      RoundedRectangle(cornerRadius: 8)
+        .stroke(world.separator.opacity(0.55), lineWidth: 0.7)
+    }
+    .accessibilityElement(children: .combine)
   }
 
   private var compactMonthGrid: some View {
@@ -1019,8 +1051,7 @@ struct LifeCalendarView: View {
   private func compactCalendarDay(_ date: Date) -> some View {
     let identifier = EchoDayIdentifier(containing: date, calendar: calendar)
     let day = days.first(where: { $0.id == identifier })
-    let isSelected = selectedDayID == identifier
-      || (selectedDayID == nil && calendar.isDateInToday(date))
+    let isSelected = isCalendarDateSelected(identifier, date: date)
 
     return Button {
       selectedDayID = identifier
@@ -1199,7 +1230,7 @@ struct LifeCalendarView: View {
       monthButton(systemImage: "chevron.right", offset: 1)
 
       Button("Today") {
-        displayedMonth = .now
+        selectToday()
       }
       .font(EchoTypography.metadata.weight(.semibold))
       .buttonStyle(.bordered)
@@ -1273,6 +1304,51 @@ struct LifeCalendarView: View {
     calendar.dateInterval(of: .month, for: displayedMonth)?.start ?? displayedMonth
   }
 
+  private var selectedDisplayDate: Date {
+    if let selectedDate = selectedDayID?.date(in: calendar.timeZone),
+      calendar.isDate(selectedDate, equalTo: displayedMonth, toGranularity: .month)
+    {
+      return selectedDate
+    }
+
+    if calendar.isDate(displayedMonth, equalTo: .now, toGranularity: .month) {
+      return .now
+    }
+
+    return monthStart
+  }
+
+  private var isSelectedDateToday: Bool {
+    calendar.isDateInToday(selectedDisplayDate)
+  }
+
+  private var selectedDateContextLabel: String {
+    if isSelectedDateToday { return "TODAY" }
+    if let selectedDate = selectedDayID?.date(in: calendar.timeZone),
+      calendar.isDate(selectedDate, equalTo: displayedMonth, toGranularity: .month)
+    {
+      return "SELECTED"
+    }
+    return "VIEWING"
+  }
+
+  private func selectToday() {
+    let today = Date.now
+    displayedMonth = today
+    selectedDayID = EchoDayIdentifier(containing: today, calendar: calendar)
+  }
+
+  private func isCalendarDateSelected(_ identifier: EchoDayIdentifier, date: Date) -> Bool {
+    if let selectedDate = selectedDayID?.date(in: calendar.timeZone),
+      calendar.isDate(selectedDate, equalTo: displayedMonth, toGranularity: .month)
+    {
+      return selectedDayID == identifier
+    }
+
+    return calendar.isDate(displayedMonth, equalTo: .now, toGranularity: .month)
+      && calendar.isDateInToday(date)
+  }
+
   private var calendarColumns: [GridItem] {
     Array(repeating: GridItem(.flexible(), spacing: EchoLayout.tightSpacing), count: 7)
   }
@@ -1302,8 +1378,7 @@ struct LifeCalendarView: View {
   private func calendarDay(_ date: Date) -> some View {
     let identifier = EchoDayIdentifier(containing: date, calendar: calendar)
     let day = days.first(where: { $0.id == identifier })
-    let isSelected = selectedDayID == identifier
-      || (selectedDayID == nil && calendar.isDateInToday(date))
+    let isSelected = isCalendarDateSelected(identifier, date: date)
 
     return Button {
       selectedDayID = identifier
