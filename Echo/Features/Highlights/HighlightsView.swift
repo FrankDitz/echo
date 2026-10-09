@@ -11,6 +11,9 @@ struct HighlightsView: View {
 
   var body: some View {
     EchoWorldCanvas(screen: .highlights) {
+#if os(iOS)
+      compactHighlights
+#else
       GeometryReader { geometry in
         ScrollView {
           if geometry.size.width >= EchoLayout.wideLayoutBreakpoint {
@@ -35,6 +38,7 @@ struct HighlightsView: View {
         }
         .scrollIndicators(.hidden)
       }
+#endif
     }
     .task {
       await viewModel.load()
@@ -50,6 +54,171 @@ struct HighlightsView: View {
         journalRepository: journalRepository,
         focusedEntryID: item.entry.id
       )
+    }
+  }
+
+  private var compactHighlights: some View {
+    ScrollView {
+      LazyVStack(alignment: .leading, spacing: 0) {
+        compactMasthead
+        compactGallery
+      }
+      .frame(maxWidth: EchoLayout.contentMaxWidth)
+      .frame(maxWidth: .infinity)
+    }
+    .scrollIndicators(.hidden)
+  }
+
+  private var compactMasthead: some View {
+    VStack(alignment: .leading, spacing: 5) {
+      Spacer(minLength: 52)
+      Text("Highlights")
+        .font(world.displayFont(size: 43, weight: .bold))
+        .tracking(-0.6)
+        .foregroundStyle(world.primaryText)
+        .accessibilityAddTraits(.isHeader)
+
+      Text("TRUTH WORTH RETURNING TO.")
+        .font(.system(size: 10, weight: .black))
+        .tracking(2.3)
+        .foregroundStyle(world.primaryText.opacity(0.88))
+    }
+    .shadow(color: world.contentShadow, radius: 10, y: 3)
+    .padding(.horizontal, 18)
+    .padding(.bottom, 17)
+    .frame(maxWidth: .infinity, minHeight: 140, alignment: .bottomLeading)
+  }
+
+  @ViewBuilder
+  private var compactGallery: some View {
+    VStack(alignment: .leading, spacing: 12) {
+      if viewModel.isLoading && viewModel.items.isEmpty {
+        EchoLoadingState(title: "Loading your highlights…", minHeight: 280)
+      } else if viewModel.items.isEmpty {
+        EchoEmptyState(
+          title: "Nothing highlighted yet",
+          systemImage: "bookmark",
+          description: "Highlight an entry when you find a moment worth keeping close.",
+          minHeight: 280
+        )
+      } else {
+        compactFilterRibbon
+
+        if filteredItems.isEmpty {
+          EchoEmptyState(
+            title: "No \(selectedFilter.title.lowercased()) highlights",
+            systemImage: selectedFilter.systemImage,
+            description: "Choose another filter or save a matching entry.",
+            minHeight: 220
+          )
+        } else {
+          LazyVStack(alignment: .leading, spacing: 9) {
+            ForEach(Array(filteredItems.enumerated()), id: \.element.id) { index, item in
+              CompactHighlightedEntryCard(
+                item: item,
+                visualIndex: index,
+                onOpen: { selectedItem = item },
+                onRemove: {
+                  Task { await viewModel.remove(entryID: item.entry.id) }
+                }
+              )
+            }
+          }
+        }
+      }
+
+      if let failureMessage {
+        EchoErrorState(message: failureMessage)
+      }
+    }
+    .foregroundStyle(galleryInk)
+    .padding(.horizontal, 14)
+    .padding(.top, 12)
+    .padding(.bottom, 28)
+    .frame(maxWidth: .infinity, minHeight: 500, alignment: .topLeading)
+    .background(galleryBackground)
+    .overlay(alignment: .top) {
+      Rectangle()
+        .fill(world.editorialAccent)
+        .frame(height: 3)
+    }
+  }
+
+  private var compactFilterRibbon: some View {
+    ScrollView(.horizontal) {
+      HStack(spacing: 7) {
+        ForEach(HighlightFilter.allCases) { filter in
+          Button {
+            selectedFilter = filter
+          } label: {
+            Label(filter.title, systemImage: filter.systemImage)
+              .font(.caption.weight(.semibold))
+              .foregroundStyle(compactFilterInk(for: filter))
+              .padding(.horizontal, 12)
+              .padding(.vertical, 8)
+              .background(compactFilterFill(for: filter), in: RoundedRectangle(cornerRadius: 9))
+              .overlay {
+                RoundedRectangle(cornerRadius: 9)
+                  .stroke(galleryInk.opacity(0.16), lineWidth: 0.75)
+              }
+          }
+          .buttonStyle(.plain)
+        }
+      }
+    }
+    .scrollIndicators(.hidden)
+    .accessibilityLabel(
+      "\(viewModel.items.count) saved \(viewModel.items.count == 1 ? "entry" : "entries")"
+    )
+  }
+
+  private var galleryBackground: Color {
+    return switch world.id {
+    case .goldStandard:
+      world.canvas.opacity(0.96)
+    case .kingdomGreen:
+      world.canvas.opacity(0.95)
+    case .covenantBlue, .cornerstoneSignal:
+      world.editorialPaper.opacity(0.98)
+    }
+  }
+
+  private var galleryInk: Color {
+    return switch world.id {
+    case .goldStandard, .covenantBlue, .cornerstoneSignal:
+      world.editorialInk
+    case .kingdomGreen:
+      world.primaryText
+    }
+  }
+
+  private func compactFilterFill(for filter: HighlightFilter) -> Color {
+    guard selectedFilter == filter else {
+      return world.id == .kingdomGreen
+        ? world.surfaceFill.opacity(0.78)
+        : world.editorialPaper.opacity(0.66)
+    }
+
+    return switch world.id {
+    case .goldStandard:
+      world.editorialInk
+    case .kingdomGreen:
+      world.editorialPaper
+    case .covenantBlue, .cornerstoneSignal:
+      world.editorialAccent
+    }
+  }
+
+  private func compactFilterInk(for filter: HighlightFilter) -> Color {
+    guard selectedFilter == filter else { return galleryInk }
+
+    return switch world.id {
+    case .goldStandard:
+      world.canvas
+    case .kingdomGreen:
+      world.editorialInk
+    case .covenantBlue, .cornerstoneSignal:
+      world.editorialPaper
     }
   }
 
@@ -217,6 +386,143 @@ struct HighlightsView: View {
     case nil:
       nil
     }
+  }
+}
+
+private struct CompactHighlightedEntryCard: View {
+  let item: HighlightedEntry
+  let visualIndex: Int
+  let onOpen: () -> Void
+  let onRemove: () -> Void
+
+  @Environment(\.echoVisualWorld) private var world
+
+  var body: some View {
+    HStack(alignment: .top, spacing: 10) {
+      Button(action: onOpen) {
+        HStack(alignment: .top, spacing: 10) {
+          thumbnail
+
+          VStack(alignment: .leading, spacing: 5) {
+            Text(item.entry.preferredText)
+              .font(.system(size: 14, weight: .medium, design: .serif))
+              .lineSpacing(2)
+              .lineLimit(3)
+              .multilineTextAlignment(.leading)
+              .frame(maxWidth: .infinity, alignment: .leading)
+
+            HStack(spacing: 5) {
+              Image(systemName: item.entry.type == .voice ? "waveform" : "text.alignleft")
+              Text(
+                item.entry.createdAt.formatted(
+                  .dateTime.month(.abbreviated).day().year()
+                ).uppercased()
+              )
+            }
+            .font(.system(size: 9, weight: .bold))
+            .tracking(0.8)
+            .foregroundStyle(cardInk.opacity(0.6))
+          }
+        }
+        .contentShape(Rectangle())
+      }
+      .buttonStyle(.plain)
+      .accessibilityHint("Opens the original day and entry")
+
+      VStack(spacing: 4) {
+        Button(action: onRemove) {
+          Image(systemName: "bookmark.fill")
+            .font(.body.weight(.bold))
+            .foregroundStyle(cardAccent)
+            .frame(width: 28, height: 28)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Remove Highlight")
+
+        Menu {
+          Button("Open original", systemImage: "arrow.up.right", action: onOpen)
+          Button("Remove Highlight", systemImage: "bookmark.slash", role: .destructive, action: onRemove)
+        } label: {
+          Image(systemName: "ellipsis")
+            .font(.subheadline.weight(.bold))
+            .frame(width: 28, height: 28)
+            .foregroundStyle(cardInk)
+        }
+      }
+    }
+    .foregroundStyle(cardInk)
+    .padding(9)
+    .frame(maxWidth: .infinity, minHeight: 92, alignment: .topLeading)
+    .background(cardFill, in: RoundedRectangle(cornerRadius: 11))
+    .overlay {
+      RoundedRectangle(cornerRadius: 11)
+        .stroke(cardBorder, lineWidth: 0.8)
+    }
+    .shadow(color: world.contentShadow.opacity(0.18), radius: 5, y: 2)
+    .contextMenu {
+      Button("Open original", systemImage: "arrow.up.right", action: onOpen)
+      Button("Remove Highlight", systemImage: "bookmark.slash", role: .destructive, action: onRemove)
+    }
+  }
+
+  private var thumbnail: some View {
+    ZStack {
+      LinearGradient(
+        colors: thumbnailColors,
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+      )
+
+      VStack(spacing: 5) {
+        Image(systemName: item.entry.type == .voice ? "waveform" : "quote.opening")
+          .font(.title3.weight(.bold))
+        Rectangle()
+          .fill(.white.opacity(0.7))
+          .frame(width: 24, height: 1)
+      }
+      .foregroundStyle(.white)
+    }
+    .frame(width: 72, height: 72)
+    .clipShape(RoundedRectangle(cornerRadius: 8))
+    .overlay {
+      RoundedRectangle(cornerRadius: 8)
+        .stroke(.white.opacity(0.28), lineWidth: 0.75)
+    }
+    .accessibilityHidden(true)
+  }
+
+  private var usesDarkCard: Bool {
+    switch world.id {
+    case .covenantBlue:
+      !visualIndex.isMultiple(of: 2)
+    case .cornerstoneSignal:
+      visualIndex.isMultiple(of: 3)
+    case .goldStandard, .kingdomGreen:
+      false
+    }
+  }
+
+  private var cardFill: Color {
+    usesDarkCard ? world.surfaceFill.opacity(0.98) : world.editorialPaper
+  }
+
+  private var cardInk: Color {
+    usesDarkCard ? world.primaryText : world.editorialInk
+  }
+
+  private var cardAccent: Color {
+    usesDarkCard ? world.accent : world.editorialAccent
+  }
+
+  private var cardBorder: Color {
+    usesDarkCard ? world.separator : world.editorialInk.opacity(0.12)
+  }
+
+  private var thumbnailColors: [Color] {
+    let accent = usesDarkCard ? world.accent : world.editorialAccent
+    return visualIndex.isMultiple(of: 2)
+      ? [accent.opacity(0.95), cardInk.opacity(0.92)]
+      : [cardInk.opacity(0.86), accent.opacity(0.74)]
   }
 }
 
