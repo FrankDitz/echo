@@ -768,6 +768,9 @@ struct LifeCalendarView: View {
 
   var body: some View {
     EchoWorldCanvas(screen: .calendar) {
+#if os(iOS)
+      compactLifeCalendar
+#else
       GeometryReader { proxy in
         ScrollView {
           let isWide = proxy.size.width >= EchoLayout.wideLayoutBreakpoint
@@ -809,8 +812,341 @@ struct LifeCalendarView: View {
         }
         .scrollIndicators(.hidden)
       }
+#endif
     }
     .frame(minWidth: 360, minHeight: 520)
+  }
+
+  private var compactLifeCalendar: some View {
+    ScrollView {
+      LazyVStack(alignment: .leading, spacing: 0) {
+        compactCalendarMasthead
+        compactCalendarContent
+      }
+      .frame(maxWidth: EchoLayout.contentMaxWidth)
+      .frame(maxWidth: .infinity)
+    }
+    .scrollIndicators(.hidden)
+  }
+
+  private var compactCalendarMasthead: some View {
+    VStack(alignment: .leading, spacing: 4) {
+      Spacer(minLength: 30)
+      Text("Life Calendar")
+        .font(world.displayFont(size: 42, weight: .black))
+        .tracking(-0.7)
+        .foregroundStyle(world.primaryText)
+        .accessibilityAddTraits(.isHeader)
+
+      Text("A MONTH IN PERSPECTIVE.")
+        .font(.system(size: 10, weight: .black))
+        .tracking(2.2)
+        .foregroundStyle(world.primaryText.opacity(0.86))
+    }
+    .shadow(color: world.contentShadow, radius: 10, y: 3)
+    .padding(.horizontal, 18)
+    .padding(.bottom, 14)
+    .frame(maxWidth: .infinity, minHeight: 116, alignment: .bottomLeading)
+  }
+
+  private var compactCalendarContent: some View {
+    VStack(alignment: .leading, spacing: 10) {
+      compactMonthBar
+      compactMonthGrid
+      compactMonthSummary
+      compactWritingSignals
+    }
+    .padding(.horizontal, 14)
+    .padding(.top, 12)
+    .padding(.bottom, 26)
+    .frame(maxWidth: .infinity, alignment: .topLeading)
+    .background(world.canvas.opacity(0.96))
+    .overlay(alignment: .top) {
+      Rectangle()
+        .fill(world.accent)
+        .frame(height: 3)
+    }
+  }
+
+  private var compactMonthBar: some View {
+    HStack(spacing: 8) {
+      compactMonthButton(systemImage: "chevron.left", offset: -1)
+
+      Text(monthStart, format: .dateTime.month(.wide).year())
+        .font(world.displayFont(size: 20, weight: .bold))
+        .frame(maxWidth: .infinity)
+
+      compactMonthButton(systemImage: "chevron.right", offset: 1)
+
+      Button("Today") {
+        displayedMonth = .now
+      }
+      .font(.caption.weight(.bold))
+      .padding(.horizontal, 10)
+      .frame(height: 32)
+      .overlay {
+        Capsule().stroke(compactBarInk.opacity(0.45), lineWidth: 0.8)
+      }
+      .buttonStyle(.plain)
+
+      if showsDismissButton {
+        Button("Done") { dismiss() }
+          .font(.caption.weight(.bold))
+          .buttonStyle(.plain)
+      }
+    }
+    .foregroundStyle(compactBarInk)
+    .padding(.horizontal, 10)
+    .padding(.vertical, 7)
+    .background(compactBarFill, in: RoundedRectangle(cornerRadius: 10))
+  }
+
+  private var compactMonthGrid: some View {
+    LazyVGrid(columns: compactCalendarColumns, spacing: 2) {
+      ForEach(Array(rotatedWeekdaySymbols.enumerated()), id: \.offset) { _, symbol in
+        Text(symbol.uppercased())
+          .font(.system(size: 9, weight: .black))
+          .foregroundStyle(world.secondaryText)
+          .frame(maxWidth: .infinity, minHeight: 18)
+      }
+
+      ForEach(Array(monthCells.enumerated()), id: \.offset) { _, date in
+        if let date {
+          compactCalendarDay(date)
+        } else {
+          Color.clear
+            .frame(minHeight: 43)
+            .accessibilityHidden(true)
+        }
+      }
+    }
+    .padding(5)
+    .background(world.surfaceFill.opacity(0.38), in: RoundedRectangle(cornerRadius: 10))
+    .overlay {
+      RoundedRectangle(cornerRadius: 10)
+        .stroke(world.separator.opacity(0.72), lineWidth: 0.8)
+    }
+    .dynamicTypeSize(...DynamicTypeSize.large)
+  }
+
+  private var compactMonthSummary: some View {
+    HStack(alignment: .bottom, spacing: 14) {
+      VStack(alignment: .leading, spacing: 2) {
+        Text(monthDeltaLabel)
+          .font(world.displayFont(size: 36, weight: .black))
+          .foregroundStyle(compactSummaryAccent)
+          .minimumScaleFactor(0.72)
+          .lineLimit(1)
+
+        Text("WRITING DAYS")
+          .font(.system(size: 9, weight: .black))
+          .tracking(1.4)
+        Text(monthComparisonLabel)
+          .font(.caption2.weight(.medium))
+          .opacity(0.72)
+      }
+      .frame(width: 126, alignment: .leading)
+
+      HStack(alignment: .bottom, spacing: 7) {
+        ForEach(Array(weeklyEntryCounts.enumerated()), id: \.offset) { index, count in
+          VStack(spacing: 3) {
+            RoundedRectangle(cornerRadius: 2)
+              .fill(count == 0 ? compactSummaryInk.opacity(0.18) : compactSummaryAccent)
+              .frame(height: max(7, min(CGFloat(count) * 6, 60)))
+            Text("W\(index + 1)")
+              .font(.system(size: 7, weight: .bold))
+              .opacity(0.64)
+          }
+          .frame(maxWidth: .infinity, alignment: .bottom)
+        }
+      }
+      .frame(maxWidth: .infinity, minHeight: 72, alignment: .bottom)
+      .accessibilityElement(children: .ignore)
+      .accessibilityLabel(
+        "Weekly journal activity: \(weeklyEntryCounts.map(String.init).joined(separator: ", ")) entries"
+      )
+    }
+    .foregroundStyle(compactSummaryInk)
+    .padding(14)
+    .background(compactSummaryFill, in: RoundedRectangle(cornerRadius: 12))
+  }
+
+  private var compactWritingSignals: some View {
+    VStack(alignment: .leading, spacing: 9) {
+      HStack {
+        Text("Writing Signals")
+          .font(.headline.weight(.bold))
+        Spacer()
+        Text("\(monthEntryCount) entries")
+          .font(.caption.weight(.bold))
+          .foregroundStyle(world.secondaryText)
+      }
+
+      HStack(spacing: 7) {
+        compactSignal(
+          title: "Written",
+          value: monthDaysWithEntries.count,
+          systemImage: "book.closed.fill"
+        )
+        compactSignal(title: "Voice", value: monthVoiceEntryCount, systemImage: "waveform")
+        compactSignal(title: "Full days", value: monthFullDayCount, systemImage: "chart.bar.fill")
+      }
+    }
+    .foregroundStyle(world.primaryText)
+    .padding(12)
+    .background(world.surfaceFill.opacity(0.82), in: RoundedRectangle(cornerRadius: 12))
+    .overlay {
+      RoundedRectangle(cornerRadius: 12)
+        .stroke(world.separator.opacity(0.62), lineWidth: 0.8)
+    }
+  }
+
+  private func compactSignal(title: String, value: Int, systemImage: String) -> some View {
+    VStack(spacing: 4) {
+      Image(systemName: systemImage)
+        .font(.subheadline.weight(.bold))
+        .foregroundStyle(world.accent)
+      Text(value, format: .number)
+        .font(.headline.weight(.bold))
+      Text(title)
+        .font(.caption2.weight(.semibold))
+        .foregroundStyle(world.secondaryText)
+    }
+    .frame(maxWidth: .infinity, minHeight: 62)
+    .background(world.selectedFill.opacity(0.22), in: RoundedRectangle(cornerRadius: 8))
+  }
+
+  private func compactCalendarDay(_ date: Date) -> some View {
+    let identifier = EchoDayIdentifier(containing: date, calendar: calendar)
+    let day = days.first(where: { $0.id == identifier })
+    let isSelected = selectedDayID == identifier
+      || (selectedDayID == nil && calendar.isDateInToday(date))
+
+    return Button {
+      selectedDayID = identifier
+      if showsDismissButton {
+        dismiss()
+      } else {
+        onSelectDay?()
+      }
+    } label: {
+      VStack(spacing: 2) {
+        Text(date, format: .dateTime.day())
+          .font(.caption.weight(isSelected ? .black : .semibold))
+
+        Image(systemName: day == nil ? "circle.fill" : journalSignal(for: day, date: date))
+          .font(.system(size: day == nil ? 5 : 11, weight: .bold))
+          .opacity(day == nil ? 0.3 : 1)
+      }
+      .foregroundStyle(compactDayInk(isSelected: isSelected))
+      .frame(maxWidth: .infinity, minHeight: 43)
+      .background(
+        compactDayFill(day: day, isSelected: isSelected),
+        in: RoundedRectangle(cornerRadius: 6)
+      )
+      .overlay {
+        RoundedRectangle(cornerRadius: 6)
+          .stroke(world.separator.opacity(0.5), lineWidth: 0.65)
+      }
+      .contentShape(Rectangle())
+    }
+    .buttonStyle(.plain)
+    .disabled(day == nil)
+    .accessibilityLabel(
+      "\(date.formatted(.dateTime.weekday(.wide).month(.wide).day().year())), \(day == nil ? "no entries" : "\(day?.entryCount ?? 0) entries")"
+    )
+    .accessibilityHint(day == nil ? "" : "Shows this day in Timeline")
+  }
+
+  private func compactMonthButton(systemImage: String, offset: Int) -> some View {
+    Button {
+      if let newMonth = calendar.date(byAdding: .month, value: offset, to: monthStart) {
+        displayedMonth = newMonth
+      }
+    } label: {
+      Image(systemName: systemImage)
+        .font(.caption.weight(.black))
+        .frame(width: 30, height: 30)
+        .background(compactBarInk.opacity(0.1), in: RoundedRectangle(cornerRadius: 7))
+    }
+    .buttonStyle(.plain)
+    .accessibilityLabel(offset < 0 ? "Previous month" : "Next month")
+  }
+
+  private func compactDayFill(day: EchoDay?, isSelected: Bool) -> Color {
+    if isSelected { return compactSelectedDayFill }
+    if day != nil { return world.selectedFill.opacity(0.42) }
+    return world.surfaceFill.opacity(0.16)
+  }
+
+  private func compactDayInk(isSelected: Bool) -> Color {
+    isSelected ? compactSelectedDayInk : world.primaryText
+  }
+
+  private var compactBarFill: Color {
+    world.preferredColorScheme == .dark ? world.surfaceFill.opacity(0.96) : world.editorialInk
+  }
+
+  private var compactBarInk: Color {
+    world.preferredColorScheme == .dark ? world.primaryText : world.editorialPaper
+  }
+
+  private var compactSelectedDayFill: Color {
+    world.preferredColorScheme == .dark ? world.editorialPaper : world.editorialInk
+  }
+
+  private var compactSelectedDayInk: Color {
+    world.preferredColorScheme == .dark ? world.editorialInk : world.editorialPaper
+  }
+
+  private var compactSummaryFill: Color {
+    world.preferredColorScheme == .dark ? world.surfaceFill.opacity(0.98) : world.editorialInk
+  }
+
+  private var compactSummaryInk: Color {
+    world.preferredColorScheme == .dark ? world.primaryText : world.editorialPaper
+  }
+
+  private var compactSummaryAccent: Color {
+    world.id == .goldStandard ? world.canvas : world.accent
+  }
+
+  private var compactCalendarColumns: [GridItem] {
+    Array(repeating: GridItem(.flexible(), spacing: 2), count: 7)
+  }
+
+  private var monthEntryCount: Int {
+    monthDaysWithEntries.reduce(0) { $0 + $1.entryCount }
+  }
+
+  private var monthVoiceEntryCount: Int {
+    monthDaysWithEntries.flatMap(\.entries).filter { $0.type == .voice }.count
+  }
+
+  private var monthFullDayCount: Int {
+    monthDaysWithEntries.filter { $0.entryCount >= 3 }.count
+  }
+
+  private var previousMonthDaysWithEntries: Int {
+    guard let previousMonth = calendar.date(byAdding: .month, value: -1, to: monthStart) else {
+      return 0
+    }
+    return days.filter { day in
+      guard let date = day.id.date(in: calendar.timeZone) else { return false }
+      return calendar.isDate(date, equalTo: previousMonth, toGranularity: .month)
+    }.count
+  }
+
+  private var monthDeltaLabel: String {
+    let delta = monthDaysWithEntries.count - previousMonthDaysWithEntries
+    if delta == 0 { return "STEADY" }
+    return delta > 0 ? "+\(delta)" : "\(delta)"
+  }
+
+  private var monthComparisonLabel: String {
+    let delta = monthDaysWithEntries.count - previousMonthDaysWithEntries
+    if delta == 0 { return "Same as last month" }
+    return delta > 0 ? "More than last month" : "Fewer than last month"
   }
 
   private var calendarPanel: some View {
