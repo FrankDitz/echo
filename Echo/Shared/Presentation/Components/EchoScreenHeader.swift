@@ -17,5 +17,6 @@ struct EchoScreenHeader: View {
     }
     .shadow(color: world.contentShadow, radius: 10, y: 3)
     .accessibilityElement(children: .combine)
+    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
   }
 }

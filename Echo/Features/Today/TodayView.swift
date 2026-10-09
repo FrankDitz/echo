@@ -133,6 +133,7 @@ struct TodayView: View {
       .font(isWide ? EchoTypography.wideEditorialPrompt : EchoTypography.editorialPrompt)
       .accessibilityAddTraits(.isHeader)
       .shadow(color: world.contentShadow, radius: 8, y: 2)
+      .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
   }
 
   private func todayHero(isWide: Bool) -> some View {
@@ -158,6 +159,7 @@ struct TodayView: View {
     .shadow(color: world.contentShadow, radius: 10, y: 3)
     .padding(.top, isWide ? 0 : 24)
     .accessibilityElement(children: .combine)
+    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
   }
 
   private var quickCaptureActions: some View {
@@ -178,6 +180,7 @@ struct TodayView: View {
         marksNextEntryImportant.toggle()
       }
     }
+    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
   }
 
   private func quickCaptureButton(
@@ -388,7 +391,9 @@ struct TodayView: View {
           .fill(world.surfaceFill.opacity(0.72))
       } else {
         Rectangle()
-          .fill(world.canvas.opacity(0.18))
+          .fill(.ultraThinMaterial)
+        Rectangle()
+          .fill(world.surfaceFill.opacity(0.78))
       }
     }
     .overlay {
