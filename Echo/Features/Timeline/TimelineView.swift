@@ -81,7 +81,7 @@ struct TimelineView: View {
         .foregroundStyle(world.accent)
 
       Text("Timeline")
-        .font(EchoTypography.editorialDisplay)
+        .font(world.displayFont(size: 38, weight: .medium))
         .foregroundStyle(world.primaryText)
         .accessibilityAddTraits(.isHeader)
 

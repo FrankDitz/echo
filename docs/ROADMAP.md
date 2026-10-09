@@ -96,8 +96,8 @@ Every deliverable uses its own short-lived branch and pull request. Theme change
 6. **Screen-specific theme architecture (complete):** give Today, Timeline, Day Reflection, Highlights, Life Calendar, and focused utility screens explicit visual roles; replace the shared top tab strip with concept-faithful brand and bottom navigation; and expose reusable layout, typography, surface, and artwork contracts without changing journal data.
 7. **Cornerstone Signal screen system (complete):** create distinct iPhone and Mac artwork for each primary screen and rebuild its headers, capture controls, date rail, reflection presentation, saved-writing cards, calendar, and responsive surfaces to match the approved concept.
 8. **Kingdom Green screen system (complete):** create distinct iPhone and Mac artwork for each primary screen and apply the emerald, ivory, near-black, and antique-gold component treatment throughout the complete product flow.
-9. **Gold Standard screen system (next):** create distinct iPhone and Mac artwork for each primary screen and apply the bold mustard-gold, charcoal, and cream hierarchy throughout the complete product flow.
-10. **Covenant Blue screen system:** create distinct iPhone and Mac artwork for each primary screen and apply the cobalt, midnight, warm-white, and pale-silver hierarchy throughout the complete product flow.
+9. **Gold Standard screen system (complete):** create distinct iPhone and Mac artwork for each primary screen and apply the bold mustard-gold, charcoal, and cream hierarchy throughout the complete product flow.
+10. **Covenant Blue screen system (next):** create distinct iPhone and Mac artwork for each primary screen and apply the cobalt, midnight, warm-white, and pale-silver hierarchy throughout the complete product flow.
 11. **Cross-platform closeout:** exercise all four complete screen systems with fictional populated data on supported iPhone and Mac layouts; verify legacy selection migration, contrast, Dynamic Type, reduced transparency, repository safety, full builds, and tests; then refresh final visual-design and provenance documentation.
 
 ## Near-term improvements

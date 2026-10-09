@@ -147,11 +147,7 @@ struct TodayView: View {
       .foregroundStyle(world.accent)
 
       Text("Today")
-        .font(
-          isWide
-            ? .system(size: 68, weight: .black, design: .serif)
-            : .system(size: 52, weight: .black, design: .serif)
-        )
+        .font(world.displayFont(size: isWide ? 68 : 52, weight: .black))
         .accessibilityAddTraits(.isHeader)
 
       Text("BE WITH GOD. BE PRESENT. WRITE IT DOWN.")

@@ -61,7 +61,7 @@ struct HighlightsView: View {
         .foregroundStyle(world.accent)
 
       Text("Highlights")
-        .font(EchoTypography.editorialDisplay)
+        .font(world.displayFont(size: 38, weight: .medium))
         .foregroundStyle(world.primaryText)
         .accessibilityAddTraits(.isHeader)
 
