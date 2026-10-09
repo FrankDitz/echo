@@ -228,6 +228,47 @@ struct EchoVisualWorld {
 
     return .system(size: size, weight: weight, design: .serif)
   }
+
+  var editorialPaper: Color {
+    switch id {
+    case .cornerstoneSignal:
+      Color(red: 0.94, green: 0.9, blue: 0.79)
+    case .goldStandard:
+      Color(red: 1, green: 0.95, blue: 0.8)
+    case .kingdomGreen:
+      Color(red: 0.97, green: 0.955, blue: 0.88)
+    case .covenantBlue:
+      Color(red: 0.97, green: 0.965, blue: 0.92)
+    }
+  }
+
+  var editorialInk: Color {
+    switch id {
+    case .cornerstoneSignal, .goldStandard:
+      Color(red: 0.07, green: 0.065, blue: 0.05)
+    case .kingdomGreen:
+      Color(red: 0.015, green: 0.18, blue: 0.115)
+    case .covenantBlue:
+      Color(red: 0.025, green: 0.09, blue: 0.24)
+    }
+  }
+
+  var editorialMuted: Color {
+    editorialInk.opacity(0.62)
+  }
+
+  var editorialAccent: Color {
+    switch id {
+    case .cornerstoneSignal:
+      accent
+    case .goldStandard:
+      canvas
+    case .kingdomGreen:
+      Color(red: 0.02, green: 0.32, blue: 0.2)
+    case .covenantBlue:
+      Color(red: 0.04, green: 0.34, blue: 0.78)
+    }
+  }
 }
 
 private struct EchoVisualWorldKey: EnvironmentKey {

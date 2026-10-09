@@ -111,7 +111,9 @@ struct AppShellView: View {
         viewModel: todayViewModel,
         highlightViewModel: highlightViewModel,
         aiService: aiService,
-        voiceCaptureViewModel: voiceCaptureViewModel
+        voiceCaptureViewModel: voiceCaptureViewModel,
+        onOpenTimeline: { selection = .timeline },
+        onOpenHighlights: { selection = .highlights }
       )
     case .timeline:
       TimelineView(

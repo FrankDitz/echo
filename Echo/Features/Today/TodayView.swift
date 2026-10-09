@@ -5,6 +5,8 @@ struct TodayView: View {
   let highlightViewModel: EntryHighlightViewModel
   let aiService: any EchoAIService
   let voiceCaptureViewModel: VoiceCaptureViewModel
+  let onOpenTimeline: () -> Void
+  let onOpenHighlights: () -> Void
 
   @State private var draft = ""
   @State private var marksNextEntryImportant = false
@@ -62,7 +64,11 @@ struct TodayView: View {
     }
   }
 
+  @ViewBuilder
   private func compactContent(availableHeight: CGFloat) -> some View {
+#if os(iOS)
+    iPhoneDashboard(availableHeight: availableHeight)
+#else
     LazyVStack(alignment: .leading, spacing: 20) {
       todayHero(isWide: false)
       promptHeader(isWide: false)
@@ -78,7 +84,349 @@ struct TodayView: View {
     .padding(.bottom, EchoLayout.pageVerticalPadding)
     .frame(maxWidth: .infinity)
     .frame(minHeight: max(availableHeight, 0), alignment: .top)
+#endif
   }
+
+#if os(iOS)
+  private func iPhoneDashboard(availableHeight: CGFloat) -> some View {
+    LazyVStack(alignment: .leading, spacing: 0) {
+      iPhoneHero
+
+      VStack(alignment: .leading, spacing: 14) {
+        carryForwardCard
+        iPhoneCaptureControl
+        iPhoneQuickActions
+        voiceStatus
+        iPhoneImportantSection
+        iPhoneRecentEntries
+        memorySection
+          .padding(.top, 4)
+      }
+      .padding(.horizontal, 18)
+      .padding(.top, 14)
+      .padding(.bottom, 28)
+      .foregroundStyle(world.editorialInk, world.editorialMuted)
+      .background(world.editorialPaper)
+    }
+    .frame(maxWidth: .infinity)
+    .frame(minHeight: max(availableHeight, 0), alignment: .top)
+  }
+
+  private var iPhoneHero: some View {
+    VStack(alignment: .leading, spacing: 5) {
+      Spacer(minLength: 18)
+
+      Text(
+        viewModel.displayedDate.formatted(
+          .dateTime.month(.abbreviated).day().year().weekday(.abbreviated)
+        ).uppercased()
+      )
+      .font(.system(size: 11, weight: .bold))
+      .tracking(1.7)
+      .foregroundStyle(world.accent)
+
+      Text("Today")
+        .font(world.displayFont(size: 48, weight: .black))
+        .accessibilityAddTraits(.isHeader)
+
+      Text(todayMessage)
+        .font(.system(size: 11, weight: .bold))
+        .tracking(1.55)
+        .lineSpacing(2)
+        .foregroundStyle(world.primaryText.opacity(0.9))
+
+      Spacer(minLength: 16)
+    }
+    .padding(.horizontal, 20)
+    .frame(maxWidth: .infinity, minHeight: 176, alignment: .leading)
+    .shadow(color: world.contentShadow, radius: 8, y: 2)
+    .accessibilityElement(children: .combine)
+  }
+
+  private var todayMessage: String {
+    switch world.id {
+    case .cornerstoneSignal:
+      "MAKE ROOM. TELL THE TRUTH. KEEP THE SIGNAL."
+    case .goldStandard:
+      "SPEND TIME. WRITE IT DOWN. STAY CLOSE."
+    case .kingdomGreen:
+      "YOUR STORY MATTERS TO GOD."
+    case .covenantBlue:
+      "BE WITH GOD. BE BRAVE TODAY."
+    }
+  }
+
+  private var iPhoneCaptureControl: some View {
+    HStack(spacing: 10) {
+      TextField(
+        "",
+        text: $draft,
+        prompt: Text("What's on your heart today?")
+          .foregroundStyle(world.editorialMuted),
+        axis: .vertical
+      )
+        .focused($isComposerFocused)
+        .lineLimit(1...3)
+        .textFieldStyle(.plain)
+        .font(.system(size: 14))
+        .foregroundStyle(world.editorialInk)
+        .accessibilityLabel("New journal entry")
+
+      if draft.contains(where: { !$0.isWhitespace }) {
+        Button(action: submitDraft) {
+          Image(systemName: "arrow.up")
+            .font(.system(size: 14, weight: .bold))
+            .foregroundStyle(world.editorialPaper)
+            .frame(width: 34, height: 34)
+            .background(world.editorialAccent, in: Circle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Save entry")
+      }
+
+      Button(action: voiceAction) {
+        Image(systemName: voiceCaptureViewModel.state == .recording ? "stop.fill" : "mic.fill")
+          .font(.system(size: 15, weight: .bold))
+          .foregroundStyle(world.editorialPaper)
+          .frame(width: 38, height: 38)
+          .background(
+            voiceCaptureViewModel.state == .recording ? world.error : world.editorialAccent,
+            in: Circle()
+          )
+      }
+      .buttonStyle(.plain)
+      .accessibilityLabel(
+        voiceCaptureViewModel.state == .recording ? "Stop and save recording" : "Record voice entry"
+      )
+    }
+    .padding(.leading, 16)
+    .padding(.trailing, 6)
+    .padding(.vertical, 6)
+    .background(world.editorialPaper, in: Capsule())
+    .overlay {
+      Capsule().stroke(world.editorialInk.opacity(0.22), lineWidth: 1)
+    }
+    .shadow(color: world.contentShadow.opacity(0.16), radius: 10, y: 4)
+  }
+
+  private var iPhoneQuickActions: some View {
+    HStack(spacing: 7) {
+      iPhoneQuickAction("Journal", systemImage: "pencil") {
+        isComposerFocused = true
+      }
+      iPhoneQuickAction(
+        voiceCaptureViewModel.state == .recording ? "Stop" : "Voice",
+        systemImage: voiceCaptureViewModel.state == .recording ? "stop.fill" : "waveform"
+      ) {
+        voiceAction()
+      }
+      iPhoneQuickAction(
+        marksNextEntryImportant ? "Marked" : "Important",
+        systemImage: marksNextEntryImportant ? "bookmark.fill" : "bookmark"
+      ) {
+        marksNextEntryImportant.toggle()
+      }
+      iPhoneQuickAction("Quick Note", systemImage: "list.bullet") {
+        isComposerFocused = true
+      }
+    }
+  }
+
+  private func iPhoneQuickAction(
+    _ title: String,
+    systemImage: String,
+    action: @escaping () -> Void
+  ) -> some View {
+    Button(action: action) {
+      VStack(spacing: 5) {
+        Image(systemName: systemImage)
+          .font(.system(size: 16, weight: .semibold))
+        Text(title)
+          .font(.system(size: 9, weight: .semibold))
+          .lineLimit(1)
+          .minimumScaleFactor(0.7)
+      }
+      .foregroundStyle(world.editorialPaper)
+      .frame(maxWidth: .infinity, minHeight: 54)
+      .background(world.editorialInk, in: RoundedRectangle(cornerRadius: 9))
+    }
+    .buttonStyle(.plain)
+  }
+
+  @ViewBuilder
+  private var iPhoneImportantSection: some View {
+    if let entry = importantEntry {
+      VStack(alignment: .leading, spacing: 7) {
+        iPhoneSectionHeader("Important", trailing: "See all", action: onOpenHighlights)
+
+        Button {
+          selectedEntry = entry
+        } label: {
+          HStack(spacing: 11) {
+            iPhoneEntryArtwork(for: entry, emphasized: true)
+
+            VStack(alignment: .leading, spacing: 3) {
+              Text(entry.preferredText)
+                .font(.system(size: 14, weight: .bold, design: .serif))
+                .lineLimit(2)
+                .multilineTextAlignment(.leading)
+              Text(entry.createdAt, format: .dateTime.month(.abbreviated).day().year())
+                .font(.system(size: 10, weight: .semibold))
+                .foregroundStyle(world.editorialMuted)
+            }
+
+            Spacer(minLength: 4)
+
+            Image(systemName: "bookmark.fill")
+              .foregroundStyle(world.editorialAccent)
+          }
+          .padding(9)
+          .foregroundStyle(world.editorialInk)
+          .background(world.editorialInk.opacity(0.06), in: RoundedRectangle(cornerRadius: 10))
+          .overlay {
+            RoundedRectangle(cornerRadius: 10)
+              .stroke(world.editorialInk.opacity(0.14), lineWidth: 0.75)
+          }
+        }
+        .buttonStyle(.plain)
+      }
+    }
+  }
+
+  private var iPhoneRecentEntries: some View {
+    VStack(alignment: .leading, spacing: 6) {
+      iPhoneSectionHeader(
+        "Recent Entries",
+        trailing: viewModel.entries.count > 3 ? "See all" : nil,
+        action: viewModel.entries.count > 3 ? onOpenTimeline : nil
+      )
+
+      if viewModel.isLoading && viewModel.entries.isEmpty {
+        EchoLoadingState(title: "Loading today’s entries…", minHeight: 74)
+      } else if viewModel.entries.isEmpty {
+        Text("A quiet day so far. Write whenever something is worth remembering.")
+          .font(.system(size: 13))
+          .foregroundStyle(world.editorialMuted)
+          .padding(.vertical, 12)
+      } else {
+        VStack(spacing: 0) {
+          ForEach(Array(viewModel.entries.reversed().prefix(4))) { entry in
+            iPhoneRecentEntryRow(entry)
+            if entry.id != viewModel.entries.reversed().prefix(4).last?.id {
+              Divider().overlay(world.editorialInk.opacity(0.12))
+            }
+          }
+        }
+      }
+
+      if let failureMessage {
+        Text(failureMessage)
+          .font(.system(size: 11, weight: .semibold))
+          .foregroundStyle(world.error)
+      }
+    }
+  }
+
+  private func iPhoneSectionHeader(
+    _ title: String,
+    trailing: String?,
+    action: (() -> Void)? = nil
+  ) -> some View {
+    HStack(alignment: .firstTextBaseline) {
+      Text(title)
+        .font(.system(size: 17, weight: .bold, design: .serif))
+      Spacer()
+      if let trailing {
+        if let action {
+          Button(trailing, action: action)
+            .buttonStyle(.plain)
+            .font(.system(size: 10, weight: .semibold))
+            .foregroundStyle(world.editorialMuted)
+        } else {
+          Text(trailing)
+            .font(.system(size: 10, weight: .semibold))
+            .foregroundStyle(world.editorialMuted)
+        }
+      }
+    }
+  }
+
+  private func iPhoneRecentEntryRow(_ entry: EchoEntry) -> some View {
+    HStack(alignment: .center, spacing: 8) {
+      Button {
+        selectedEntry = entry
+      } label: {
+        HStack(alignment: .center, spacing: 10) {
+        iPhoneEntryArtwork(for: entry, emphasized: false)
+
+        VStack(alignment: .leading, spacing: 2) {
+          Text(entry.preferredText)
+            .font(.system(size: 13, weight: .semibold, design: .serif))
+            .lineLimit(2)
+            .multilineTextAlignment(.leading)
+          Text(entry.createdAt, format: .dateTime.hour().minute())
+            .font(.system(size: 9, weight: .semibold))
+            .foregroundStyle(world.editorialMuted)
+        }
+
+        Spacer(minLength: 4)
+        }
+        .contentShape(Rectangle())
+      }
+      .buttonStyle(.plain)
+
+      if entry.type == .voice {
+        Button {
+          Task { await voiceCaptureViewModel.play(entryID: entry.id) }
+        } label: {
+          Image(systemName: "waveform")
+            .frame(width: 28, height: 28)
+        }
+        .buttonStyle(.plain)
+        .font(.system(size: 12, weight: .semibold))
+        .foregroundStyle(world.editorialAccent)
+        .accessibilityLabel("Play voice entry")
+      }
+
+      EntryHighlightButton(entryID: entry.id, viewModel: highlightViewModel)
+        .buttonStyle(.plain)
+        .labelStyle(.iconOnly)
+        .font(.system(size: 13))
+        .foregroundStyle(world.editorialAccent)
+
+      Menu("Entry Actions", systemImage: "ellipsis") {
+        Button("Edit", systemImage: "pencil") { selectedEntry = entry }
+        Button("Delete", systemImage: "trash", role: .destructive) {
+          confirmDeletion(of: entry)
+        }
+      }
+      .labelStyle(.iconOnly)
+      .foregroundStyle(world.editorialInk)
+    }
+    .padding(.vertical, 7)
+  }
+
+  private func iPhoneEntryArtwork(for entry: EchoEntry, emphasized: Bool) -> some View {
+    ZStack {
+      LinearGradient(
+        colors: [world.editorialAccent.opacity(0.95), world.editorialInk],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+      )
+      Image(systemName: entry.type == .voice ? "waveform" : "text.quote")
+        .font(.system(size: emphasized ? 18 : 14, weight: .semibold))
+        .foregroundStyle(world.editorialPaper)
+    }
+    .frame(width: emphasized ? 66 : 48, height: emphasized ? 58 : 42)
+    .clipShape(RoundedRectangle(cornerRadius: 7))
+    .accessibilityHidden(true)
+  }
+
+  private var importantEntry: EchoEntry? {
+    viewModel.entries.reversed().first(where: { highlightViewModel.isHighlighted($0.id) })
+      ?? viewModel.memories.saved.first
+  }
+#endif
 
   private func wideContent(availableSize: CGSize) -> some View {
     VStack(alignment: .leading, spacing: 30) {
