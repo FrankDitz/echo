@@ -52,7 +52,11 @@ struct DayReflectionView: View {
       }
     }
     .safeAreaInset(edge: .top, spacing: 0) {
+#if os(iOS)
+      compactReflectionModePicker
+#else
       reflectionModePicker
+#endif
     }
     .task {
       await todayViewModel.load()
@@ -83,6 +87,46 @@ struct DayReflectionView: View {
     .padding(.horizontal, EchoLayout.pageHorizontalPadding)
     .padding(.vertical, EchoLayout.tightSpacing)
     .background(.ultraThinMaterial)
+  }
+
+  private var compactReflectionModePicker: some View {
+    HStack(spacing: 18) {
+      ForEach(ReflectionMode.allCases) { mode in
+        Button {
+          reflectionMode = mode
+        } label: {
+          VStack(spacing: 4) {
+            Text(mode == .daily ? "Daily" : "Weekly")
+              .font(.caption.weight(reflectionMode == mode ? .bold : .semibold))
+              .foregroundStyle(
+                reflectionMode == mode ? world.primaryText : world.secondaryText
+              )
+
+            Capsule()
+              .fill(reflectionMode == mode ? world.accent : Color.clear)
+              .frame(height: 2)
+          }
+        }
+        .buttonStyle(.plain)
+      }
+
+      Spacer()
+
+      Text(reflectionMode == .daily ? "DAY READER" : "WEEKLY ECHO")
+        .font(.system(size: 9, weight: .bold))
+        .tracking(1.4)
+        .foregroundStyle(world.secondaryText)
+    }
+    .padding(.horizontal, 18)
+    .padding(.top, 5)
+    .padding(.bottom, 4)
+    .background(world.canvas.opacity(0.95))
+    .overlay(alignment: .bottom) {
+      Rectangle()
+        .fill(world.separator.opacity(0.5))
+        .frame(height: EchoShape.hairlineWidth)
+    }
+    .dynamicTypeSize(...DynamicTypeSize.large)
   }
 
   @Environment(\.echoVisualWorld) private var world
@@ -438,6 +482,9 @@ struct DayDetailView: View {
               .padding(.vertical, 44)
               .frame(maxWidth: .infinity, alignment: .top)
             } else {
+#if os(iOS)
+              compactReflectionReader
+#else
               LazyVStack(alignment: .leading, spacing: EchoLayout.sectionSpacing) {
                 dayHeader
                 DayReflectionSection(
@@ -451,6 +498,7 @@ struct DayDetailView: View {
               .padding(.horizontal, EchoLayout.pageHorizontalPadding)
               .padding(.vertical, EchoLayout.pageVerticalPadding)
               .frame(maxWidth: .infinity)
+#endif
             }
           }
           .scrollIndicators(.hidden)
@@ -476,6 +524,18 @@ struct DayDetailView: View {
     )
   }
 
+  private var compactReflectionReader: some View {
+    CompactDayReflectionReader(
+      day: day,
+      displayDate: displayDate,
+      focusedEntryID: focusedEntryID,
+      viewModel: organizationViewModel,
+      highlightViewModel: highlightViewModel
+    )
+    .frame(maxWidth: EchoLayout.contentMaxWidth)
+    .frame(maxWidth: .infinity)
+  }
+
   private var reflectionActionDock: some View {
     ReflectionActionBar(viewModel: organizationViewModel)
       .frame(maxWidth: 610)
@@ -483,7 +543,13 @@ struct DayDetailView: View {
       .padding(.horizontal, EchoLayout.pageHorizontalPadding)
       .padding(.top, EchoLayout.microSpacing)
       .padding(.bottom, EchoLayout.tightSpacing)
-      .background(.ultraThinMaterial)
+      .background {
+#if os(iOS)
+        world.editorialPaper
+#else
+        Rectangle().fill(.ultraThinMaterial)
+#endif
+      }
       .overlay(alignment: .top) {
         Rectangle()
           .fill(world.separator)
@@ -551,6 +617,347 @@ struct DayDetailView: View {
 
   private var entryCountLabel: String {
     day.entryCount == 1 ? "1 entry" : "\(day.entryCount) entries"
+  }
+}
+
+private struct CompactDayReflectionReader: View {
+  let day: EchoDay
+  let displayDate: Date
+  let focusedEntryID: UUID?
+  let viewModel: DayOrganizationViewModel
+  let highlightViewModel: EntryHighlightViewModel
+
+  @Environment(\.echoVisualWorld) private var world
+  @Environment(CarryForwardViewModel.self) private var carryForwardViewModel
+
+  var body: some View {
+    LazyVStack(alignment: .leading, spacing: 0) {
+      masthead
+      editorialPage
+    }
+  }
+
+  private var masthead: some View {
+    VStack(alignment: .leading, spacing: 6) {
+      Spacer(minLength: 22)
+
+      Text(displayDate.formatted(.dateTime.weekday(.wide).month(.abbreviated).day().year()))
+        .font(.caption.weight(.bold))
+        .textCase(.uppercase)
+        .tracking(1.25)
+
+      HStack(alignment: .lastTextBaseline) {
+        Text("Reflection")
+          .font(world.displayFont(size: 24, weight: .bold))
+          .accessibilityAddTraits(.isHeader)
+        Spacer()
+        Text(day.entryCount == 1 ? "1 source" : "\(day.entryCount) sources")
+          .font(.caption.weight(.semibold))
+      }
+    }
+    .foregroundStyle(world.primaryText)
+    .shadow(color: world.contentShadow, radius: 9, y: 3)
+    .padding(.horizontal, 18)
+    .padding(.bottom, 14)
+    .frame(maxWidth: .infinity, minHeight: 92, alignment: .bottomLeading)
+  }
+
+  private var editorialPage: some View {
+    VStack(alignment: .leading, spacing: 16) {
+      if viewModel.isLoading {
+        EchoLoadingState(title: "Loading organized journal…", minHeight: 220)
+      } else if viewModel.isGenerating {
+        EchoLoadingState(title: "Organizing this day…", minHeight: 220)
+      } else if let journal = viewModel.journal {
+        journalContent(journal)
+      } else {
+        emptyJournal
+      }
+
+      if viewModel.failure != nil {
+        EchoErrorState(message: "The organized journal could not be loaded or saved.")
+      }
+      if carryForwardViewModel.actionState == .failed {
+        EchoErrorState(message: "That thought could not be carried forward.")
+      }
+    }
+    .foregroundStyle(world.editorialInk)
+    .padding(.horizontal, 18)
+    .padding(.top, 20)
+    .padding(.bottom, 30)
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .background(world.editorialPaper)
+    .overlay(alignment: .top) {
+      Rectangle()
+        .fill(world.editorialAccent)
+        .frame(height: 3)
+    }
+  }
+
+  @ViewBuilder
+  private func journalContent(_ journal: EchoOrganizedJournal) -> some View {
+    Text(journal.title ?? "A Day in Perspective")
+      .font(world.displayFont(size: 39, weight: .bold))
+      .tracking(-0.8)
+      .fixedSize(horizontal: false, vertical: true)
+      .accessibilityAddTraits(.isHeader)
+
+    HStack(spacing: 5) {
+      Rectangle()
+        .fill(world.editorialAccent)
+        .frame(width: 42, height: 3)
+      ForEach(0..<4, id: \.self) { _ in
+        Circle()
+          .fill(world.editorialAccent.opacity(0.5))
+          .frame(width: 3, height: 3)
+      }
+    }
+    .accessibilityHidden(true)
+
+    Text("MY REFLECTION")
+      .font(.caption.weight(.black))
+      .tracking(1.35)
+      .foregroundStyle(world.editorialAccent)
+
+    Text(journal.body)
+      .font(.system(size: 16, weight: .regular, design: .serif))
+      .lineSpacing(4)
+      .fixedSize(horizontal: false, vertical: true)
+      .textSelection(.enabled)
+
+    if !journal.themes.isEmpty {
+      sectionHeading("Themes", count: nil)
+
+      ScrollView(.horizontal) {
+        HStack(spacing: 7) {
+          ForEach(Array(journal.themes.enumerated()), id: \.element) { index, theme in
+            Label(theme, systemImage: themeIcon(at: index))
+              .font(.caption.weight(.semibold))
+              .foregroundStyle(index == 0 ? world.editorialPaper : world.editorialInk)
+              .padding(.horizontal, 11)
+              .padding(.vertical, 7)
+              .background(
+                index == 0
+                  ? world.editorialAccent
+                  : world.editorialInk.opacity(0.055),
+                in: Capsule()
+              )
+              .overlay {
+                Capsule()
+                  .stroke(world.editorialInk.opacity(0.15), lineWidth: 0.75)
+              }
+          }
+        }
+      }
+      .scrollIndicators(.hidden)
+    }
+
+    sectionHeading("Source Entries", count: day.entryCount)
+
+    VStack(spacing: 0) {
+      ForEach(Array(day.entries.enumerated()), id: \.element.id) { index, entry in
+        CompactReflectionSourceRow(
+          entry: entry,
+          visualIndex: index,
+          isFocused: entry.id == focusedEntryID,
+          isReflectionSource: journal.sourceEntryIDs.contains(entry.id),
+          highlightViewModel: highlightViewModel,
+          onCarryForward: {
+            await carryForwardViewModel.carryToTomorrow(
+              text: entry.preferredText,
+              sourceKind: .entry,
+              sourceDay: day.id,
+              sourceEntryID: entry.id
+            )
+          }
+        )
+        .id(entry.id)
+
+        if entry.id != day.entries.last?.id {
+          Divider().overlay(world.editorialInk.opacity(0.12))
+        }
+      }
+    }
+    .background(world.editorialInk.opacity(0.035), in: RoundedRectangle(cornerRadius: 12))
+    .overlay {
+      RoundedRectangle(cornerRadius: 12)
+        .stroke(world.editorialInk.opacity(0.13), lineWidth: 0.75)
+    }
+
+    if !journal.keyMoments.isEmpty {
+      sectionHeading("Worth Remembering", count: nil)
+      VStack(alignment: .leading, spacing: 10) {
+        ForEach(journal.keyMoments, id: \.self) { moment in
+          CompactCarryForwardRow(text: moment) {
+            await carryForwardViewModel.carryToTomorrow(
+              text: moment,
+              sourceKind: .dayReflectionKeyMoment,
+              sourceDay: day.id
+            )
+          }
+        }
+      }
+    }
+
+    if !journal.reflectionQuestions.isEmpty {
+      sectionHeading("Carry Into Tomorrow", count: nil)
+      ForEach(journal.reflectionQuestions, id: \.self) { question in
+        CompactCarryForwardRow(text: question, emphasized: true) {
+          await carryForwardViewModel.carryToTomorrow(
+            text: question,
+            sourceKind: .dayReflectionQuestion,
+            sourceDay: day.id
+          )
+        }
+      }
+    }
+
+    Label(
+      "Created privately from \(journal.sourceEntryIDs.count) original \(journal.sourceEntryIDs.count == 1 ? "entry" : "entries")",
+      systemImage: "lock.shield.fill"
+    )
+    .font(.caption2.weight(.medium))
+    .foregroundStyle(world.editorialMuted)
+  }
+
+  private var emptyJournal: some View {
+    VStack(alignment: .leading, spacing: 12) {
+      Image(systemName: "sparkles.rectangle.stack")
+        .font(.title2.weight(.bold))
+        .foregroundStyle(world.editorialAccent)
+      Text("Bring the day into focus")
+        .font(world.displayFont(size: 32, weight: .bold))
+      Text(
+        "Echo can shape these entries into a readable reflection while keeping every original word unchanged."
+      )
+      .font(.system(size: 16, design: .serif))
+      .foregroundStyle(world.editorialMuted)
+    }
+    .frame(minHeight: 220, alignment: .topLeading)
+  }
+
+  private func sectionHeading(_ title: String, count: Int?) -> some View {
+    HStack(alignment: .firstTextBaseline) {
+      Text(title)
+        .font(.headline.weight(.bold))
+      Spacer()
+      if let count {
+        Text(count, format: .number)
+          .font(.caption.weight(.bold))
+          .foregroundStyle(world.editorialMuted)
+      }
+    }
+  }
+
+  private func themeIcon(at index: Int) -> String {
+    ["crown.fill", "hourglass", "chart.bar.fill", "sparkles"][index % 4]
+  }
+}
+
+private struct CompactReflectionSourceRow: View {
+  let entry: EchoEntry
+  let visualIndex: Int
+  let isFocused: Bool
+  let isReflectionSource: Bool
+  let highlightViewModel: EntryHighlightViewModel
+  let onCarryForward: () async -> Bool
+
+  @State private var didCarry = false
+  @Environment(\.echoVisualWorld) private var world
+
+  var body: some View {
+    HStack(spacing: 10) {
+      ZStack {
+        LinearGradient(
+          colors: thumbnailColors,
+          startPoint: .topLeading,
+          endPoint: .bottomTrailing
+        )
+        Image(systemName: entry.type == .voice ? "waveform" : "text.quote")
+          .font(.caption.weight(.bold))
+          .foregroundStyle(world.editorialPaper)
+      }
+      .frame(width: 43, height: 38)
+      .clipShape(RoundedRectangle(cornerRadius: 7))
+      .accessibilityHidden(true)
+
+      VStack(alignment: .leading, spacing: 3) {
+        Text(entry.preferredText)
+          .font(.subheadline.weight(.semibold))
+          .foregroundStyle(world.editorialInk)
+          .lineLimit(1)
+        Text(entry.createdAt, format: .dateTime.hour().minute())
+          .font(.caption2.weight(.medium))
+          .foregroundStyle(world.editorialMuted)
+      }
+
+      Spacer(minLength: 4)
+
+      EntryHighlightButton(entryID: entry.id, viewModel: highlightViewModel)
+        .buttonStyle(.borderless)
+        .labelStyle(.iconOnly)
+        .foregroundStyle(world.editorialAccent)
+
+      Menu {
+        Button(didCarry ? "Set for tomorrow" : "Carry to tomorrow", systemImage: "arrow.turn.down.right") {
+          Task { didCarry = await onCarryForward() }
+        }
+      } label: {
+        Image(systemName: didCarry ? "checkmark" : "ellipsis")
+          .font(.subheadline.weight(.bold))
+          .frame(width: 25, height: 34)
+          .foregroundStyle(world.editorialInk)
+      }
+    }
+    .padding(.horizontal, 9)
+    .padding(.vertical, 7)
+    .background(isFocused ? world.editorialAccent.opacity(0.12) : Color.clear)
+    .accessibilityElement(children: .contain)
+    .accessibilityValue(isReflectionSource ? "Used in reflection" : "")
+  }
+
+  private var thumbnailColors: [Color] {
+    let base = world.editorialAccent
+    return visualIndex.isMultiple(of: 2)
+      ? [base.opacity(0.95), world.editorialInk]
+      : [world.editorialInk.opacity(0.9), base.opacity(0.72)]
+  }
+}
+
+private struct CompactCarryForwardRow: View {
+  let text: String
+  var emphasized = false
+  let action: () async -> Bool
+
+  @State private var didCarry = false
+  @Environment(\.echoVisualWorld) private var world
+
+  var body: some View {
+    HStack(alignment: .firstTextBaseline, spacing: 10) {
+      Image(systemName: emphasized ? "arrow.up.right" : "diamond.fill")
+        .font(.caption2.weight(.bold))
+        .foregroundStyle(world.editorialAccent)
+
+      Text(text)
+        .font(emphasized ? .subheadline.weight(.semibold) : .subheadline)
+        .foregroundStyle(world.editorialInk)
+        .frame(maxWidth: .infinity, alignment: .leading)
+
+      Button {
+        Task { didCarry = await action() }
+      } label: {
+        Image(systemName: didCarry ? "checkmark" : "arrow.turn.down.right")
+          .font(.subheadline.weight(.semibold))
+      }
+      .buttonStyle(.plain)
+      .foregroundStyle(world.editorialAccent)
+      .accessibilityLabel(didCarry ? "Set for tomorrow" : "Carry to tomorrow")
+    }
+    .padding(12)
+    .background(
+      emphasized ? world.editorialAccent.opacity(0.1) : world.editorialInk.opacity(0.035),
+      in: RoundedRectangle(cornerRadius: 10)
+    )
   }
 }
 
