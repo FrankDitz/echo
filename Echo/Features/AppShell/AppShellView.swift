@@ -83,6 +83,11 @@ struct AppShellView: View {
     ) { _ in
       privacyLockController.applicationWillResignActive()
     }
+    .onAppear {
+      if let initialSection = EchoVisualQAConfiguration.current.initialSection {
+        selection = initialSection
+      }
+    }
   }
 
   private var isPrivacyShieldVisible: Bool {
