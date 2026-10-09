@@ -54,10 +54,9 @@ struct EchoPrimaryNavigation: View {
         compactNavigationButton(section)
       }
     }
-    .padding(.horizontal, 6)
-    .padding(.top, 5)
-    .padding(.bottom, 3)
-    .frame(maxWidth: .infinity)
+    .padding(.horizontal, 4)
+    .offset(y: 17)
+    .frame(maxWidth: .infinity, minHeight: 60)
     .background {
       Rectangle()
         .fill(world.surfaceFill.opacity(0.98))
@@ -112,22 +111,22 @@ struct EchoPrimaryNavigation: View {
         selection = section
       }
     } label: {
-      VStack(spacing: 2) {
+      VStack(spacing: 3) {
         Image(systemName: section.systemImage)
-          .font(.system(size: 15, weight: selection == section ? .bold : .medium))
-          .frame(height: 17)
+          .font(.system(size: 17, weight: selection == section ? .bold : .semibold))
+          .frame(height: 20)
 
         Text(section.compactLabel)
-          .font(.system(size: 10, weight: selection == section ? .bold : .medium))
+          .font(.system(size: 11, weight: selection == section ? .bold : .semibold))
           .lineLimit(1)
           .minimumScaleFactor(0.72)
 
         Capsule()
           .fill(selection == section ? world.accent : .clear)
-          .frame(width: 18, height: 2)
+          .frame(width: 22, height: 3)
       }
       .foregroundStyle(selection == section ? world.accent : world.secondaryText)
-      .frame(maxWidth: .infinity, minHeight: 42)
+      .frame(maxWidth: .infinity, minHeight: 54)
       .contentShape(Rectangle())
     }
     .buttonStyle(.plain)
