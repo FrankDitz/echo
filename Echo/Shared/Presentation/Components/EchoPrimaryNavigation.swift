@@ -69,6 +69,7 @@ struct EchoPrimaryNavigation: View {
     }
     .accessibilityElement(children: .contain)
     .accessibilityLabel("Primary navigation")
+    .dynamicTypeSize(...DynamicTypeSize.large)
   }
 
   private func navigationButton(_ section: EchoPrimarySection) -> some View {
@@ -143,5 +144,6 @@ struct EchoBrandHeader: View {
     .padding(.horizontal, EchoLayout.pageHorizontalPadding)
     .padding(.vertical, EchoLayout.tightSpacing)
     .frame(maxWidth: .infinity)
+    .dynamicTypeSize(...DynamicTypeSize.large)
   }
 }

@@ -91,6 +91,7 @@ struct TimelineView: View {
     }
     .shadow(color: world.contentShadow, radius: 10, y: 3)
     .accessibilityElement(children: .combine)
+    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
   }
 
   @ViewBuilder
@@ -480,71 +481,169 @@ struct LifeCalendarView: View {
 
   var body: some View {
     EchoWorldCanvas(screen: .calendar) {
-      ScrollView {
-        VStack(alignment: .leading, spacing: EchoLayout.contentSpacing) {
-          Text("Life Calendar")
-            .font(.system(size: 46, weight: .black, design: .serif))
-            .foregroundStyle(world.primaryText)
-            .accessibilityAddTraits(.isHeader)
+      GeometryReader { proxy in
+        ScrollView {
+          let isWide = proxy.size.width >= EchoLayout.wideLayoutBreakpoint
 
-        HStack {
-          VStack(alignment: .leading, spacing: EchoLayout.microSpacing) {
-            Text("A MONTH IN PERSPECTIVE")
-              .font(EchoTypography.editorialEyebrow)
-              .tracking(1.4)
-              .foregroundStyle(world.accent)
-            Text(monthStart, format: .dateTime.month(.wide).year())
-              .font(EchoTypography.sectionTitle)
+          VStack(alignment: .leading, spacing: EchoLayout.sectionSpacing) {
+            VStack(alignment: .leading, spacing: EchoLayout.inlineSpacing) {
+              Text("Life Calendar")
+                .font(world.displayFont(size: isWide ? 58 : 46, weight: .black))
+                .foregroundStyle(world.primaryText)
+                .accessibilityAddTraits(.isHeader)
+
+              Text("A MONTH IN PERSPECTIVE")
+                .font(EchoTypography.editorialEyebrow)
+                .tracking(1.6)
+                .foregroundStyle(world.accent)
+            }
+            .shadow(color: world.contentShadow, radius: 10, y: 3)
+            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+
+            if isWide {
+              HStack(alignment: .top, spacing: 32) {
+                calendarPanel
+                  .frame(maxWidth: 720)
+                monthPerspective
+                  .frame(width: 340)
+              }
+            } else {
+              calendarPanel
+              monthPerspective
+            }
+          }
+          .frame(
+            maxWidth: isWide ? EchoLayout.wideContentMaxWidth : EchoLayout.contentMaxWidth,
+            alignment: .topLeading
+          )
+          .padding(.horizontal, isWide ? 40 : EchoLayout.pageHorizontalPadding)
+          .padding(.vertical, isWide ? 36 : EchoLayout.pageVerticalPadding)
+          .frame(maxWidth: .infinity, minHeight: proxy.size.height, alignment: .top)
+        }
+        .scrollIndicators(.hidden)
+      }
+    }
+    .frame(minWidth: 360, minHeight: 520)
+  }
+
+  private var calendarPanel: some View {
+    EchoReadabilityPanel {
+      VStack(spacing: EchoLayout.contentSpacing) {
+        ViewThatFits(in: .horizontal) {
+          HStack(spacing: EchoLayout.tightSpacing) {
+            monthTitle
+            monthControls
           }
 
-          Spacer()
-
-          monthButton(systemImage: "chevron.left", offset: -1)
-          monthButton(systemImage: "chevron.right", offset: 1)
-
-          if showsDismissButton {
-            Button("Done") { dismiss() }
-              .buttonStyle(.borderedProminent)
-              .tint(world.accent)
-              .foregroundStyle(world.canvas)
+          VStack(alignment: .leading, spacing: EchoLayout.rowSpacing) {
+            monthTitle
+            monthControls
           }
         }
 
-        EchoReadabilityPanel {
-          VStack(spacing: EchoLayout.rowSpacing) {
-            LazyVGrid(columns: calendarColumns, spacing: EchoLayout.inlineSpacing) {
-              ForEach(Array(rotatedWeekdaySymbols.enumerated()), id: \.offset) { _, symbol in
-                Text(symbol.uppercased())
-                  .font(EchoTypography.editorialEyebrow)
-                  .foregroundStyle(world.secondaryText)
-                  .frame(maxWidth: .infinity)
-              }
+        LazyVGrid(columns: calendarColumns, spacing: EchoLayout.tightSpacing) {
+          ForEach(Array(rotatedWeekdaySymbols.enumerated()), id: \.offset) { _, symbol in
+            Text(symbol.uppercased())
+              .font(EchoTypography.editorialEyebrow)
+              .foregroundStyle(world.secondaryText)
+              .frame(maxWidth: .infinity)
+          }
 
-              ForEach(Array(monthCells.enumerated()), id: \.offset) { _, date in
-                if let date {
-                  calendarDay(date)
-                } else {
-                  Color.clear
-                    .frame(minHeight: 48)
-                    .accessibilityHidden(true)
-                }
-              }
+          ForEach(Array(monthCells.enumerated()), id: \.offset) { _, date in
+            if let date {
+              calendarDay(date)
+            } else {
+              Color.clear
+                .frame(minHeight: 56)
+                .accessibilityHidden(true)
             }
           }
         }
-
-          Text("Choose any day containing journal entries, including today.")
-            .font(EchoTypography.supporting)
-            .foregroundStyle(world.secondaryText)
-            .frame(maxWidth: .infinity, alignment: .leading)
-        }
-        .frame(maxWidth: 620, alignment: .topLeading)
-        .padding(EchoLayout.pageHorizontalPadding)
-        .frame(maxWidth: .infinity, alignment: .top)
+        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
       }
-      .scrollIndicators(.hidden)
     }
-    .frame(minWidth: 360, minHeight: 520)
+  }
+
+  private var monthTitle: some View {
+    Text(monthStart, format: .dateTime.month(.wide).year())
+      .font(EchoTypography.sectionTitle)
+      .frame(maxWidth: .infinity, alignment: .leading)
+  }
+
+  private var monthControls: some View {
+    HStack(spacing: EchoLayout.tightSpacing) {
+      monthButton(systemImage: "chevron.left", offset: -1)
+      monthButton(systemImage: "chevron.right", offset: 1)
+
+      Button("Today") {
+        displayedMonth = .now
+      }
+      .font(EchoTypography.metadata.weight(.semibold))
+      .buttonStyle(.bordered)
+
+      if showsDismissButton {
+        Button("Done") { dismiss() }
+          .font(EchoTypography.metadata.weight(.semibold))
+          .buttonStyle(.borderedProminent)
+          .tint(world.accent)
+          .foregroundStyle(world.canvas)
+      }
+    }
+    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+  }
+
+  private var monthPerspective: some View {
+    EchoReadabilityPanel {
+      VStack(alignment: .leading, spacing: EchoLayout.contentSpacing) {
+        VStack(alignment: .leading, spacing: EchoLayout.microSpacing) {
+          Text("THIS MONTH")
+            .font(EchoTypography.editorialEyebrow)
+            .tracking(1.4)
+            .foregroundStyle(world.accent)
+          Text("Your writing rhythm")
+            .font(EchoTypography.sectionTitle)
+        }
+
+        HStack(alignment: .firstTextBaseline, spacing: EchoLayout.tightSpacing) {
+          Text(monthDaysWithEntries.count, format: .number)
+            .font(world.displayFont(size: 44, weight: .black))
+            .foregroundStyle(world.accent)
+          Text(monthDaysWithEntries.count == 1 ? "journal day" : "journal days")
+            .font(EchoTypography.supporting.weight(.semibold))
+            .foregroundStyle(world.secondaryText)
+        }
+
+        HStack(alignment: .bottom, spacing: EchoLayout.tightSpacing) {
+          ForEach(Array(weeklyEntryCounts.enumerated()), id: \.offset) { index, count in
+            VStack(spacing: EchoLayout.microSpacing) {
+              RoundedRectangle(cornerRadius: 4)
+                .fill(count == 0 ? world.separator.opacity(0.35) : world.accent)
+                .frame(height: max(8, CGFloat(count) * 8))
+              Text("W\(index + 1)")
+                .font(.caption2.weight(.semibold))
+                .foregroundStyle(world.secondaryText)
+            }
+            .frame(maxWidth: .infinity, alignment: .bottom)
+          }
+        }
+        .frame(height: 82, alignment: .bottom)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Weekly journal activity: \(weeklyEntryCounts.map(String.init).joined(separator: ", ")) entries")
+
+        Divider()
+          .overlay(world.separator)
+
+        HStack(spacing: EchoLayout.contentSpacing) {
+          calendarLegend("Written", systemImage: "book.closed.fill")
+          calendarLegend("Voice", systemImage: "waveform")
+          calendarLegend("Full day", systemImage: "chart.bar.fill")
+        }
+
+        Text("Select a marked day to revisit its complete timeline.")
+          .font(EchoTypography.supporting)
+          .foregroundStyle(world.secondaryText)
+      }
+    }
   }
 
   private var monthStart: Date {
@@ -581,6 +680,7 @@ struct LifeCalendarView: View {
     let identifier = EchoDayIdentifier(containing: date, calendar: calendar)
     let day = days.first(where: { $0.id == identifier })
     let isSelected = selectedDayID == identifier
+      || (selectedDayID == nil && calendar.isDateInToday(date))
 
     return Button {
       selectedDayID = identifier
@@ -590,22 +690,24 @@ struct LifeCalendarView: View {
         onSelectDay?()
       }
     } label: {
-      VStack(spacing: EchoLayout.microSpacing) {
+      VStack(spacing: 2) {
         Text(date, format: .dateTime.day())
-          .font(.body.weight(isSelected ? .bold : .medium))
-          .frame(width: 36, height: 36)
-          .foregroundStyle(isSelected ? world.canvas : world.primaryText)
-          .background {
-            if isSelected {
-              Circle().fill(world.accent)
-            }
-          }
+          .font(.subheadline.weight(isSelected ? .bold : .medium))
 
-        Circle()
-          .fill(day == nil ? Color.clear : world.accent)
-          .frame(width: 4, height: 4)
+        Image(systemName: journalSignal(for: day, date: date))
+          .font(.caption2.weight(.bold))
+          .opacity(day == nil ? 0 : 1)
       }
-      .frame(maxWidth: .infinity, minHeight: 48)
+      .foregroundStyle(isSelected ? world.canvas : world.primaryText)
+      .frame(maxWidth: .infinity, minHeight: 56)
+      .background(
+        isSelected ? world.accent : world.selectedFill.opacity(day == nil ? 0.08 : 0.28),
+        in: RoundedRectangle(cornerRadius: 8)
+      )
+      .overlay {
+        RoundedRectangle(cornerRadius: 8)
+          .stroke(world.separator.opacity(day == nil ? 0.35 : 0.9), lineWidth: EchoShape.hairlineWidth)
+      }
       .contentShape(Rectangle())
     }
     .buttonStyle(.plain)
@@ -615,6 +717,43 @@ struct LifeCalendarView: View {
       "\(date.formatted(.dateTime.weekday(.wide).month(.wide).day().year())), \(day == nil ? "no entries" : "\(day?.entryCount ?? 0) entries")"
     )
     .accessibilityHint(day == nil ? "" : "Shows this day in Timeline")
+  }
+
+  private var monthDaysWithEntries: [EchoDay] {
+    days.filter { day in
+      guard let date = day.id.date(in: calendar.timeZone) else { return false }
+      return calendar.isDate(date, equalTo: monthStart, toGranularity: .month)
+    }
+  }
+
+  private var weeklyEntryCounts: [Int] {
+    var counts = Array(repeating: 0, count: 6)
+    for day in monthDaysWithEntries {
+      guard let date = day.id.date(in: calendar.timeZone) else { continue }
+      let week = min(max((calendar.component(.day, from: date) - 1) / 7, 0), 5)
+      counts[week] += day.entryCount
+    }
+    return counts
+  }
+
+  private func journalSignal(for day: EchoDay?, date: Date) -> String {
+    guard let day else { return "circle" }
+    if calendar.isDateInToday(date) { return "crown.fill" }
+    if day.entries.contains(where: { $0.type == .voice }) { return "waveform" }
+    if day.entryCount >= 3 { return "chart.bar.fill" }
+    return "book.closed.fill"
+  }
+
+  private func calendarLegend(_ title: String, systemImage: String) -> some View {
+    VStack(spacing: EchoLayout.microSpacing) {
+      Image(systemName: systemImage)
+        .font(.subheadline.weight(.bold))
+        .foregroundStyle(world.accent)
+      Text(title)
+        .font(.caption2.weight(.semibold))
+        .foregroundStyle(world.secondaryText)
+    }
+    .frame(maxWidth: .infinity)
   }
 
   private func monthButton(systemImage: String, offset: Int) -> some View {

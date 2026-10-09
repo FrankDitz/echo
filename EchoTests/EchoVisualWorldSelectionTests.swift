@@ -174,6 +174,53 @@ struct EchoVisualWorldSelectionTests {
       ) == "retired-world"
     )
   }
+
+  @Test("Visual QA stays disabled unless its explicit launch flag is present")
+  func visualQADisabledByDefault() {
+    let configuration = EchoVisualQAConfiguration(
+      arguments: ["Echo", "-echoVisualWorld", EchoVisualWorldID.goldStandard.rawValue]
+    )
+
+    #expect(configuration.isEnabled == false)
+    #expect(configuration.worldID == .goldStandard)
+    #expect(configuration.initialSection == nil)
+  }
+
+  @Test("Visual QA resolves legacy world identifiers and a requested screen")
+  func visualQALaunchConfiguration() {
+    let configuration = EchoVisualQAConfiguration(
+      arguments: [
+        "Echo",
+        "-echoVisualQA",
+        "-echoVisualWorld",
+        EchoVisualWorldID.kingdomGreen.rawValue,
+        "-echoScreen",
+        "day-reflection",
+      ]
+    )
+
+    #expect(configuration.isEnabled)
+    #expect(configuration.worldID == .kingdomGreen)
+    #expect(configuration.initialSection == .reflection)
+  }
+
+  @Test("Visual QA ignores unsupported world and screen values")
+  func visualQAInvalidArguments() {
+    let configuration = EchoVisualQAConfiguration(
+      arguments: [
+        "Echo",
+        "-echoVisualQA",
+        "-echoVisualWorld",
+        "unknown-world",
+        "-echoScreen",
+        "unknown-screen",
+      ]
+    )
+
+    #expect(configuration.isEnabled)
+    #expect(configuration.worldID == nil)
+    #expect(configuration.initialSection == nil)
+  }
 }
 
 private final class InMemoryVisualWorldPreferenceStore:

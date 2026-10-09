@@ -71,6 +71,7 @@ struct HighlightsView: View {
     }
     .shadow(color: world.contentShadow, radius: 10, y: 3)
     .accessibilityElement(children: .combine)
+    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
   }
 
   @ViewBuilder
@@ -123,9 +124,9 @@ struct HighlightsView: View {
             }
           }
         } else {
-          EchoReadabilityPanel(padding: 0) {
-            VStack(alignment: .leading, spacing: 0) {
-              ForEach(filteredItems) { item in
+          LazyVStack(alignment: .leading, spacing: EchoLayout.tightSpacing) {
+            ForEach(filteredItems) { item in
+              EchoReadabilityPanel(padding: 0, cornerRadius: 12) {
                 HighlightedEntryRow(
                   item: item,
                   onOpen: { selectedItem = item },
@@ -135,11 +136,6 @@ struct HighlightsView: View {
                     }
                   }
                 )
-
-                if item.id != filteredItems.last?.id {
-                  Divider()
-                    .overlay(world.separator.opacity(0.7))
-                }
               }
             }
           }

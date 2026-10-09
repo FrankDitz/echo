@@ -61,6 +61,8 @@ GitHub Actions repeats the full-history check for pushes and pull requests. Thes
 
 Demo mode should use deterministic fictional fixtures stored separately from production persistence. Public screenshots should be reviewed for visible content and embedded metadata. Bug reports should reproduce behavior with the smallest fictional example and omit production containers entirely.
 
+Debug builds provide an explicit visual-QA launch mode for populated layout review. It is enabled only with `-echoVisualQA`, creates an in-memory model container, uses a volatile theme preference, and seeds obviously fictional entries. `-echoVisualWorld <stable-id>` and `-echoScreen <tab>` can select the world and starting tab without reading or changing the user's stored journal or preferences. The mode is compiled out of release builds, and any screenshots produced during review stay outside the repository.
+
 ## Incident response
 
 If private data reaches Git history:
