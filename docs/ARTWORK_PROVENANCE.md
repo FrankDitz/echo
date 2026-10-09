@@ -71,6 +71,15 @@ Both outputs were reviewed before inclusion. They contain fictional generated co
 
 The generation brief requested a cobalt and midnight modern Christian worship-and-reflection environment with a blank journal, unbranded closed Bible without readable text, studio microphone, empty worship stage, concrete church stairs, cross-shaped architectural light, and restrained waveform, ruled-paper, and cornerstone geometry. It prohibited people, faces, hands, plants, slogans, readable scripture or personal writing, real locations, logos, brands, watermarks, screens, UI, and city skylines.
 
+### Screen-specific Covenant Blue artwork
+
+- **Assets:** `CovenantBlueTimelineBackground.imageset`, `CovenantBlueReflectionBackground.imageset`, `CovenantBlueHighlightsBackground.imageset`, and `CovenantBlueCalendarBackground.imageset`
+- **Created:** October 8, 2026
+- **Method:** OpenAI built-in image generation using the approved Covenant Blue board and production world as references; each phone and Mac scene was composed independently
+- **Purpose:** Carry the cobalt worship, studio, journal, and concrete-church language through each primary workflow
+
+Timeline received a silver journey rail and concrete ascent; Reflection a warm-white editorial field and cross-shaped light; Highlights a journal, microphone, worship-stage, stair, and cross-light perimeter; Calendar a pale-silver month grid and restrained faith marks. The briefs prohibited personal content, readable writing, people, plants, brands, app UI, skylines, and identifying locations.
+
 Both outputs were reviewed before inclusion. They contain fictional generated content only, preserve broad calm blue content regions, avoid generic cyberpunk or city imagery, and use independent portrait and 16:10 compositions.
 
 ## Teal Immersion background

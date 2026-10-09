@@ -111,6 +111,23 @@ struct EchoVisualWorldSelectionTests {
     )
   }
 
+  @Test("Covenant Blue routes each primary screen to purpose-built artwork")
+  func covenantBlueScreenArtwork() {
+    let world = EchoVisualWorld.covenantBlue
+    let primaryScreens: [EchoScreenRole] = [
+      .today, .timeline, .reflection, .highlights, .calendar,
+    ]
+
+    #expect(
+      Set(primaryScreens.map(world.backgroundAssetName(for:))).count
+        == primaryScreens.count
+    )
+    #expect(
+      world.backgroundAssetName(for: .editor)
+        == world.backgroundAssetName(for: .reflection)
+    )
+  }
+
   @Test("UserDefaults stores only the selected world's stable identifier")
   func userDefaultsPersistence() throws {
     let suiteName = "EchoVisualWorldSelectionTests.\(UUID().uuidString)"
