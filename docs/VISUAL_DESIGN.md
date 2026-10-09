@@ -99,7 +99,8 @@ Feature screens consume semantic values. They must not switch on individual worl
 
 ### Kingdom Green production treatment
 
-- `KingdomGreenBackground.imageset` contains separate portrait and native 16:10 Mac compositions. Both use original generated journaling, worship, and concrete-church imagery with no people, readable text, logos, personal media, or embedded location details.
+- Kingdom Green uses five scene-specific artwork sets: `KingdomGreenBackground` for Today, plus `KingdomGreenTimelineBackground`, `KingdomGreenReflectionBackground`, `KingdomGreenHighlightsBackground`, and `KingdomGreenCalendarBackground`. Every set provides a separately composed phone portrait and native 16:10 Mac image.
+- Timeline uses an ivory journey rail and architectural ascent; Reflection uses a warm cross-lit sanctuary field; Highlights surrounds saved writing with studio, worship, stair, and journal fragments; Calendar integrates a restrained gold month grid and symbolic geometry.
 - A blank journal, unbranded closed Bible, empty worship stage, ascending steps, and warm architectural light stay concentrated at the outer edges. A calmer emerald center supports journal controls and reading surfaces.
 - Primary text uses warm ivory, secondary text uses muted sage, and antique gold is reserved for selection and action. Mint distinguishes saved state while coral remains reserved for errors.
 - The world avoids oversized slogans and generic city scenery. Its quiet-strength character comes from saturated emerald surfaces, near-black structure, worship-space depth, and disciplined gold detail.

@@ -1,0 +1,10 @@
+{
+  "images" : [
+    { "filename" : "kingdom-green-reflection.png", "idiom" : "universal", "scale" : "1x" },
+    { "idiom" : "universal", "scale" : "2x" },
+    { "idiom" : "universal", "scale" : "3x" },
+    { "filename" : "kingdom-green-reflection-mac.png", "idiom" : "mac", "scale" : "1x" },
+    { "idiom" : "mac", "scale" : "2x" }
+  ],
+  "info" : { "author" : "xcode", "version" : 1 }
+}
