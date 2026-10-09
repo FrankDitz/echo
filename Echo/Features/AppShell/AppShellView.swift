@@ -24,6 +24,7 @@ struct AppShellView: View {
   @State private var selection: EchoPrimarySection = .today
   @State private var selectedTimelineDayID: EchoDayIdentifier?
   @State private var isShowingSettings = false
+  @State private var isSearchRequested = false
   @Environment(\.accessibilityReduceMotion) private var reduceMotion
   @Environment(\.scenePhase) private var scenePhase
 
@@ -37,6 +38,7 @@ struct AppShellView: View {
             EchoBrandHeader(
               showSearch: {
                 selection = .timeline
+                isSearchRequested = true
               },
               showSettings: {
                 isShowingSettings = true
@@ -121,7 +123,9 @@ struct AppShellView: View {
         selectedDayID: $selectedTimelineDayID,
         highlightViewModel: highlightViewModel,
         aiService: aiService,
-        journalRepository: journalRepository
+        journalRepository: journalRepository,
+        isSearchRequested: $isSearchRequested,
+        onCapture: { selection = .today }
       )
     case .calendar:
       LifeCalendarView(
