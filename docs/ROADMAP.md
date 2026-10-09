@@ -15,7 +15,7 @@ Each phase is implemented, built, tested where behavior exists, reviewed, commit
 - **Phase 8 — Memory, reflection, and continuity (complete):** turn the functional journal into a product worth returning to through honest retrieval, richer private reflection, memory resurfacing, faster capture, and explicit personal-data controls. Each capability remains local-first, optional where appropriate, and independently reviewable.
 - **Phase 9 — Frictionless intelligent capture (complete):** make writing or speaking a thought the shortest path through Echo, preserve every original capture, refine grammar and spoken cadence without changing meaning, and make important entries immediately recognizable.
 - **Phase 10 — Urban Christian visual system (complete):** replaced the original city worlds with the approved Cornerstone Signal, Kingdom Green, Gold Standard, and Covenant Blue directions, including screen-specific artwork and concept-faithful components, while preserving private journal data, stable theme preferences, accessibility, and cross-platform behavior.
-- **Phase 11 — iPhone concept fidelity (in progress):** rebuild the compact iPhone experience one screen at a time against the approved urban Christian concepts, correcting hierarchy, density, navigation, surface treatment, and populated-state behavior without altering private journal data.
+- **Phase 11 — iPhone concept fidelity (complete):** rebuilt the compact iPhone experience one screen at a time against the approved urban Christian concepts, correcting hierarchy, density, navigation, surface treatment, and populated-state behavior without altering private journal data.
 - **Phase 12 — Mac concept fidelity:** translate the approved system into a purpose-built desktop workspace after the iPhone composition is reviewed and accepted.
 - **Phase 13 — MVP review:** full builds and tests, architecture and privacy review, naming cleanup, documentation refresh, staged-data scan, and full reachable-history scan.
 
@@ -113,7 +113,7 @@ Every deliverable uses a short-lived enterprise-named branch, is built and visua
 5. **Highlights gallery (complete):** add the compact filter rhythm, dense saved-entry cards, honest type imagery, metadata, source navigation, and theme-specific light/dark surface alternation.
 6. **Life Calendar (complete):** fit the month and truthful writing-rhythm summary into a useful viewport, improve day markers and selection, and prepare the presentation boundary for later optional mood tracking without inventing mood data.
 7. **Theme fidelity passes (complete):** tune Cornerstone Signal, Gold Standard, Kingdom Green, and Covenant Blue independently so each changes meaningful surfaces, artwork placement, contrast, and card rhythm rather than acting as a palette swap.
-8. **iPhone populated-state closeout:** exercise all tabs and themes with deterministic fictional data, Dynamic Type, VoiceOver, reduced motion/transparency, empty/error states, and dense writing; run full iPhone builds, tests, and repository-safety checks before Phase 12.
+8. **iPhone populated-state closeout (complete):** exercise all tabs and themes with deterministic fictional data, Dynamic Type, VoiceOver semantics, reduced motion/transparency fallbacks, empty/error states, and dense writing; run full iPhone builds, tests, Mac regression build, and complete repository-safety checks before Phase 12.
 
 ## Near-term improvements
 
