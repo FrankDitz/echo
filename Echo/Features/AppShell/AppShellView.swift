@@ -34,9 +34,14 @@ struct AppShellView: View {
           .id(selection)
           .transition(.opacity)
           .safeAreaInset(edge: .top, spacing: 0) {
-            EchoBrandHeader {
-              isShowingSettings = true
-            }
+            EchoBrandHeader(
+              showSearch: {
+                selection = .timeline
+              },
+              showSettings: {
+                isShowingSettings = true
+              }
+            )
           }
           .safeAreaInset(edge: .bottom, spacing: 0) {
             primaryNavigation
