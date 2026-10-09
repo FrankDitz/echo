@@ -82,3 +82,40 @@ struct EchoWorldCanvas<Content: View>: View {
     .tint(world.accent)
   }
 }
+
+/// A quiet, theme-aware wash for type placed directly over screen artwork.
+/// It preserves the image while keeping the title readable across every crop.
+struct EchoArtworkTitleScrim: View {
+  @Environment(\.echoVisualWorld) private var world
+
+  var body: some View {
+    LinearGradient(
+      colors: [
+        backdrop.opacity(0.9),
+        backdrop.opacity(0.66),
+        backdrop.opacity(0.24),
+        Color.clear,
+      ],
+      startPoint: .leading,
+      endPoint: .trailing
+    )
+    .mask {
+      LinearGradient(
+        stops: [
+          .init(color: .clear, location: 0),
+          .init(color: .black, location: 0.16),
+          .init(color: .black, location: 0.84),
+          .init(color: .clear, location: 1),
+        ],
+        startPoint: .top,
+        endPoint: .bottom
+      )
+    }
+    .allowsHitTesting(false)
+    .accessibilityHidden(true)
+  }
+
+  private var backdrop: Color {
+    world.preferredColorScheme == .dark ? world.canvas : world.editorialPaper
+  }
+}

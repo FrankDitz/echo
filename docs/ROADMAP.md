@@ -114,6 +114,7 @@ Every deliverable uses a short-lived enterprise-named branch, is built and visua
 6. **Life Calendar (complete):** fit the month and truthful writing-rhythm summary into a useful viewport, improve day markers and selection, and prepare the presentation boundary for later optional mood tracking without inventing mood data.
 7. **Theme fidelity passes (complete):** tune Cornerstone Signal, Gold Standard, Kingdom Green, and Covenant Blue independently so each changes meaningful surfaces, artwork placement, contrast, and card rhythm rather than acting as a palette swap.
 8. **iPhone populated-state closeout (complete):** exercise all tabs and themes with deterministic fictional data, Dynamic Type, VoiceOver semantics, reduced motion/transparency fallbacks, empty/error states, and dense writing; run full iPhone builds, tests, Mac regression build, and complete repository-safety checks before Phase 12.
+9. **iPhone visual polish (complete):** feather image-backed title contrast across all visual worlds, extend the custom navigation surface through the bottom safe area, and make the real current date explicit and reliably selected when opening or returning to Life Calendar.
 
 ## Near-term improvements
 

@@ -87,6 +87,7 @@ struct HighlightsView: View {
     .padding(.horizontal, 18)
     .padding(.bottom, 17)
     .frame(maxWidth: .infinity, minHeight: 140, alignment: .bottomLeading)
+    .background { EchoArtworkTitleScrim() }
   }
 
   @ViewBuilder

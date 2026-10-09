@@ -131,7 +131,7 @@ struct AppShellView: View {
       LifeCalendarView(
         days: timelineViewModel.days,
         selectedDayID: $selectedTimelineDayID,
-        initialDate: timelineViewModel.mostRecentTimelineDate,
+        initialDate: .now,
         showsDismissButton: false
       ) {
         selection = .timeline
