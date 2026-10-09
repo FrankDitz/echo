@@ -108,7 +108,8 @@ Feature screens consume semantic values. They must not switch on individual worl
 
 ### Covenant Blue production treatment
 
-- `CovenantBlueBackground.imageset` contains separate portrait and native 16:10 Mac compositions. Both use original generated journaling, worship-stage, studio, and concrete-church imagery with no people, plants, readable text, logos, personal media, or embedded location details.
+- Covenant Blue uses five screen-specific artwork sets: `CovenantBlueBackground` for Today, plus `CovenantBlueTimelineBackground`, `CovenantBlueReflectionBackground`, `CovenantBlueHighlightsBackground`, and `CovenantBlueCalendarBackground`. Every set contains independent phone portrait and native 16:10 Mac compositions.
+- Timeline uses a silver-blue journey rail and concrete ascent; Reflection opens a warm-white writing field beside cross light; Highlights frames saved writing with studio and worship-stage fragments; Calendar integrates a quiet silver month grid and faith symbols.
 - A blank journal, unbranded closed Bible, studio microphone, stage, stairs, and cross-shaped architectural light stay near the outer edges. Broad cobalt and midnight fields support journal controls and reading surfaces.
 - Primary text uses warm near-white, secondary text uses pale silver-blue, and clear cobalt is reserved for selection and action. Mint distinguishes saved state while coral remains reserved for errors.
 - The world avoids waterfront skylines and generic cyberpunk light. Its visual identity comes from worship-space depth, disciplined blue fields, studio objects, and warm architectural light.

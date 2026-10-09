@@ -173,7 +173,15 @@ struct EchoVisualWorld {
     id: .covenantBlue,
     displayName: "Covenant Blue",
     paletteDescription: "Covenant cobalt, midnight navy, warm white, and pale silver.",
-    artwork: EchoVisualWorldArtwork(shared: "CovenantBlueBackground"),
+    artwork: EchoVisualWorldArtwork(
+      today: "CovenantBlueBackground",
+      timeline: "CovenantBlueTimelineBackground",
+      reflection: "CovenantBlueReflectionBackground",
+      highlights: "CovenantBlueHighlightsBackground",
+      calendar: "CovenantBlueCalendarBackground",
+      editor: "CovenantBlueReflectionBackground",
+      settings: "CovenantBlueBackground"
+    ),
     canvas: Color(red: 0.015, green: 0.075, blue: 0.22),
     primaryText: Color(red: 0.97, green: 0.975, blue: 0.94),
     secondaryText: Color(red: 0.7, green: 0.81, blue: 0.94),
