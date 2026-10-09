@@ -108,7 +108,7 @@ Every deliverable uses a short-lived enterprise-named branch, is built and visua
 
 1. **Compact editorial shell (complete):** replace oversized iPhone chrome with the concept's compact wordmark, search/menu actions, slim navigation, safe content insets, and reusable editorial sizing while preserving the existing Mac shell.
 2. **Today dashboard (complete):** compose a bounded hero, compact capture control, honest quick actions, Important preview, and dense Recent Entries list that prioritizes writing over decoration.
-3. **Timeline journal rail:** compact the date ribbon, move search behind the header action, place independent entry cards on a continuous chronology rail, and expose capture without hiding populated content.
+3. **Timeline journal rail (complete):** compact the date ribbon, move search behind the header action, place independent entry cards on a continuous chronology rail, and expose capture without hiding populated content.
 4. **Day Reflection reader:** remove duplicate hierarchy, create the calm editorial reading canvas, keep source provenance visible, and retain reachable organize, regenerate, and carry-forward actions.
 5. **Highlights gallery:** add the compact filter rhythm, dense saved-entry cards, honest type imagery, metadata, source navigation, and theme-specific light/dark surface alternation.
 6. **Life Calendar:** fit the month and truthful writing-rhythm summary into a useful viewport, improve day markers and selection, and prepare the presentation boundary for later optional mood tracking without inventing mood data.

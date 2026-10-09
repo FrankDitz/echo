@@ -6,9 +6,12 @@ struct TimelineView: View {
   let highlightViewModel: EntryHighlightViewModel
   let aiService: any EchoAIService
   let journalRepository: any EchoOrganizedJournalRepository
+  @Binding var isSearchRequested: Bool
+  let onCapture: () -> Void
 
   @State private var searchQuery = ""
   @State private var isShowingCalendar = false
+  @State private var isSearchPresented = false
   @FocusState private var isSearchFocused: Bool
 
   @Environment(\.timeZone) private var timeZone
@@ -37,11 +40,15 @@ struct TimelineView: View {
                 .frame(maxWidth: 760, alignment: .leading)
               }
             } else {
+#if os(iOS)
+              iPhoneTimelineContent
+#else
               LazyVStack(alignment: .leading, spacing: EchoLayout.compactSectionSpacing) {
                 timelineHeader
                 searchControl
                 timelineContent(isWide: false)
               }
+#endif
             }
           }
           .frame(
@@ -61,6 +68,14 @@ struct TimelineView: View {
     }
     .task {
       await viewModel.load()
+      if isSearchRequested {
+        presentSearch()
+      }
+    }
+    .onChange(of: isSearchRequested) { _, requested in
+      if requested {
+        presentSearch()
+      }
     }
     .sheet(isPresented: $isShowingCalendar) {
       LifeCalendarView(
@@ -72,6 +87,278 @@ struct TimelineView: View {
       .echoPrivacyProtected()
     }
   }
+
+  private func presentSearch() {
+    isSearchPresented = true
+    isSearchFocused = true
+    isSearchRequested = false
+  }
+
+#if os(iOS)
+  private var iPhoneTimelineContent: some View {
+    LazyVStack(alignment: .leading, spacing: 12) {
+      iPhoneTimelineHeader
+
+      if isSearchPresented || containsSearchQuery {
+        searchControl
+          .transition(.move(edge: .top).combined(with: .opacity))
+      }
+
+      if containsSearchQuery {
+        searchContent
+          .padding(.top, 4)
+      } else if viewModel.isLoading && viewModel.days.isEmpty {
+        EchoLoadingState(title: "Loading your timeline…")
+      } else {
+        iPhoneDateStrip
+
+        if viewModel.days.isEmpty {
+          EchoSurface {
+            EchoEmptyState(
+              title: "Your story starts here",
+              systemImage: "clock.arrow.circlepath",
+              description: "Days with journal entries will gather here over time.",
+              minHeight: 140
+            )
+          }
+        } else {
+          iPhoneTimelineRail
+        }
+
+        if viewModel.failure != nil {
+          EchoErrorState(
+            message: "The timeline could not be refreshed. Showing the last loaded days."
+          )
+        }
+      }
+    }
+    .animation(.easeInOut(duration: 0.2), value: isSearchPresented)
+  }
+
+  private var iPhoneTimelineHeader: some View {
+    VStack(alignment: .leading, spacing: 2) {
+      Text("Timeline")
+        .font(world.displayFont(size: 42, weight: .black))
+        .accessibilityAddTraits(.isHeader)
+      Text(timelineMessage)
+        .font(.system(size: 10, weight: .bold))
+        .tracking(1.65)
+        .foregroundStyle(world.accent)
+    }
+    .padding(.top, 10)
+    .padding(.bottom, 4)
+    .shadow(color: world.contentShadow, radius: 8, y: 2)
+    .accessibilityElement(children: .combine)
+  }
+
+  private var timelineMessage: String {
+    switch world.id {
+    case .cornerstoneSignal: "A RECORD OF GRACE"
+    case .goldStandard: "A JOURNEY OF GRACE"
+    case .kingdomGreen: "THE STORY YOU ARE LIVING"
+    case .covenantBlue: "COURAGE, KEPT IN ORDER"
+    }
+  }
+
+  private var iPhoneDateStrip: some View {
+    VStack(alignment: .leading, spacing: 7) {
+      HStack {
+        Text(stripDateRangeLabel)
+          .font(.system(size: 10, weight: .bold))
+          .tracking(1.4)
+        Spacer()
+        Button {
+          isShowingCalendar = true
+        } label: {
+          Image(systemName: "calendar")
+            .frame(width: 30, height: 26)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Open calendar browser")
+      }
+
+      HStack(spacing: 4) {
+        ForEach(dateStripDates, id: \.self) { date in
+          let day = day(for: date)
+          Button {
+            if let day { selectedDayID = day.id }
+          } label: {
+            VStack(spacing: 2) {
+              Text(date, format: .dateTime.day())
+                .font(.system(size: 14, weight: .bold))
+              Text(date, format: .dateTime.weekday(.abbreviated))
+                .font(.system(size: 8, weight: .semibold))
+                .textCase(.uppercase)
+            }
+            .foregroundStyle(
+              day?.id == selectedTimelineDay?.id ? world.editorialPaper : world.primaryText
+            )
+            .frame(maxWidth: .infinity, minHeight: 44)
+            .background {
+              RoundedRectangle(cornerRadius: 8)
+                .fill(
+                  day?.id == selectedTimelineDay?.id
+                    ? world.editorialInk : world.canvas.opacity(day == nil ? 0.14 : 0.54)
+                )
+            }
+            .overlay {
+              RoundedRectangle(cornerRadius: 8)
+                .stroke(world.separator.opacity(0.65), lineWidth: 0.75)
+            }
+          }
+          .buttonStyle(.plain)
+          .disabled(day == nil)
+          .opacity(day == nil ? 0.58 : 1)
+        }
+      }
+    }
+    .padding(10)
+    .background(world.canvas.opacity(0.7), in: RoundedRectangle(cornerRadius: 12))
+    .overlay {
+      RoundedRectangle(cornerRadius: 12)
+        .stroke(world.separator.opacity(0.72), lineWidth: 0.75)
+    }
+  }
+
+  private var iPhoneTimelineRail: some View {
+    VStack(alignment: .leading, spacing: 0) {
+      HStack {
+        Text(
+          selectedTimelineDay.map(displayDate(for:)) ?? stripAnchorDate,
+          format: .dateTime.weekday(.abbreviated).month(.abbreviated).day().year()
+        )
+        .font(.system(size: 10, weight: .bold))
+        .tracking(1.35)
+        .textCase(.uppercase)
+        .foregroundStyle(world.primaryText.opacity(0.86))
+
+        Spacer()
+
+        Text(selectedTimelineDay?.entryCount ?? 0, format: .number)
+          .font(.system(size: 10, weight: .bold))
+          .foregroundStyle(world.accent)
+      }
+      .padding(.horizontal, 4)
+      .padding(.bottom, 6)
+
+      if let selectedTimelineDay {
+        let entries = Array(selectedTimelineDay.entries.reversed())
+        ForEach(Array(entries.enumerated()), id: \.element.id) { index, entry in
+          NavigationLink {
+            destination(for: selectedTimelineDay, focusedEntryID: entry.id)
+          } label: {
+            iPhoneTimelineEntry(
+              entry,
+              index: index,
+              continues: index < entries.count - 1
+            )
+          }
+          .buttonStyle(.plain)
+          .accessibilityHint("Opens this entry in its day reflection")
+        }
+      }
+    }
+    .overlay(alignment: .bottomTrailing) {
+      Button(action: onCapture) {
+        Image(systemName: "plus")
+          .font(.system(size: 19, weight: .bold))
+          .foregroundStyle(world.editorialPaper)
+          .frame(width: 48, height: 48)
+          .background(world.editorialAccent, in: Circle())
+          .overlay {
+            Circle().stroke(world.editorialPaper.opacity(0.82), lineWidth: 1.5)
+          }
+          .shadow(color: world.contentShadow, radius: 9, y: 4)
+      }
+      .buttonStyle(.plain)
+      .padding(.trailing, 2)
+      .padding(.bottom, 8)
+      .accessibilityLabel("Capture a new entry")
+      .accessibilityHint("Opens Today and its journal composer")
+    }
+  }
+
+  private func iPhoneTimelineEntry(
+    _ entry: EchoEntry,
+    index: Int,
+    continues: Bool
+  ) -> some View {
+    let usesDarkCard = world.id == .covenantBlue && index.isMultiple(of: 2) == false
+    let cardFill = usesDarkCard ? world.surfaceFill.opacity(0.96) : world.editorialPaper
+    let cardInk = usesDarkCard ? world.primaryText : world.editorialInk
+    let cardMuted = usesDarkCard ? world.secondaryText : world.editorialMuted
+    let parts = timelineTextParts(entry.preferredText)
+
+    return HStack(alignment: .top, spacing: 8) {
+      VStack(spacing: 0) {
+        Circle()
+          .fill(world.accent)
+          .frame(width: 12, height: 12)
+          .overlay {
+            Circle().stroke(world.editorialPaper, lineWidth: 1.5)
+          }
+        if continues {
+          Rectangle()
+            .fill(world.accent)
+            .frame(width: 2)
+            .frame(maxHeight: .infinity)
+        }
+      }
+      .frame(width: 18)
+
+      HStack(spacing: 9) {
+        VStack(alignment: .leading, spacing: 2) {
+          Text(entry.createdAt, format: .dateTime.hour().minute())
+            .font(.system(size: 9, weight: .semibold))
+            .foregroundStyle(cardMuted)
+          Text(parts.title)
+            .font(.system(size: 14, weight: .bold, design: .serif))
+            .foregroundStyle(cardInk)
+            .lineLimit(1)
+          if let detail = parts.detail {
+            Text(detail)
+              .font(.system(size: 11))
+              .foregroundStyle(cardInk.opacity(0.82))
+              .lineLimit(2)
+          }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+
+        ZStack {
+          LinearGradient(
+            colors: [world.editorialAccent.opacity(0.9), world.editorialInk],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+          )
+          Image(systemName: entry.type == .voice ? "waveform" : "text.quote")
+            .font(.system(size: 13, weight: .semibold))
+            .foregroundStyle(world.editorialPaper)
+        }
+        .frame(width: 48, height: 54)
+        .clipShape(RoundedRectangle(cornerRadius: 7))
+        .accessibilityHidden(true)
+
+        Image(systemName: "ellipsis")
+          .font(.system(size: 11, weight: .bold))
+          .foregroundStyle(cardMuted)
+      }
+      .padding(.horizontal, 10)
+      .padding(.vertical, 8)
+      .background(cardFill, in: RoundedRectangle(cornerRadius: 10))
+      .overlay {
+        RoundedRectangle(cornerRadius: 10)
+          .stroke(world.separator.opacity(0.65), lineWidth: 0.75)
+      }
+      .padding(.bottom, 7)
+    }
+  }
+
+  private func timelineTextParts(_ text: String) -> (title: String, detail: String?) {
+    let words = text.split(whereSeparator: \.isWhitespace).map(String.init)
+    guard words.count > 5 else { return (text, nil) }
+    return (words.prefix(4).joined(separator: " "), words.dropFirst(4).joined(separator: " "))
+  }
+#endif
 
   private var timelineHeader: some View {
     VStack(alignment: .leading, spacing: EchoLayout.inlineSpacing) {
