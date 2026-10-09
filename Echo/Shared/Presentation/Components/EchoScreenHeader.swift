@@ -9,7 +9,7 @@ struct EchoScreenHeader: View {
   var body: some View {
     VStack(alignment: .leading, spacing: EchoLayout.tightSpacing) {
       Text(title)
-        .font(EchoTypography.screenTitle)
+        .font(world.displayFont(size: 34))
         .foregroundStyle(world.primaryText)
       Text(subtitle)
         .font(EchoTypography.screenSubtitle)

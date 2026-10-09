@@ -92,7 +92,8 @@ Feature screens consume semantic values. They must not switch on individual worl
 
 ### Gold Standard production treatment
 
-- `GoldStandardBackground.imageset` contains separate portrait and native 16:10 Mac compositions. Both use original generated journaling and worship imagery with no people, readable text, logos, personal media, or embedded location details.
+- Gold Standard uses five screen-specific artwork sets: `GoldStandardBackground` for Today, plus `GoldStandardTimelineBackground`, `GoldStandardReflectionBackground`, `GoldStandardHighlightsBackground`, and `GoldStandardCalendarBackground`. Every set provides a separately composed phone portrait and native 16:10 Mac image.
+- Timeline uses a charcoal journey rail over saturated gold; Reflection opens a cream writing field beside cross-shaped light; Highlights frames saved writing with worship-stage and notebook imagery; Calendar uses a disciplined black-and-gold month grid.
 - A blank journal, studio headphones, unbranded closed Bible, worship stage, and concrete steps stay near the outer edges. A broad mustard-gold field supports journal controls and reading surfaces.
 - Primary text uses near-black charcoal, secondary text uses warm umber, and charcoal is the principal action accent against gold. Deep green distinguishes saved state while oxblood remains reserved for errors.
 - Gold fills the environment and selected surfaces rather than appearing only as an outline. Warm cream panels preserve long-form readability without making the world feel like a generic white theme.

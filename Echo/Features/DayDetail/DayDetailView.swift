@@ -106,7 +106,7 @@ struct DayReflectionView: View {
         .tracking(1.5)
         .foregroundStyle(.secondary)
       Text("Make sense of the day.")
-        .font(EchoTypography.editorialDisplay)
+        .font(world.displayFont(size: 38, weight: .medium))
         .accessibilityAddTraits(.isHeader)
       Text("Your original entries stay intact while Echo shapes a readable narrative.")
         .font(EchoTypography.supporting)

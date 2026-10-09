@@ -51,6 +51,15 @@ Both outputs were reviewed before inclusion. They contain fictional generated co
 
 The generation brief requested a bold mustard-gold modern Christian worship-journal environment with a blank journal, unbranded closed Bible without readable text, fountain pen, studio headphones, empty worship stage, microphone, instruments in silhouette, concrete steps, church-window light, and restrained crown, waveform, and ruled-paper geometry. It prohibited people, faces, hands, plants, slogans, readable scripture or personal writing, real locations, logos, brands, watermarks, screens, UI, and journal entries.
 
+### Screen-specific Gold Standard artwork
+
+- **Assets:** `GoldStandardTimelineBackground.imageset`, `GoldStandardReflectionBackground.imageset`, `GoldStandardHighlightsBackground.imageset`, and `GoldStandardCalendarBackground.imageset`
+- **Created:** October 8, 2026
+- **Method:** OpenAI built-in image generation using the approved Gold Standard board and production world as references; each phone and Mac scene was composed independently
+- **Purpose:** Carry the bold gold worship-notes direction through every primary workflow instead of applying a shared yellow wallpaper
+
+Timeline received a charcoal journey rail and stage ascent; Reflection a warm-cream editorial field with cross light; Highlights a curated notebook, headphones, stage, microphone, and stair perimeter; Calendar a black-and-gold month grid with restrained faith and audio symbols. The briefs prohibited personal content, readable writing, people, plants, brands, app UI, and identifying locations.
+
 Both outputs were reviewed before inclusion. They contain fictional generated content only, use gold as an environmental field rather than a thin accent, preserve calm reading areas, and use independent portrait and 16:10 compositions.
 
 ## Covenant Blue backgrounds

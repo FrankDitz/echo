@@ -121,7 +121,15 @@ struct EchoVisualWorld {
     id: .goldStandard,
     displayName: "Gold Standard",
     paletteDescription: "Mustard gold, charcoal, warm cream, and burnished light.",
-    artwork: EchoVisualWorldArtwork(shared: "GoldStandardBackground"),
+    artwork: EchoVisualWorldArtwork(
+      today: "GoldStandardBackground",
+      timeline: "GoldStandardTimelineBackground",
+      reflection: "GoldStandardReflectionBackground",
+      highlights: "GoldStandardHighlightsBackground",
+      calendar: "GoldStandardCalendarBackground",
+      editor: "GoldStandardReflectionBackground",
+      settings: "GoldStandardBackground"
+    ),
     canvas: Color(red: 0.94, green: 0.63, blue: 0.06),
     primaryText: Color(red: 0.07, green: 0.06, blue: 0.045),
     secondaryText: Color(red: 0.17, green: 0.13, blue: 0.065),
@@ -194,6 +202,23 @@ struct EchoVisualWorld {
 
   func backgroundAssetName(for screen: EchoScreenRole) -> String {
     artwork.assetName(for: screen)
+  }
+
+  func displayFont(
+    size: CGFloat,
+    relativeTo textStyle: Font.TextStyle = .largeTitle,
+    weight: Font.Weight = .bold
+  ) -> Font {
+    if id == .goldStandard {
+      return Font.custom(
+        "Avenir Next Condensed",
+        size: size,
+        relativeTo: textStyle
+      )
+      .weight(.heavy)
+    }
+
+    return .system(size: size, weight: weight, design: .serif)
   }
 }
 

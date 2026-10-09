@@ -112,7 +112,7 @@ struct EchoBrandHeader: View {
   var body: some View {
     HStack(spacing: EchoLayout.contentSpacing) {
       Text("Echo")
-        .font(EchoTypography.wordmark)
+        .font(world.displayFont(size: 34))
         .foregroundStyle(world.primaryText)
         .shadow(color: world.contentShadow, radius: 8, y: 2)
         .accessibilityAddTraits(.isHeader)
