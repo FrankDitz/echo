@@ -126,7 +126,7 @@ Every deliverable uses a short-lived enterprise-named branch and pull request. P
 4. **Reflection workspace (complete):** make daily and weekly reading feel editorial at desktop scale, keep source provenance alongside the reflection, and keep organize, regenerate, and Carry Forward actions persistently reachable.
 5. **Highlights library (complete):** replace the generic card grid with a dense themed library that carries over the iPhone filters, type imagery, metadata, bookmark treatment, and source navigation while using additional columns responsibly.
 6. **Life Calendar workspace (complete):** strengthen the current-date state, month navigation, calendar grid, writing signals, and month comparison as one coherent desktop dashboard rather than two unrelated panels.
-7. **Utility and theme fidelity:** bring entry editing, Settings, sheets, empty/loading/error states, and all four visual worlds into the same desktop component language; verify contrast at supported window sizes and preserve keyboard and accessibility behavior.
+7. **Utility and theme fidelity (complete):** bring entry editing, Settings, sheets, empty/loading/error states, and all four visual worlds into the same desktop component language; verify contrast at supported window sizes and preserve keyboard and accessibility behavior.
 8. **Mac populated-state closeout:** exercise all tabs and themes with deterministic fictional data at minimum, default, and full-screen sizes; run full Mac and iPhone regression suites, privacy scans, and final visual comparison before Phase 13.
 
 ## Near-term improvements

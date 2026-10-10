@@ -43,11 +43,22 @@ struct EntryEditorView: View {
           editorHeader(isWide: isWide)
 
           ScrollView {
-            VStack(alignment: .leading, spacing: EchoLayout.contentSpacing) {
-              writingCanvas(isWide: isWide)
-              assistanceSection
+            Group {
+              if isWide && hasAssistanceContent {
+                HStack(alignment: .top, spacing: 22) {
+                  writingCanvas(isWide: true)
+                    .frame(maxWidth: 620, alignment: .topLeading)
+                  assistanceSection
+                    .frame(maxWidth: 430, alignment: .topLeading)
+                }
+              } else {
+                VStack(alignment: .leading, spacing: EchoLayout.contentSpacing) {
+                  writingCanvas(isWide: isWide)
+                  assistanceSection
+                }
+              }
             }
-            .frame(maxWidth: isWide ? 860 : EchoLayout.contentMaxWidth, alignment: .leading)
+            .frame(maxWidth: isWide ? 1080 : EchoLayout.contentMaxWidth, alignment: .leading)
             .padding(.horizontal, isWide ? 36 : EchoLayout.pageHorizontalPadding)
             .padding(.top, isWide ? 28 : EchoLayout.contentSpacing)
             .padding(.bottom, EchoLayout.sectionSpacing)
@@ -58,6 +69,7 @@ struct EntryEditorView: View {
       }
     }
     .frame(minWidth: 360, minHeight: 520)
+    .echoEditorMinimumSize()
     .interactiveDismissDisabled(isDirty)
     .confirmationDialog(
       "Discard unsaved changes?",
@@ -318,6 +330,10 @@ struct EntryEditorView: View {
     isDirty && containsWriting && !isSaving
   }
 
+  private var hasAssistanceContent: Bool {
+    assistedText != nil || isGeneratingAssistance || assistanceFailed
+  }
+
   private func save() {
     let text = draft
     isSaving = true
@@ -367,6 +383,17 @@ struct EntryEditorView: View {
       }
       isGeneratingAssistance = false
     }
+  }
+}
+
+extension View {
+  @ViewBuilder
+  fileprivate func echoEditorMinimumSize() -> some View {
+    #if os(macOS)
+      frame(minWidth: 1_060, minHeight: 680)
+    #else
+      self
+    #endif
   }
 }
 
