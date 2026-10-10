@@ -29,7 +29,11 @@ struct SettingsView: View {
               subtitle: "Choose the atmosphere that surrounds your writing."
             )
 
-            VStack(spacing: EchoLayout.rowSpacing) {
+            LazyVGrid(
+              columns: [GridItem(.adaptive(minimum: 280), spacing: EchoLayout.rowSpacing)],
+              alignment: .leading,
+              spacing: EchoLayout.rowSpacing
+            ) {
               ForEach(EchoVisualWorldID.allCases) { id in
                 VisualWorldOption(
                   world: EchoVisualWorld.resolve(id),
@@ -209,7 +213,7 @@ struct SettingsView: View {
             .font(EchoTypography.supporting)
             .foregroundStyle(visualWorldSelection.selectedWorld.secondaryText)
           }
-          .frame(maxWidth: EchoLayout.contentMaxWidth, alignment: .leading)
+          .frame(maxWidth: settingsContentMaxWidth, alignment: .leading)
           .padding(.horizontal, EchoLayout.pageHorizontalPadding)
           .padding(.vertical, EchoLayout.pageVerticalPadding)
           .frame(maxWidth: .infinity)
@@ -271,6 +275,14 @@ struct SettingsView: View {
     .onDisappear {
       privacyLockController.cancelAuthentication()
     }
+  }
+
+  private var settingsContentMaxWidth: CGFloat {
+#if os(macOS)
+    980
+#else
+    EchoLayout.contentMaxWidth
+#endif
   }
 
   private func exportButton(
@@ -366,7 +378,7 @@ extension View {
   @ViewBuilder
   fileprivate func echoSettingsMinimumSize() -> some View {
     #if os(macOS)
-      frame(minWidth: 620, minHeight: 720)
+      frame(minWidth: 880, minHeight: 720)
     #else
       self
     #endif
@@ -450,7 +462,7 @@ private struct VisualWorldOption: View {
 
             Text(world.paletteDescription)
               .font(EchoTypography.supporting)
-              .foregroundStyle(world.secondaryText)
+              .foregroundStyle(.secondary)
               .multilineTextAlignment(.leading)
           }
 
@@ -458,7 +470,7 @@ private struct VisualWorldOption: View {
 
           Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
             .font(.title2)
-            .foregroundStyle(isSelected ? world.accent : world.secondaryText)
+            .foregroundStyle(isSelected ? world.accent : .secondary)
             .accessibilityHidden(true)
         }
       }
