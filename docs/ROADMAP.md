@@ -116,6 +116,19 @@ Every deliverable uses a short-lived enterprise-named branch, is built and visua
 8. **iPhone populated-state closeout (complete):** exercise all tabs and themes with deterministic fictional data, Dynamic Type, VoiceOver semantics, reduced motion/transparency fallbacks, empty/error states, and dense writing; run full iPhone builds, tests, Mac regression build, and complete repository-safety checks before Phase 12.
 9. **iPhone visual polish (complete):** feather image-backed title contrast across all visual worlds, extend the custom navigation surface through the bottom safe area, and make the real current date explicit and reliably selected when opening or returning to Life Calendar.
 
+## Phase 12 deliverables
+
+Every deliverable uses a short-lived enterprise-named branch and pull request. Phase 12 preserves the iPhone compositions while translating their hierarchy, themed artwork, editorial surfaces, and interaction honesty into a purpose-built Mac workspace.
+
+1. **Desktop editorial shell:** replace the phone-like bottom bar with a persistent, theme-aware desktop navigation rail; consolidate the Echo brand, search, settings, privacy posture, selection state, and keyboard shortcuts without reducing content space at the top or bottom of the window.
+2. **Today workspace:** give capture a stable desktop writing desk, keep important and recent entries immediately scannable, and use the wide canvas for memory resurfacing without allowing cards to drift or collect at the bottom of large windows.
+3. **Timeline workspace:** align the themed masthead, search, date navigation, chronology rail, and selected-day entries into a clear master-detail workspace that retains the compact app's visual rhythm.
+4. **Reflection workspace:** make daily and weekly reading feel editorial at desktop scale, keep source provenance alongside the reflection, and keep organize, regenerate, and Carry Forward actions persistently reachable.
+5. **Highlights library:** replace the generic card grid with a dense themed library that carries over the iPhone filters, type imagery, metadata, bookmark treatment, and source navigation while using additional columns responsibly.
+6. **Life Calendar workspace:** strengthen the current-date state, month navigation, calendar grid, writing signals, and month comparison as one coherent desktop dashboard rather than two unrelated panels.
+7. **Utility and theme fidelity:** bring entry editing, Settings, sheets, empty/loading/error states, and all four visual worlds into the same desktop component language; verify contrast at supported window sizes and preserve keyboard and accessibility behavior.
+8. **Mac populated-state closeout:** exercise all tabs and themes with deterministic fictional data at minimum, default, and full-screen sizes; run full Mac and iPhone regression suites, privacy scans, and final visual comparison before Phase 13.
+
 ## Near-term improvements
 
 - Search and calendar browsing
