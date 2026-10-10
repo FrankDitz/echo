@@ -463,19 +463,43 @@ struct DayDetailView: View {
         ScrollViewReader { proxy in
           ScrollView {
             if geometry.size.width >= EchoLayout.wideLayoutBreakpoint {
-              HStack(alignment: .top, spacing: 42) {
-                VStack(alignment: .leading, spacing: EchoLayout.sectionSpacing) {
-                  dayHeader
-                  DayReflectionSection(
-                    viewModel: organizationViewModel,
-                    sourceDay: day.id,
-                    isCompact: false
-                  )
+              HStack(alignment: .top, spacing: 24) {
+                CompactDayReflectionReader(
+                  day: day,
+                  displayDate: displayDate,
+                  focusedEntryID: focusedEntryID,
+                  viewModel: organizationViewModel,
+                  highlightViewModel: highlightViewModel,
+                  showsSourceEntries: false
+                )
+                .frame(maxWidth: 720, alignment: .topLeading)
+                .clipShape(RoundedRectangle(cornerRadius: 18))
+                .overlay {
+                  RoundedRectangle(cornerRadius: 18)
+                    .stroke(world.separator, lineWidth: EchoShape.hairlineWidth)
                 }
-                .frame(maxWidth: 610, alignment: .leading)
+                .shadow(color: world.contentShadow.opacity(0.2), radius: 20, y: 8)
 
-                entries
-                  .frame(maxWidth: 440, alignment: .topLeading)
+                VStack(alignment: .leading, spacing: 14) {
+                  HStack {
+                    VStack(alignment: .leading, spacing: 3) {
+                      Text("ORIGINAL WRITING")
+                        .font(EchoTypography.editorialEyebrow)
+                        .tracking(1.4)
+                        .foregroundStyle(world.accent)
+                      Text("Source ledger")
+                        .font(EchoTypography.contentTitle)
+                    }
+                    Spacer()
+                    Label("Unchanged", systemImage: "lock.fill")
+                      .font(EchoTypography.metadata)
+                      .foregroundStyle(world.secondaryText)
+                  }
+                  .padding(.horizontal, 4)
+
+                  entries
+                }
+                .frame(maxWidth: 430, alignment: .topLeading)
               }
               .frame(maxWidth: EchoLayout.wideContentMaxWidth, alignment: .topLeading)
               .padding(.horizontal, 40)
@@ -530,7 +554,8 @@ struct DayDetailView: View {
       displayDate: displayDate,
       focusedEntryID: focusedEntryID,
       viewModel: organizationViewModel,
-      highlightViewModel: highlightViewModel
+      highlightViewModel: highlightViewModel,
+      showsSourceEntries: true
     )
     .frame(maxWidth: EchoLayout.contentMaxWidth)
     .frame(maxWidth: .infinity)
@@ -626,6 +651,7 @@ private struct CompactDayReflectionReader: View {
   let focusedEntryID: UUID?
   let viewModel: DayOrganizationViewModel
   let highlightViewModel: EntryHighlightViewModel
+  let showsSourceEntries: Bool
 
   @Environment(\.echoVisualWorld) private var world
   @Environment(CarryForwardViewModel.self) private var carryForwardViewModel
@@ -753,36 +779,38 @@ private struct CompactDayReflectionReader: View {
       .scrollIndicators(.hidden)
     }
 
-    sectionHeading("Source Entries", count: day.entryCount)
+    if showsSourceEntries {
+      sectionHeading("Source Entries", count: day.entryCount)
 
-    VStack(spacing: 0) {
-      ForEach(Array(day.entries.enumerated()), id: \.element.id) { index, entry in
-        CompactReflectionSourceRow(
-          entry: entry,
-          visualIndex: index,
-          isFocused: entry.id == focusedEntryID,
-          isReflectionSource: journal.sourceEntryIDs.contains(entry.id),
-          highlightViewModel: highlightViewModel,
-          onCarryForward: {
-            await carryForwardViewModel.carryToTomorrow(
-              text: entry.preferredText,
-              sourceKind: .entry,
-              sourceDay: day.id,
-              sourceEntryID: entry.id
-            )
+      VStack(spacing: 0) {
+        ForEach(Array(day.entries.enumerated()), id: \.element.id) { index, entry in
+          CompactReflectionSourceRow(
+            entry: entry,
+            visualIndex: index,
+            isFocused: entry.id == focusedEntryID,
+            isReflectionSource: journal.sourceEntryIDs.contains(entry.id),
+            highlightViewModel: highlightViewModel,
+            onCarryForward: {
+              await carryForwardViewModel.carryToTomorrow(
+                text: entry.preferredText,
+                sourceKind: .entry,
+                sourceDay: day.id,
+                sourceEntryID: entry.id
+              )
+            }
+          )
+          .id(entry.id)
+
+          if entry.id != day.entries.last?.id {
+            Divider().overlay(world.editorialInk.opacity(0.12))
           }
-        )
-        .id(entry.id)
-
-        if entry.id != day.entries.last?.id {
-          Divider().overlay(world.editorialInk.opacity(0.12))
         }
       }
-    }
-    .background(world.editorialInk.opacity(0.035), in: RoundedRectangle(cornerRadius: 12))
-    .overlay {
-      RoundedRectangle(cornerRadius: 12)
-        .stroke(world.editorialInk.opacity(0.13), lineWidth: 0.75)
+      .background(world.editorialInk.opacity(0.035), in: RoundedRectangle(cornerRadius: 12))
+      .overlay {
+        RoundedRectangle(cornerRadius: 12)
+          .stroke(world.editorialInk.opacity(0.13), lineWidth: 0.75)
+      }
     }
 
     if !journal.keyMoments.isEmpty {
