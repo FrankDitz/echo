@@ -77,7 +77,7 @@ struct TodayView: View {
       quickCaptureActions
       voiceStatus
       entrySection(isWide: false)
-      memorySection
+      memorySection()
     }
     .frame(maxWidth: EchoLayout.contentMaxWidth, alignment: .leading)
     .padding(.horizontal, EchoLayout.pageHorizontalPadding)
@@ -99,7 +99,7 @@ struct TodayView: View {
         voiceStatus
         iPhoneImportantSection
         iPhoneRecentEntries
-        memorySection
+        memorySection()
           .padding(.top, 4)
       }
       .padding(.horizontal, 18)
@@ -430,7 +430,7 @@ struct TodayView: View {
 #endif
 
   private func wideContent(availableSize: CGSize) -> some View {
-    VStack(alignment: .leading, spacing: 30) {
+    VStack(alignment: .leading, spacing: 24) {
       HStack(spacing: EchoLayout.rowSpacing) {
         Capsule()
           .fill(world.accent)
@@ -453,28 +453,125 @@ struct TodayView: View {
           .foregroundStyle(world.secondaryText)
       }
 
-      HStack(alignment: .top, spacing: 72) {
-        VStack(alignment: .leading, spacing: EchoLayout.contentSpacing) {
-          todayHero(isWide: true)
-          promptHeader(isWide: true)
-          carryForwardCard
-          captureControl
-          quickCaptureActions
-          voiceStatus
-          memorySection
+      HStack(alignment: .top, spacing: 24) {
+        VStack(alignment: .leading, spacing: 24) {
+          desktopWritingDesk
+          memorySection(isWide: true)
         }
-        .frame(maxWidth: 610, alignment: .leading)
+        .frame(maxWidth: .infinity, alignment: .leading)
 
-        entrySection(isWide: true)
-          .frame(width: min(max(availableSize.width * 0.34, 390), 470))
+        VStack(alignment: .leading, spacing: 16) {
+          desktopImportantCard
+          entrySection(isWide: true)
+        }
+        .frame(width: min(max(availableSize.width * 0.34, 410), 500))
       }
-
     }
     .frame(maxWidth: EchoLayout.wideContentMaxWidth, alignment: .leading)
     .padding(.horizontal, 40)
     .padding(.top, 44)
     .padding(.bottom, 64)
     .frame(maxWidth: .infinity, minHeight: max(availableSize.height, 0), alignment: .top)
+  }
+
+  private var desktopWritingDesk: some View {
+    VStack(alignment: .leading, spacing: 0) {
+      VStack(alignment: .leading, spacing: 16) {
+        todayHero(isWide: true)
+        promptHeader(isWide: true)
+      }
+      .frame(maxWidth: .infinity, minHeight: 220, alignment: .bottomLeading)
+      .padding(30)
+      .background {
+        EchoArtworkTitleScrim()
+        LinearGradient(
+          colors: [.clear, world.canvas.opacity(0.34)],
+          startPoint: .topTrailing,
+          endPoint: .bottomLeading
+        )
+      }
+
+      VStack(alignment: .leading, spacing: 16) {
+        HStack(alignment: .firstTextBaseline) {
+          Text("CAPTURE A THOUGHT")
+            .font(EchoTypography.editorialEyebrow)
+            .tracking(1.5)
+            .foregroundStyle(world.accent)
+          Spacer()
+          Text("⌘ RETURN TO SAVE")
+            .font(EchoTypography.metadata)
+            .tracking(0.8)
+            .foregroundStyle(world.secondaryText)
+        }
+
+        carryForwardCard
+        captureControl
+        quickCaptureActions
+        voiceStatus
+      }
+      .padding(24)
+      .background(world.surfaceFill.opacity(0.88))
+    }
+    .clipShape(RoundedRectangle(cornerRadius: 18))
+    .overlay {
+      RoundedRectangle(cornerRadius: 18)
+        .stroke(world.separator, lineWidth: EchoShape.hairlineWidth)
+    }
+    .shadow(color: world.contentShadow.opacity(0.2), radius: 20, y: 8)
+  }
+
+  @ViewBuilder
+  private var desktopImportantCard: some View {
+    if let entry = desktopImportantEntry {
+      VStack(alignment: .leading, spacing: 14) {
+        HStack {
+          Label("IMPORTANT", systemImage: "bookmark.fill")
+            .font(EchoTypography.editorialEyebrow)
+            .tracking(1.4)
+            .foregroundStyle(world.accent)
+          Spacer()
+          Button("See highlights", action: onOpenHighlights)
+            .buttonStyle(.plain)
+            .font(EchoTypography.metadata.weight(.semibold))
+            .foregroundStyle(world.secondaryText)
+        }
+
+        Button {
+          selectedEntry = entry
+        } label: {
+          VStack(alignment: .leading, spacing: 8) {
+            Text(entry.preferredText)
+              .font(world.displayFont(size: 24, weight: .bold))
+              .lineSpacing(3)
+              .lineLimit(3)
+              .multilineTextAlignment(.leading)
+            Text(entry.createdAt, format: .dateTime.month(.abbreviated).day().year())
+              .font(EchoTypography.metadata)
+              .foregroundStyle(world.secondaryText)
+          }
+          .frame(maxWidth: .infinity, alignment: .leading)
+          .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+      }
+      .padding(20)
+      .background {
+        RoundedRectangle(cornerRadius: 14)
+          .fill(.ultraThinMaterial)
+        RoundedRectangle(cornerRadius: 14)
+          .fill(world.surfaceFill.opacity(0.78))
+      }
+      .overlay {
+        RoundedRectangle(cornerRadius: 14)
+          .stroke(world.accent.opacity(0.45), lineWidth: 1)
+      }
+      .shadow(color: world.contentShadow.opacity(0.14), radius: 12, y: 5)
+    }
+  }
+
+  private var desktopImportantEntry: EchoEntry? {
+    viewModel.entries.reversed().first(where: { highlightViewModel.isHighlighted($0.id) })
+      ?? viewModel.memories.saved.first
   }
 
   private func promptHeader(isWide: Bool) -> some View {
@@ -665,8 +762,14 @@ struct TodayView: View {
   private func entrySection(isWide: Bool) -> some View {
     VStack(alignment: .leading, spacing: 0) {
       HStack {
-        Text("Entries")
-          .font(.headline.weight(.semibold))
+        VStack(alignment: .leading, spacing: 2) {
+          Text("RECENT ENTRIES")
+            .font(EchoTypography.editorialEyebrow)
+            .tracking(1.3)
+            .foregroundStyle(world.accent)
+          Text("Today’s writing")
+            .font(EchoTypography.contentTitle)
+        }
 
         Spacer()
 
@@ -768,10 +871,11 @@ struct TodayView: View {
     )
   }
 
-  private var memorySection: some View {
+  private func memorySection(isWide: Bool = false) -> some View {
     TodayMemorySection(
       snapshot: viewModel.memories,
       isLoading: viewModel.isLoadingMemories,
+      isWide: isWide,
       onOpen: { selectedEntry = $0 }
     )
   }
@@ -831,6 +935,7 @@ struct TodayView: View {
 private struct TodayMemorySection: View {
   let snapshot: TodayMemorySnapshot
   let isLoading: Bool
+  let isWide: Bool
   let onOpen: (EchoEntry) -> Void
 
   var body: some View {
@@ -851,6 +956,16 @@ private struct TodayMemorySection: View {
           Label("Your memories will gather here as you write.", systemImage: "sparkles")
             .font(EchoTypography.supporting)
             .foregroundStyle(world.secondaryText)
+        }
+      } else if isWide {
+        LazyVGrid(
+          columns: [GridItem(.adaptive(minimum: 250), spacing: EchoLayout.contentSpacing)],
+          alignment: .leading,
+          spacing: EchoLayout.contentSpacing
+        ) {
+          ForEach(populatedLanes) { lane in
+            memoryLane(lane)
+          }
         }
       } else {
         ScrollView(.horizontal) {
