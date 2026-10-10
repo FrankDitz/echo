@@ -224,20 +224,42 @@ struct HighlightsView: View {
   }
 
   private var highlightsHeader: some View {
-    VStack(alignment: .leading, spacing: EchoLayout.inlineSpacing) {
-      Text("SAVED WRITING")
-        .font(EchoTypography.editorialEyebrow)
-        .tracking(1.5)
-        .foregroundStyle(world.accent)
+    HStack(alignment: .bottom, spacing: 24) {
+      VStack(alignment: .leading, spacing: EchoLayout.inlineSpacing) {
+        Text("SAVED WRITING")
+          .font(EchoTypography.editorialEyebrow)
+          .tracking(1.5)
+          .foregroundStyle(world.accent)
 
-      Text("Highlights")
-        .font(world.displayFont(size: 38, weight: .medium))
-        .foregroundStyle(world.primaryText)
-        .accessibilityAddTraits(.isHeader)
+        Text("Highlights")
+          .font(world.displayFont(size: 48, weight: .bold))
+          .foregroundStyle(world.primaryText)
+          .accessibilityAddTraits(.isHeader)
 
-      Text("Meaningful moments, kept close.")
-        .font(EchoTypography.supporting)
-        .foregroundStyle(world.primaryText.opacity(0.82))
+        Text("TRUTH WORTH RETURNING TO.")
+          .font(EchoTypography.editorialEyebrow)
+          .tracking(1.8)
+          .foregroundStyle(world.primaryText.opacity(0.84))
+      }
+
+      Spacer()
+
+      VStack(alignment: .trailing, spacing: 2) {
+        Text(viewModel.items.count, format: .number)
+          .font(world.displayFont(size: 34, weight: .bold))
+        Text(viewModel.items.count == 1 ? "SAVED MOMENT" : "SAVED MOMENTS")
+          .font(EchoTypography.metadata)
+          .tracking(1.1)
+          .foregroundStyle(world.secondaryText)
+      }
+    }
+    .padding(26)
+    .frame(maxWidth: .infinity, minHeight: 164, alignment: .bottomLeading)
+    .background { EchoArtworkTitleScrim() }
+    .clipShape(RoundedRectangle(cornerRadius: 18))
+    .overlay {
+      RoundedRectangle(cornerRadius: 18)
+        .stroke(world.separator.opacity(0.75), lineWidth: EchoShape.hairlineWidth)
     }
     .shadow(color: world.contentShadow, radius: 10, y: 3)
     .accessibilityElement(children: .combine)
@@ -273,24 +295,24 @@ struct HighlightsView: View {
         } else if isWide {
           LazyVGrid(
             columns: [
-              GridItem(.flexible(), spacing: EchoLayout.contentSpacing, alignment: .top),
-              GridItem(.flexible(), spacing: EchoLayout.contentSpacing, alignment: .top),
+              GridItem(
+                .adaptive(minimum: 300, maximum: 400),
+                spacing: EchoLayout.contentSpacing,
+                alignment: .top
+              )
             ],
             alignment: .leading,
             spacing: EchoLayout.contentSpacing
           ) {
-            ForEach(filteredItems) { item in
-              EchoReadabilityPanel(padding: 0) {
-                HighlightedEntryRow(
-                  item: item,
-                  onOpen: { selectedItem = item },
-                  onRemove: {
-                    Task {
-                      await viewModel.remove(entryID: item.entry.id)
-                    }
-                  }
-                )
-              }
+            ForEach(Array(filteredItems.enumerated()), id: \.element.id) { index, item in
+              CompactHighlightedEntryCard(
+                item: item,
+                visualIndex: index,
+                onOpen: { selectedItem = item },
+                onRemove: {
+                  Task { await viewModel.remove(entryID: item.entry.id) }
+                }
+              )
             }
           }
         } else {
