@@ -30,25 +30,7 @@ struct AppShellView: View {
 
   var body: some View {
     ZStack {
-      NavigationStack {
-        selectedContent
-          .id(selection)
-          .transition(.opacity)
-          .safeAreaInset(edge: .top, spacing: 0) {
-            EchoBrandHeader(
-              showSearch: {
-                selection = .timeline
-                isSearchRequested = true
-              },
-              showSettings: {
-                isShowingSettings = true
-              }
-            )
-          }
-          .safeAreaInset(edge: .bottom, spacing: 0) {
-            primaryNavigation
-          }
-      }
+      applicationChrome
       .accessibilityHidden(isPrivacyShieldVisible)
       if !privacyLockController.isApplicationActive || privacyLockController.isLocked {
         EchoPrivacyShield(
@@ -103,6 +85,49 @@ struct AppShellView: View {
 
   private var primaryNavigation: some View {
     EchoPrimaryNavigation(selection: $selection)
+  }
+
+  @ViewBuilder
+  private var applicationChrome: some View {
+#if os(macOS)
+    GeometryReader { proxy in
+      HStack(spacing: 0) {
+        EchoDesktopNavigation(
+          selection: $selection,
+          isCompact: proxy.size.width < 1_080,
+          showSearch: openSearch,
+          showSettings: { isShowingSettings = true }
+        )
+
+        NavigationStack {
+          selectedContent
+            .id(selection)
+            .transition(.opacity)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+      }
+    }
+#else
+    NavigationStack {
+      selectedContent
+        .id(selection)
+        .transition(.opacity)
+        .safeAreaInset(edge: .top, spacing: 0) {
+          EchoBrandHeader(
+            showSearch: openSearch,
+            showSettings: { isShowingSettings = true }
+          )
+        }
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+          primaryNavigation
+        }
+    }
+#endif
+  }
+
+  private func openSearch() {
+    selection = .timeline
+    isSearchRequested = true
   }
 
   @ViewBuilder
