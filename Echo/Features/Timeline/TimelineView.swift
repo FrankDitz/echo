@@ -27,18 +27,7 @@ struct TimelineView: View {
 
           Group {
             if isWide {
-              HStack(alignment: .top, spacing: 48) {
-                VStack(alignment: .leading, spacing: EchoLayout.compactSectionSpacing) {
-                  timelineHeader
-                  searchControl
-                }
-                .frame(width: 300, alignment: .leading)
-
-                LazyVStack(alignment: .leading, spacing: EchoLayout.compactSectionSpacing) {
-                  timelineContent(isWide: true)
-                }
-                .frame(maxWidth: 760, alignment: .leading)
-              }
+              desktopTimelineWorkspace
             } else {
 #if os(iOS)
               iPhoneTimelineContent
@@ -381,6 +370,142 @@ struct TimelineView: View {
     .shadow(color: world.contentShadow, radius: 10, y: 3)
     .accessibilityElement(children: .combine)
     .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+  }
+
+  private var desktopTimelineWorkspace: some View {
+    VStack(alignment: .leading, spacing: 24) {
+      HStack(alignment: .bottom, spacing: 48) {
+        timelineHeader
+          .frame(maxWidth: .infinity, alignment: .leading)
+        searchControl
+          .frame(width: 420)
+      }
+
+      if containsSearchQuery {
+        searchContent
+          .frame(maxWidth: 980, alignment: .leading)
+      } else if viewModel.isLoading && viewModel.days.isEmpty {
+        EchoLoadingState(title: "Loading your timeline…")
+      } else if viewModel.days.isEmpty {
+        EchoSurface {
+          EchoEmptyState(
+            title: "Your story starts here",
+            systemImage: "clock.arrow.circlepath",
+            description: "Days with journal entries will gather here over time.",
+            minHeight: EchoLayout.compactStateHeight
+          )
+        }
+      } else {
+        HStack(alignment: .top, spacing: 22) {
+          desktopDayNavigator
+            .frame(width: 280)
+          timelineRail
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+      }
+
+      if viewModel.failure != nil {
+        EchoErrorState(
+          message: "The timeline could not be refreshed. Showing the last loaded days."
+        )
+      }
+    }
+  }
+
+  private var desktopDayNavigator: some View {
+    VStack(alignment: .leading, spacing: 0) {
+      HStack {
+        VStack(alignment: .leading, spacing: 3) {
+          Text("RECENT DAYS")
+            .font(EchoTypography.editorialEyebrow)
+            .tracking(1.4)
+            .foregroundStyle(world.accent)
+          Text(stripDateRangeLabel)
+            .font(EchoTypography.metadata)
+            .foregroundStyle(world.secondaryText)
+        }
+        Spacer()
+        Button {
+          isShowingCalendar = true
+        } label: {
+          Image(systemName: "calendar")
+            .frame(width: 30, height: 30)
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(world.accent)
+        .accessibilityLabel("Open calendar browser")
+      }
+      .padding(18)
+
+      Divider().overlay(world.separator)
+
+      ForEach(dateStripDates.reversed(), id: \.self) { date in
+        let day = day(for: date)
+        Button {
+          if let day { selectedDayID = day.id }
+        } label: {
+          HStack(spacing: 14) {
+            VStack(spacing: 1) {
+              Text(date, format: .dateTime.day())
+                .font(world.displayFont(size: 25, weight: .bold))
+              Text(date, format: .dateTime.weekday(.abbreviated))
+                .font(EchoTypography.metadata)
+                .textCase(.uppercase)
+            }
+            .frame(width: 46)
+
+            VStack(alignment: .leading, spacing: 3) {
+              Text(date, format: .dateTime.month(.wide))
+                .font(EchoTypography.body.weight(.semibold))
+              Text(day.map { "\($0.entryCount) \($0.entryCount == 1 ? "entry" : "entries")" } ?? "No writing")
+                .font(EchoTypography.metadata)
+                .foregroundStyle(world.secondaryText)
+            }
+
+            Spacer()
+            Circle()
+              .fill(day == nil ? world.separator : world.accent)
+              .frame(width: 7, height: 7)
+          }
+          .foregroundStyle(
+            day?.id == selectedTimelineDay?.id ? world.editorialPaper : world.primaryText
+          )
+          .padding(.horizontal, 14)
+          .frame(minHeight: 66)
+          .background(
+            day?.id == selectedTimelineDay?.id
+              ? world.editorialInk.opacity(0.94) : Color.clear
+          )
+          .overlay(alignment: .leading) {
+            if day?.id == selectedTimelineDay?.id {
+              Rectangle()
+                .fill(world.accent)
+                .frame(width: 4)
+            }
+          }
+          .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .disabled(day == nil)
+        .opacity(day == nil ? 0.62 : 1)
+
+        if date != dateStripDates.first {
+          Divider().overlay(world.separator.opacity(0.65))
+        }
+      }
+    }
+    .background {
+      RoundedRectangle(cornerRadius: 16)
+        .fill(.ultraThinMaterial)
+      RoundedRectangle(cornerRadius: 16)
+        .fill(world.surfaceFill.opacity(0.7))
+    }
+    .clipShape(RoundedRectangle(cornerRadius: 16))
+    .overlay {
+      RoundedRectangle(cornerRadius: 16)
+        .stroke(world.separator, lineWidth: EchoShape.hairlineWidth)
+    }
+    .shadow(color: world.contentShadow.opacity(0.16), radius: 16, y: 6)
   }
 
   @ViewBuilder
