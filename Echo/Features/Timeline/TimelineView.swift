@@ -903,16 +903,42 @@ struct LifeCalendarView: View {
           let isWide = proxy.size.width >= EchoLayout.wideLayoutBreakpoint
 
           VStack(alignment: .leading, spacing: EchoLayout.sectionSpacing) {
-            VStack(alignment: .leading, spacing: EchoLayout.inlineSpacing) {
-              Text("Life Calendar")
-                .font(world.displayFont(size: isWide ? 58 : 46, weight: .black))
-                .foregroundStyle(world.primaryText)
-                .accessibilityAddTraits(.isHeader)
+            HStack(alignment: .bottom, spacing: 24) {
+              VStack(alignment: .leading, spacing: EchoLayout.inlineSpacing) {
+                Text("Life Calendar")
+                  .font(world.displayFont(size: isWide ? 58 : 46, weight: .black))
+                  .foregroundStyle(world.primaryText)
+                  .accessibilityAddTraits(.isHeader)
 
-              Text("A MONTH IN PERSPECTIVE")
-                .font(EchoTypography.editorialEyebrow)
-                .tracking(1.6)
-                .foregroundStyle(world.accent)
+                Text("A MONTH IN PERSPECTIVE")
+                  .font(EchoTypography.editorialEyebrow)
+                  .tracking(1.6)
+                  .foregroundStyle(world.accent)
+              }
+
+              if isWide {
+                Spacer()
+                VStack(alignment: .trailing, spacing: 2) {
+                  Text(monthDaysWithEntries.count, format: .number)
+                    .font(world.displayFont(size: 34, weight: .bold))
+                  Text("DAYS WITH WRITING")
+                    .font(EchoTypography.metadata)
+                    .tracking(1.1)
+                    .foregroundStyle(world.secondaryText)
+                }
+              }
+            }
+            .padding(isWide ? 26 : 0)
+            .frame(maxWidth: .infinity, minHeight: isWide ? 154 : nil, alignment: .bottomLeading)
+            .background {
+              if isWide { EchoArtworkTitleScrim() }
+            }
+            .clipShape(RoundedRectangle(cornerRadius: isWide ? 18 : 0))
+            .overlay {
+              if isWide {
+                RoundedRectangle(cornerRadius: 18)
+                  .stroke(world.separator.opacity(0.72), lineWidth: EchoShape.hairlineWidth)
+              }
             }
             .shadow(color: world.contentShadow, radius: 10, y: 3)
             .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
@@ -1320,6 +1346,8 @@ struct LifeCalendarView: View {
           }
         }
 
+        compactSelectedDateBanner
+
         LazyVGrid(columns: calendarColumns, spacing: EchoLayout.tightSpacing) {
           ForEach(Array(rotatedWeekdaySymbols.enumerated()), id: \.offset) { _, symbol in
             Text(symbol.uppercased())
@@ -1374,6 +1402,27 @@ struct LifeCalendarView: View {
   private var monthPerspective: some View {
     EchoReadabilityPanel {
       VStack(alignment: .leading, spacing: EchoLayout.contentSpacing) {
+        VStack(alignment: .leading, spacing: 6) {
+          Label(
+            selectedDateContextLabel,
+            systemImage: isSelectedDateToday ? "crown.fill" : "calendar"
+          )
+          .font(EchoTypography.editorialEyebrow)
+          .tracking(1.3)
+          .foregroundStyle(world.accent)
+          Text(
+            selectedDisplayDate,
+            format: .dateTime.weekday(.wide).month(.wide).day().year()
+          )
+          .font(world.displayFont(size: 24, weight: .bold))
+          Text(selectedDaySummary)
+            .font(EchoTypography.supporting)
+            .foregroundStyle(world.secondaryText)
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(world.accent.opacity(0.12), in: RoundedRectangle(cornerRadius: 12))
+
         VStack(alignment: .leading, spacing: EchoLayout.microSpacing) {
           Text("THIS MONTH")
             .font(EchoTypography.editorialEyebrow)
@@ -1445,6 +1494,18 @@ struct LifeCalendarView: View {
 
   private var isSelectedDateToday: Bool {
     calendar.isDateInToday(selectedDisplayDate)
+  }
+
+  private var selectedCalendarDay: EchoDay? {
+    let identifier = EchoDayIdentifier(containing: selectedDisplayDate, calendar: calendar)
+    return days.first(where: { $0.id == identifier })
+  }
+
+  private var selectedDaySummary: String {
+    guard let selectedCalendarDay else { return "No writing saved for this day." }
+    return selectedCalendarDay.entryCount == 1
+      ? "1 entry saved on this day."
+      : "\(selectedCalendarDay.entryCount) entries saved on this day."
   }
 
   private var selectedDateContextLabel: String {
